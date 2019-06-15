@@ -921,10 +921,10 @@ begin
 		if (StrPosCopy(ddSuggested.Items[i], ' ', True) = EditorID(tempRecord)) then
 			tempBoolean := True;
 	if not tempBoolean then begin
-		ddSuggested.Items.AddObject(EditorID(tempRecord)+' (Level: '+IntToStr(IntWithinStr(AssociatedComponent('Level: ', frm)))+')', TObject(tempRecord));
+		ddSuggested.Items.AddObject(EditorID(tempRecord)+' (Level: '+IntToStr(IntWithinStr(AssociatedComponent('Level: ', frm).Caption))+')', TObject(tempRecord));
 		if not slContains(slGlobal, '-/-'+tempString) then
 			slGlobal.AddObject('-/-'+tempString+'='+IntToStr(tempInteger), TObject(tempRecord));
-		if CaptionExists('Added', frm) then begin
+		if CaptionExists('Added', frm) then \
 			AssociatedComponent('Added', frm).Caption := ddLeveledList.Items[ddLeveledList.ItemIndex];
 		end else begin
 			tempObject := TLabel.Create(frm);
@@ -2220,7 +2220,7 @@ var
 begin
 ////////////////////////////////////////////////////////////////////// PREP SECTION /////////////////////////////////////////////////////////////////////////////////////////
 // Begin debugMsg Section
-  debugMsg := True;
+  debugMsg := False;
 	
 	// Initialize Local
 	slTemplate := TStringList.Create;
