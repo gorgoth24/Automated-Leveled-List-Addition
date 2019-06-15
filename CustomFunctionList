@@ -2611,13 +2611,13 @@ begin
 		slBOD2.Free;
 		Exit;
 	end;
-			
+	
 ////////////////////////////////////////////////////////////////////// TIER ASSIGNMENT ////////////////////////////////////////////////////////////////////////////////////////////
 	slItem.Clear;
 	// Weapon tier detection
+	itemType := GetItemType(aRecord);
 	if (record_sig = 'WEAP') or (record_sig = 'AMMO') then begin {Debug} if debugMsg then msg('['+record_full+'] Begin Weapon Detection');
 		// Get selected record type
-		itemType := GetItemType(aRecord);
 		{Debug} if debugMsg then msg('[GetTemplate] [Tier Assignment] itemType := '+itemType);
 		// Assign tiers
 		{Debug} if debugMsg then msg('[GetTemplate] [Tier Assignment] Assign Tiers');
@@ -2642,7 +2642,6 @@ begin
 	// Armor tier detection
 	if (record_sig = 'ARMO') then begin {Debug} if debugMsg then msg('[Tier Assignment] Begin Armor Detection');
 	// Get selected record type
-		itemType := GetItemType(aRecord);
 		// Assign tiers
 		{Debug} if debugMsg then msg('[GetTemplate] Assign Tiers');
 		slTemp.CommaText := 'Necklace, Ring, Circlet';
@@ -2653,7 +2652,39 @@ begin
 			end else
 				tempString := 'BOD2';
 			{Debug} if debugMsg then msg('[GetTemplate] [Tier Assignment] geev( '+EditorID(aRecord)+', BOD2\Armor Type) := '+geev(aRecord, 'BOD2\Armor Type'));
-			if (geev(aRecord, tempString+'\Armor Type') = 'Light Armor') then begin {Debug} if debugMsg then msg('[TIER ASSIGNMENT] Begin Light Armor Detection');
+			if (geev(aRecord, tempString+'\Armor Type') = 'Clothing') then begin {Debug} if debugMsg then msg('[TIER ASSIGNMENT] Begin Clothing Detection');
+				if (itemType = 'Cuirass') then begin
+					if StrWithinStr(full(aRecord), 'Fine') then begin
+						slItem.CommaText := '00086991, 000CEE80';
+					end else
+						slItem.CommaText := '0001BE1A, 000209A6, 000261C0, 0003452E';
+					Result := GetRecordByFormID(slItem[Random(slItem.Count)]);
+				end else if (itemType = 'Helmet') then begin
+					if StrWithinStr(full(aRecord), 'Fine') then begin
+						slItem.CommaText := '000CEE84';
+					end else
+						slItem.CommaText := '00017696, 000330B3, 000209AA, 000330BC';			
+					Result := GetRecordByFormID(slItem[Random(slItem.Count)]);
+				end else if (itemType = 'Gauntlets') then begin
+					Result := GetRecordByFormID('000261C1');
+				end else if (itemType = 'Boots') then begin
+					if StrWithinStr(full(aRecord), 'Fine') then begin
+						slItem.CommaText := '00086993, 000CEE82';
+					end else
+						slItem.CommaText := '0001BE1B, 000209A5, 000261BD, 0003452F';
+					Result := GetRecordByFormID(slItem[Random(slItem.Count)]);
+				end else if (itemType = 'Necklace') then begin
+					Result := GetRecordByFormID('0009171B');
+				end else if (itemType = 'Ring') then begin
+					Result := GetRecordByFormID('000877AB');
+				end else if (itemType = 'Circlet') then begin
+					Result := GetRecordByFormID('000166FF');
+				end;
+				slTemp.Free;
+				slItem.Free;
+				slBOD2.Free;
+				Exit;
+			end else if (geev(aRecord, tempString+'\Armor Type') = 'Light Armor') then begin {Debug} if debugMsg then msg('[TIER ASSIGNMENT] Begin Light Armor Detection');
 				slTemp.CommaText := 'Hide, Leather, Elven, Scaled, Glass, Dragonscale';
 				for i := 0 to slTemp.Count-1 do begin
 					{Debug} if debugMsg then msg('[GetTemplate] [Tier Assignment] tempRecord := ebEDID( gbs(Skyrim.esm, ARMO), Armor'+slTemp[i]+itemType+' );');
@@ -5409,7 +5440,7 @@ begin
 					if (suffix = '') then
 						suffix := StrPosCopy(full(objEffect), 'of', False);
 					if (tempString <> '') then
-						suffix := sufffix+' '+DecToRoman(StrToInt(tempString));
+						suffix := suffix+' '+DecToRoman(StrToInt(tempString));
 					// Pre-Existing records
 					if not slContains(slExistingRecords, EditorID(selectedRecord)+'_'+EditorID(objEffect)) then begin
 						tempElement := wbCopyElementToFile(selectedRecord, GEVfile, True, True); {Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] enchRecord := '+EditorID(tempElement));
@@ -6283,11 +6314,12 @@ begin
 	end else if (Copy(EditorID(objEffect), 1, 2) = 'aa') then begin
 		tempString := EditorID(objEffect);
 		if (Length(IntToStr(IntWithinStr(tempString))) = 1) then begin
-			for z := 1 to 6 do
-				if slContains(slItemTiers, '0'+IntToStr(z)) then begin
-					Result := slItemTiers.Objects[slItemTiers.IndexOf('0'+IntToStr(z))]
+			for i := 1 to 6 do begin
+				if slContains(slItemTiers, '0'+IntToStr(i)) then begin
+					Result := slItemTiers.Objects[slItemTiers.IndexOf('0'+IntToStr(i))]
 				end else
 					Result := slItemTiers.Objects[slItemTiers.Count-1];
+			end;
 		end else if (IntWithinStr(tempString) = 10) then begin
 			Result := slItemTiers.Objects[0];
 		end else if (IntWithinStr(tempString) > 50) and (IntWithinStr(tempString) < 100) then begin
