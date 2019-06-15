@@ -44,8 +44,8 @@ How does this mod differ from [SkyAI](https://www.nexusmods.com/skyrimspecialedi
 
 ![alt text](https://staticdelivery.nexusmods.com/mods/1704/images/25395/25395-1556535934-1182812305.png "Installation")
 ### Download
-**note:** This is an xEdit script
 ![alt text](https://staticdelivery.nexusmods.com/mods/1704/images/25395/25395-1556540460-1355078843.png "Download")
+**note:** This is an xEdit script
 ### Open
 ![alt text](https://staticdelivery.nexusmods.com/mods/1704/images/25395/25395-1556541455-2007623751.png "Open")
 ### Drag and Drop
