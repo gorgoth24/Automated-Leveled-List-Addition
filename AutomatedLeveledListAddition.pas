@@ -376,9 +376,10 @@ end;
 
 Procedure ELLR_Btn_Plugin(Sender: TObject);
 var
-  lblELLRPlugin, lblGEVfile, lblRecipefile: TLabel;
+	tempComponent, ddALLAplugin, ddGEVfile, ddRecipefile: TComboBox;
+  lblALLAplugin, lblGEVfile, lblRecipefile: TLabel;
   btnOk, btnCancel: TButton;
-	tempComponent, ddELLRPlugin, ddGEVfile, ddRecipefile: TComboBox;
+	ALLAfile: IInterface;
   debugMsg: Boolean;
   i: Integer;
   frm: TForm;
@@ -398,27 +399,27 @@ begin
     frm.Caption := 'Output Plugin Settings';
 	
 		// ELLR Plugin Label
-    lblELLRPlugin := TLabel.Create(frm);
-    lblELLRPlugin.Parent := frm;
-    lblELLRPlugin.Top := 30;
-    lblELLRPlugin.Left := 30;		
-    lblELLRPlugin.Caption := 'One-Click Leveled List Addition Plugin: ';
+    lblALLAplugin := TLabel.Create(frm);
+    lblALLAplugin.Parent := frm;
+    lblALLAplugin.Top := 30;
+    lblALLAplugin.Left := 30;		
+    lblALLAplugin.Caption := 'One-Click Leveled List Addition Plugin: ';
 		frm.Height := frm.Height + 80;
     
 		// ELLR Plugin Edit Box
-    ddELLRPlugin := TComboBox.Create(frm);
-    ddELLRPlugin.Parent := frm;
-    ddELLRPlugin.Top := lblELLRPlugin.Top + 40;		
-    ddELLRPlugin.Left := lblELLRPlugin.Left;
-		ddELLRPlugin.Width := 500;
-    ddELLRPlugin.Items.Add(tempComponent.Caption);
-		ddELLRPlugin.ItemIndex := 0;
+    ddALLAplugin := TComboBox.Create(frm);
+    ddALLAplugin.Parent := frm;
+    ddALLAplugin.Top := lblALLAplugin.Top + 40;		
+    ddALLAplugin.Left := lblALLAplugin.Left;
+		ddALLAplugin.Width := 500;
+    ddALLAplugin.Items.Add(tempComponent.Caption);
+		ddALLAplugin.ItemIndex := 0;
 
 		// GEV Plugin Label
     lblGEVfile := TLabel.Create(frm);
     lblGEVfile.Parent := frm;
-    lblGEVfile.Top := ddELLRPlugin.Top + 40;
-    lblGEVfile.Left := lblELLRPlugin.Left;		
+    lblGEVfile.Top := ddALLAplugin.Top + 40;
+    lblGEVfile.Left := lblALLAplugin.Left;		
     lblGEVfile.Caption := 'Generate Enchanted Versions Plugin: ';
 		frm.Height := frm.Height + 80;
     
@@ -437,16 +438,16 @@ begin
 		// Recipe Plugin Label
     lblRecipefile := TLabel.Create(frm);
     lblRecipefile.Parent := frm;
-		lblRecipefile.Height := lblELLRPlugin.Height;
+		lblRecipefile.Height := lblALLAplugin.Height;
     lblRecipefile.Top := ddGEVfile.Top + 40;
-    lblRecipefile.Left := lblELLRPlugin.Left;		
+    lblRecipefile.Left := lblALLAplugin.Left;		
     lblRecipefile.Caption := 'Generate Recipes Plugin: ';
 		frm.Height := frm.Height + 80;
     
 		// Recipe Plugin Edit Box
     ddRecipefile := TComboBox.Create(frm);
     ddRecipefile.Parent := frm;
-		ddRecipefile.Height := lblELLRPlugin.Height;
+		ddRecipefile.Height := lblALLAplugin.Height;
     ddRecipefile.Top := lblRecipefile.Top + 40;
     ddRecipefile.Left := lblRecipefile.Left;
 		ddRecipefile.Width := 500;
@@ -475,14 +476,14 @@ begin
 		// What happens when Ok is pressed
 		frm.ShowModal;
     if (frm.ModalResult = mrOk) then begin
-			tempComponent.Caption := ddELLRplugin.Text;
-			if DoesFileExist(ddELLRplugin.Text) then begin
-				// msg('[File Prep] '+ddELLRplugin.Text+' detected; Preparing file');
-				SetObject('ALLAfile', FileByName(ddELLRplugin.Text), slGlobal);
+			tempComponent.Caption := ddALLAplugin.Text;
+			if DoesFileExist(ddALLAplugin.Text) then begin
+				// msg('[File Prep] '+ddALLAplugin.Text+' detected; Preparing file');
+				SetObject('ALLAfile', FileByName(ddALLAplugin.Text), slGlobal);
 			end else begin 
-				if MessageDlg('Create a new plugin named '+ddELLRplugin.Text+' [YES] or cancel [NO]?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
-					{Debug} if debugMsg then msg('ddELLRplugin.Text := AddNewFileName( '+ddELLRplugin.Text+' );');
-					ALLAfile := AddNewFileName(ddELLRplugin.Text); 
+				if MessageDlg('Create a new plugin named '+ddALLAplugin.Text+' [YES] or cancel [NO]?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+					{Debug} if debugMsg then msg('ddALLAplugin.Text := AddNewFileName( '+ddALLAplugin.Text+' );');
+					ALLAfile := AddNewFileName(ddALLAplugin.Text); 
 				end;
 			end;
 			if DoesFileExist(ddGEVfile.Text) then begin
@@ -635,19 +636,21 @@ begin
 			for i := 0 to slGlobal.Count-1 do begin
 				if DoesFileExist(slGlobal[i]) then begin
 					RemoveMastersAuto(FileByName(slGlobal[i]), ALLAfile);
-					slTemp.Add(IntToStr(i));
+					slTemp.Add(slGlobal[i]);
 				end;
 			end;
 			for i := 0 to slTemp.Count-1 do
-				slGlobal.Delete(StrToInt(slTemp[i]));
+				if (slGlobal.IndexOf(slTemp[i]) >= 0) then
+					slGlobal.Delete(slGlobal.IndexOf(slTemp[i]));
 		end else begin
 			tempComponent.Caption := ddDetectedFile.Text;
 			slTemp.Clear;
 			for i := 0 to slGlobal.Count-1 do
 				if DoesFileExist(slGlobal[i]) then
-					slTemp.Add(IntToStr(i));
+					slTemp.Add(slGlobal[i]);
 			for i := 0 to slTemp.Count-1 do
-				slGlobal.Delete(StrToInt(slTemp[i]));		
+				if (slGlobal.IndexOf(slTemp[i]) >= 0) then
+					slGlobal.Delete(slGlobal.IndexOf(slTemp[i]));	
 		end;
 	finally
 		frm.Free;
@@ -779,7 +782,7 @@ begin
 			slTemp.CommaText := '"Breakdown Equipped: ", "Breakdown Enchanted: ", "Breakdown Daedric: ", "Breakdown DLC: "';
 			for i := 0 to slTemp.Count-1 do
 				if CaptionExists(slTemp[i], frm) then
-					SetObject(RemoveSpaces(StrPosCopy(slTemp[i], ':', True)), AssociatedComponent(slTemp[i]).Checked, slGlobal);
+					SetObject(RemoveSpaces(StrPosCopy(slTemp[i], ':', True)), AssociatedComponent(slTemp[i], frm).Checked, slGlobal);
 			{Debug} if debugMsg then msgList('[ELLR_Btn_GenerateRecipes] slGlobal := ', slGlobal, '');
 		end else begin
 		end;
@@ -807,7 +810,8 @@ begin
 	tempObject := AssociatedComponent('Current Lists: ', frm);	
 	// SetObject(EditorID(ObjectToElement(tempObject.Items.Objects[tempObject.ItemIndex]))+'-//-'+EditorID(selectedRecord), tempObject.Items.Objects[tempObject.ItemIndex], slGlobal);
 	SetObject(EditorID(ObjectToElement(tempObject.Items.Objects[tempObject.ItemIndex]))+'-/Level/-'+EditorID(selectedRecord), 0, slGlobal);
-	tempObject.Items.Delete(tempObject.ItemIndex);
+	if (tempObject.ItemIndex > -1) then
+		tempObject.Items.Delete(tempObject.ItemIndex);
 	tempElement := ComponentByTop(83, frm);
 	tempElement.Items.Assign(tempObject.Items);
 	
@@ -1549,9 +1553,10 @@ begin
 					slTemp.Clear;
 					for i := 0 to slGlobal.Count-1 do 
 						if StrWithinStr(slGlobal[i], '-//-') then
-							slTemp.Add(IntToStr(i));
+							slTemp.Add(slGlobal[i]);
 					for i := 0 to slTemp.Count-1 do
-						slGlobal.Delete(StrToInt(slTemp[i]);
+						if (slGlobal.IndexOf(slTemp[i]) > -1) then
+							slGlobal.Delete(slGlobal.IndexOf(slTemp[i]));
 					templateRecord := ObjectToElement(ddEditorID.Items.Objects[ddEditorID.ItemIndex]); {Debug} if debugMsg then msg('[ELLR_Btn_SetTemplate] templateRecord := '+EditorID(templateRecord));
 					SetObject(EditorID(tempRecord)+'Template', TObject(templateRecord), slGlobal);
 					ParentForm := Sender.Parent;
@@ -2215,7 +2220,7 @@ var
 begin
 ////////////////////////////////////////////////////////////////////// PREP SECTION /////////////////////////////////////////////////////////////////////////////////////////
 // Begin debugMsg Section
-  debugMsg := False;
+  debugMsg := True;
 	
 	// Initialize Local
 	slTemplate := TStringList.Create;
