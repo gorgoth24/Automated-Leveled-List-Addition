@@ -3668,7 +3668,7 @@ begin
 		// Grab the second digit; If the second digit is 0 we don't need the nested leveled list; Example: 10, 20, 30, etc.
 		{Debug} if debugMsg then msg('[%Chance] StrToInt(Copy(IntToStr(Chance), 2, 1)) := '+Copy(IntToStr(Chance), 2, 1));
 		tempInteger := StrToInt(Copy(IntToStr(Chance), 2, 1));
-		if tempInteger = 0 then 
+		if (tempInteger = 0) then 
 			tempBoolean := True
 		else 
 			tempBoolean := False;
@@ -3864,10 +3864,10 @@ var
 	tempComponent, btnAdd, btnOk, btnCancel, btnRemove: TButton;	
 	ddAddPlugin, ddDetectedFile: TComboBox;
 	slTemp, slFiles: TStringList;
-	ELLRfile, tempFile, tempRecord: IInterface;
+	ALLAfile, tempFile, tempRecord: IInterface;
 	frm: TForm;
 	debugMsg: Boolean;
-	ELLRplugin: String;
+	ALLAplugin: String;
 	i, x, y: Integer;
 begin
 // Begin debugMsg section
@@ -3877,14 +3877,14 @@ begin
 	slFiles := TStringList.Create;
 	slTemp := TStringList.Create;
 	frm := Sender.Parent;
-	tempComponent := ComponentByTop(ComponentByCaption('Output Plugin: ', Sender.Parent).Top-2, Sender.Parent);
-	ELLRplugin := tempComponent.Caption;
-	if not StrEndsWith(ELLRplugin, '.esl') or StrEndsWith(ELLRplugin, '.exe') or StrEndsWith(ELLRplugin, '.exe') then AppendIfMissing(ELLRplugin, '.esp');
-	if DoesFileExist(ELLRplugin) then begin
-		ELLRfile := FileByName(ELLRplugin);
+	tempComponent := AssociatedComponent('Output Plugin: ', Sender.Parent);
+	ALLAplugin := tempComponent.Caption;
+	if not StrEndsWith(ALLAplugin, '.esl') or StrEndsWith(ALLAplugin, '.exe') or StrEndsWith(ALLAplugin, '.exe') then AppendIfMissing(ALLAplugin, '.esp');
+	if DoesFileExist(ALLAplugin) then begin
+		ALLAfile := FileByName(ALLAplugin);
 	end else begin
-		if MessageDlg('Create a new plugin named '+ELLRplugin+' [YES] or cancel [NO]?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
-			AddNewFileName(ELLRplugin);
+		if MessageDlg('Create a new plugin named '+ALLAplugin+' [YES] or cancel [NO]?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+			AddNewFileName(ALLAplugin);
 		end else
 			Exit;			
 	end;
@@ -3918,7 +3918,7 @@ begin
 		ddDetectedFile.Top := lblDetectedFileText.Top;		
 		ddDetectedFile.Left := 205;
 		ddDetectedFile.Width := 480;
-		ddDetectedFile.Items.Add(ELLRplugin);
+		ddDetectedFile.Items.Add(ALLAplugin);
 		ddDetectedFile.ItemIndex := 0;
 	
 		// Add Plugin Label
@@ -4906,10 +4906,10 @@ begin
 				// Sender.Parent.Visible := False;
 				slGlobal.Clear;
 				if not DoesFileExist('Patch_'+dd_FileA_Plugin.Text+'_'+dd_FileB_Plugin.Text) then begin
-					SetObject('ELLRfile', TObject(AddNewFileName('Patch_'+dd_FileA_Plugin.Text+'_'+dd_FileB_Plugin.Text)), slGlobal);
+					SetObject('ALLAfile', TObject(AddNewFileName('Patch_'+dd_FileA_Plugin.Text+'_'+dd_FileB_Plugin.Text)), slGlobal);
 				end else
-					SetObject('ELLRfile', TObject(FileByName('Patch_'+dd_FileA_Plugin.Text+'_'+dd_FileB_Plugin.Text)), slGlobal);
-				{Debug} if debugMsg then msg('[ELLR_Btn_Patch] ELLRfile := '+GetFileName(ObjectToElement(GetObject('ELLRfile', slGlobal))));
+					SetObject('ALLAfile', TObject(FileByName('Patch_'+dd_FileA_Plugin.Text+'_'+dd_FileB_Plugin.Text)), slGlobal);
+				{Debug} if debugMsg then msg('[ELLR_Btn_Patch] ALLAfile := '+GetFileName(ObjectToElement(GetObject('ALLAfile', slGlobal))));
 				SetObject('Patch', TObject(FileByName(dd_FileB_Plugin.Text)), slGlobal);
 				slTemp.CommaText := 'AMMO, ARMO, WEAP';
 				tempFile := FileByName(dd_FileA_Plugin.Text);
@@ -6360,6 +6360,10 @@ var
 	tempRecord: IInterface;
 	debugMsg: Boolean;
 begin
+// Begin debugMsg section
+	debugMsg := False;
+	
+	{Debug} if debugMsg then msg('[GenderOnlyArmor] GenderOnlyArmor( '+aString+', '+EditorID(aRecord)+', '+GetFileName(aPlugin)+' );');
 	if StrWithinStr(aString, 'Male') then begin
 		if not (Length(geev(aRecord, 'Female world model\MOD4')) > 0) then begin
 			if not (GetLoadOrder(GetFile(aRecord)) = GetLoadOrder(aPlugin)) then begin
