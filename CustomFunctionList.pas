@@ -6,7 +6,7 @@ unit CustomFunctionList;
 ```
 }
 { General Notes
-  If the code says it expects 'end;' but finds 'end of file' check that 'if' statements are followed by 'then' and 'for' statement are followed by 'do'
+	If the code says it expects 'end;' but finds 'end of file' check that 'if' statements are followed by 'then' and 'for' statement are followed by 'do'
 }
 
 // Settings and Default values
@@ -45,21 +45,21 @@ var
 function FileByName(aPluginName: String): IInterface;
 var
 	debugMsg: Boolean;
-  i: Integer;
+	i: Integer;
 begin
 // Begin debugMsg section
 	debugMsg := False;
 	
 	{Debug} if debugMsg then msg('[FileByName] FileByName( '+aPluginName+' );');
-  for i := 0 to Pred(FileCount) do begin
-    Result := FileByIndex(i);
+	for i := 0 to Pred(FileCount) do begin
+		Result := FileByIndex(i);
 		{Debug} if debugMsg then msg('FileByIndex(i) := '+GetFileName(Result));
-    if (GetFileName(Result) = aPluginName) then begin
+		if (GetFileName(Result) = aPluginName) then begin
 			{Debug} if debugMsg then msg('Result := '+GetFileName(Result));;
 			Exit; 
 		end;
-  end;
-  Result := nil;
+	end;
+	Result := nil;
 	
 	debugMsg := False;
 // End debugMsg section
@@ -69,14 +69,14 @@ end;
 function DoesFileExist(aPluginName: String): Boolean;
 var
 	debugMsg: Boolean;
-  i: Integer;
+	i: Integer;
 begin
 // Begin debugMsg section
 	debugMsg := False;
 	
 	// Function
-  Result := True;
-  for i := 0 to Pred(FileCount) do begin
+	Result := True;
+	for i := 0 to Pred(FileCount) do begin
 		// {Debug} if debugMsg then msg('[DoesFileExist] GetFileName(aPluginName) := '+aPluginName);
 		{Debug} if debugMsg then msg('[DoesFileExist] if ( '+aPluginName+' = '+GetFileName(FileByIndex(i))+' ) then begin');
 		if (aPluginName = GetFileName(FileByIndex(i))) then begin
@@ -84,7 +84,7 @@ begin
 			Exit;
 		end;
 	end;
-  Result := False;
+	Result := False;
 	
 	debugMsg := FALSE
 // End debugMsg Section
@@ -93,22 +93,22 @@ end;
 // Find if a file contains an EditorID in a specific group
 function DoesFileContain(aPlugin: IInterface; aGroupName: String; aRecord: IInterface): String;
 var
-  i: Integer;
+	i: Integer;
 begin
-  if HasGroup(aPlugin, aGroupName) then begin
-    Result := 'True';
+	if HasGroup(aPlugin, aGroupName) then begin
+		Result := 'True';
 	for i := 0 to Pred(ec(gbs(aPlugin, aGroupName))) do if GetLoadOrderFormID(ebi(gbs(aPlugin, aGroupName), i)) = GetLoadOrderFormID(aRecord) then Exit;
-    Result := 'False';
-  end else Exit;
+		Result := 'False';
+	end else Exit;
 end;
 
-// Find where the selected record is referenced in leveled lists and make a 'Copy as Override' into a specified file.  Then replace all instances of inputRecord with replaceRecord in the override
+// Find where the selected record is referenced in leveled lists and make a 'Copy as Override' into a specified file.	Then replace all instances of inputRecord with replaceRecord in the override
 Procedure ReplaceInLeveledListAuto(inputRecord, replaceRecord, aPlugin: IInterface);
 var
-  LLrecord, LLcopy, masterRecord: IInterface;
+	LLrecord, LLcopy, masterRecord: IInterface;
 	debugMsg, tempBoolean: Boolean;
 	tempString: String;
-  i, x: Integer;
+	i, x: Integer;
 begin
 // Begin debugMsg section
 	debugMsg := False;
@@ -166,14 +166,14 @@ begin
 // End debugMsg section
 end;
 
-// Find where the selected record is referenced in leveled lists and make a 'Copy as Override' into a specified file.  Then replace all instances of inputRecord with replaceRecord in the override
+// Find where the selected record is referenced in leveled lists and make a 'Copy as Override' into a specified file.	Then replace all instances of inputRecord with replaceRecord in the override
 Procedure ReplaceInLeveledListByList(aList, bList: TStringList; aPlugin: IInterface);
 var
-  LLrecord, LLcopy, tempRecord, tempElement, inputRecord: IInterface;
+	LLrecord, LLcopy, tempRecord, tempElement, inputRecord: IInterface;
 	slTemp, slLL: TStringList;
 	debugMsg, tempBoolean, Patch: Boolean;
 	tempString: String;
-  i, x, y, tempInteger, LoadOrder: Integer;
+	i, x, y, tempInteger, LoadOrder: Integer;
 begin
 // Begin debugMsg section
 	debugMsg := False;
@@ -273,7 +273,7 @@ begin
 				end;
 			end;
 		end;
-  end;
+	end;
 
 	// Finalize
 	slTemp.Free;
@@ -283,13 +283,13 @@ begin
 // End debugMsg section
 end;
 
-// Find where the selected record is referenced in leveled lists and make a 'Copy as Override' into a specified file.  Then replace all instances of templateRecord with inputRecord in the override
+// Find where the selected record is referenced in leveled lists and make a 'Copy as Override' into a specified file.	Then replace all instances of templateRecord with inputRecord in the override
 function AddToLeveledListAuto(templateRecord: IInterface; inputRecord: IInterface; aPlugin: IInterface): String;
 var
-  LLrecord, LLcopy, masterRecord, inputEntry, tempRecord, tempElement: IInterface;
-  debugMsg, tempBoolean, AddToEnchanted, Patch: Boolean;
+	LLrecord, LLcopy, masterRecord, inputEntry, tempRecord, tempElement: IInterface;
+	debugMsg, tempBoolean, AddToEnchanted, Patch: Boolean;
 	slRecords: TStringList;
-  i, x, y, tempInteger: Integer;
+	i, x, y, tempInteger: Integer;
 	tempString: String;
 begin
 // Begin debugMsg Section
@@ -302,13 +302,13 @@ begin
 	Patch := slContains(slGlobal, 'Patch');
 	masterRecord := WinningOverride(templateRecord);	{Debug} if debugMsg then msg('[AddToLeveledListAuto] masterRecord := '+full(masterRecord)); 
 	// This pulls the item out of chanceLeveledList in order to keep the msg statements consistent
-  {Debug} if debugMsg then msg('[AddToLeveledListAuto] if '+sig(inputRecord)+' = ''LVLI'' then begin');
-  if (sig(inputRecord) = 'LVLI') then begin {Debug} if debugMsg then msg('[AddToLeveledListAuto] Pred(LLec(inputRecord)) := '+IntToStr(Pred(LLec(inputRecord))));
-    for i := 0 to Pred(LLec(inputRecord)) do begin {Debug} if debugMsg then msg('[AddToLeveledListAuto] inputEntry := '+full(LLebi(inputRecord, i)));
+	{Debug} if debugMsg then msg('[AddToLeveledListAuto] if '+sig(inputRecord)+' = ''LVLI'' then begin');
+	if (sig(inputRecord) = 'LVLI') then begin {Debug} if debugMsg then msg('[AddToLeveledListAuto] Pred(LLec(inputRecord)) := '+IntToStr(Pred(LLec(inputRecord))));
+		for i := 0 to Pred(LLec(inputRecord)) do begin {Debug} if debugMsg then msg('[AddToLeveledListAuto] inputEntry := '+full(LLebi(inputRecord, i)));
 			inputEntry := LLebi(inputRecord, i); {Debug} if debugMsg then msg('[AddToLeveledListAuto] if not (sig(inputEntry) := '+sig(inputEntry)+' = ''LVLI'') then Break; ');
 			if not (sig(inputEntry) = 'LVLI') then Break; 
 		end;
-  end else begin 
+	end else begin 
 		inputEntry := templateRecord; 
 		{Debug} if debugMsg then msg('[AddToLeveledListAuto] full(inputEntry) := '+full(inputEntry)+' EditorID(inputEntry := '+EditorID(inputEntry)); 
 	end;	
@@ -370,19 +370,19 @@ begin
 				end;
 			end;
 		end;
-  end;
+	end;
 	
 	debugMsg := False;
 // End debugMsg section
 end;
 
-// Find where the selected record is referenced in leveled lists and make a 'Copy as Override' into a specified file.  Then replace all instances of templateRecord with inputRecord in the override
+// Find where the selected record is referenced in leveled lists and make a 'Copy as Override' into a specified file.	Then replace all instances of templateRecord with inputRecord in the override
 Procedure AddToLeveledListByList(aList, bList: TStringList; aPlugin: IInterface);
 var
-  LLrecord, LLcopy, masterRecord, tempRecord, tempElement: IInterface;
-  debugMsg, tempBoolean, Patch: Boolean;
+	LLrecord, LLcopy, masterRecord, tempRecord, tempElement: IInterface;
+	debugMsg, tempBoolean, Patch: Boolean;
 	slLL, slTemp, slMessage: TStringList;
-  i, x, y, tempInteger, LoadOrder: Integer;
+	i, x, y, tempInteger, LoadOrder: Integer;
 	tempString: String;
 begin
 // Begin debugMsg Section
@@ -449,7 +449,7 @@ begin
 				slLL.AddObject(EditorID(LLrecord), TObject(LLrecord));
 		end;
 		// Custom Leveled List Input
-		tempString := '-//-'+EditorID(ObjectToElement(aList.Objects[i]));  {Debug} if debugMsg then msg('[AddToLeveledListByList] tempString := '+tempString);
+		tempString := '-//-'+EditorID(ObjectToElement(aList.Objects[i]));	{Debug} if debugMsg then msg('[AddToLeveledListByList] tempString := '+tempString);
 		for x := 0 to slGlobal.Count-1 do begin	
 			// {Debug} if debugMsg then msg('[AddToLeveledListByList] if StrWithinStr( '+slGlobal[x]+', '+tempString+' ) then begin');
 			if StrWithinStr(slGlobal[x], tempString) then begin
@@ -507,7 +507,7 @@ begin
 		end;
 		if (slMessage.Count > 0) then
 			msgList(EditorID(tempRecord)+' added to ', slMessage, '');
-  end;
+	end;
 	
 	// Finalize
 	slMessage.Free;
@@ -519,25 +519,25 @@ begin
 end;
 
 // Reassembles and then adds to all outfits containing inputRecord
-function AddToOutfitAuto(templateRecord: IInterface; inputRecord: IInterface; aPlugin: IInterface): String;  
+function AddToOutfitAuto(templateRecord: IInterface; inputRecord: IInterface; aPlugin: IInterface): String;	
 var
-  tempLevelList, tempRecord, tempElement, masterLevelList, baseLevelList, subLevelList, vanillaLevelList, masterRecord, LVLIrecord, OTFTrecord, 
+	tempLevelList, tempRecord, tempElement, masterLevelList, baseLevelList, subLevelList, vanillaLevelList, masterRecord, LVLIrecord, OTFTrecord, 
 	OTFTitems, OTFTitem, OTFTcopy, LLentry, Record_edid: IInterface;
-  debugMsg, tempBoolean, LightArmorBoolean, HeavyArmorBoolean: Boolean;  
-  tempInteger, i, x, y, z, a, b: Integer;
-  slTemp, slTempObject, slOutfit, slpair, slItem, slEnchantedList, slLevelList, slBlackList, slStringList, sl1, sl2: TStringList;
-  tempString, String1, CommonString, ElementType, OTFTrecord_edid: String;
+	debugMsg, tempBoolean, LightArmorBoolean, HeavyArmorBoolean: Boolean;	
+	tempInteger, i, x, y, z, a, b: Integer;
+	slTemp, slTempObject, slOutfit, slpair, slItem, slEnchantedList, slLevelList, slBlackList, slStringList, sl1, sl2: TStringList;
+	tempString, String1, CommonString, ElementType, OTFTrecord_edid: String;
 begin
 	// If the OTFT draws from a series of level lists assemble complete outfits from the items in those lists.
 	// In most cases OTFT records draw from a level list for each piece of the outfit (e.g. boots level list, helmet level list, etc.)
 	// Identifies and assembles based on BOD2 slots
 	// This assembles a level list of the entire 'Steel Plate' outfit so that npcs will USUALLY spawn with a complete outfit instead of a hodge-podge drawn from various level lists
-	// This does not edit or remove the original list.  The original entries remain intact as a single outfit within the complete list of outfits in masterLevelList.  
+	// This does not edit or remove the original list.	The original entries remain intact as a single outfit within the complete list of outfits in masterLevelList.	
 	// This means that, if there is 1 level list of the original outfit, 9 outfits are detected and assembled, and the script is adding 1 outfit, then you will StrToIntll have a 1/11 chance for a hodge-podge outfit <-- (1+9+1)
-	// This is intended.  The goal is to improve the outfits, NEVER to remove existing entries or functionality (even if there is a lower chance to find those items).
+	// This is intended.	The goal is to improve the outfits, NEVER to remove existing entries or functionality (even if there is a lower chance to find those items).
 	// The output should be A) A LL of selected Records B) LLs of outfit's original records C) A LL consiStrToIntng of the leftovers
 // Begin debugMsg Section
-  debugMsg := False; 
+	debugMsg := False; 
 	
 	// Initialize
 	if not Assigned(slEnchantedList) then slEnchantedList := TStringList.Create else slEnchantedList.Clear;
@@ -553,14 +553,14 @@ begin
 	if not Assigned(sl2) then sl2 := TStringList.Create else sl2.Clear;	
 	
 	// Common Function Output
-  masterRecord := MasterOrSelf(templateRecord);
-  
+	masterRecord := MasterOrSelf(templateRecord);
+	
 ////////////////////////////////////////////////////////////////////// OTFT RECORD DETECTION ///////////////////////////////////////////////////////////////////////////////////////	
 	// Find valid OTFT records
-  {Debug} if debugMsg then msg('[AddToOutfitAuto] Begin OTFT Record Detection');
-  {Debug} if debugMsg then msg('[AddToOutfitAuto] for i := 0 to Pred(rbc(masterRecord)) :='+IntToStr(Pred(rbc(masterRecord)))+' do begin');
-  for i := 0 to Pred(rbc(masterRecord)) do begin {Debug} if debugMsg then msg('[AddToOutfitAuto] LVLIrecord := '+EditorID(rbi(masterRecord, i)));
-    slTempObject.Clear;
+	{Debug} if debugMsg then msg('[AddToOutfitAuto] Begin OTFT Record Detection');
+	{Debug} if debugMsg then msg('[AddToOutfitAuto] for i := 0 to Pred(rbc(masterRecord)) :='+IntToStr(Pred(rbc(masterRecord)))+' do begin');
+	for i := 0 to Pred(rbc(masterRecord)) do begin {Debug} if debugMsg then msg('[AddToOutfitAuto] LVLIrecord := '+EditorID(rbi(masterRecord, i)));
+		slTempObject.Clear;
 		LVLIrecord := rbi(masterRecord, i); {Debug} if debugMsg then msg('[AddToOutfitAuto] if (sig(LVLIrecord) := '+sig(LVLIrecord)+'= ''LVLI'') then begin');
 		if (sig(LVLIrecord) = 'LVLI') then begin
 			// Check for outfits that reference a list of items of a specific type (e.g. Boots, Gauntlets)
@@ -597,12 +597,12 @@ begin
 				if not slContains(slOutfit, EditorID(OTFTrecord)) then
 					slOutfit.AddObject(EditorID(OTFTrecord), TObject(OTFTrecord));
 		end;
-  end;	
+	end;	
 ////////////////////////////////////////////////////////////////////// RESTRUCTURE OTFT RECORDS ///////////////////////////////////////////////////////////////////////////////////
-    {Debug} if debugMsg then msg('[AddToOutfitAuto] FormID Detection Complete; Restructuring OTFT records');
-    {Debug} if debugMsg then msgList('[AddToOutfitAuto] slOutfit := ', slOutfit, '');
+		{Debug} if debugMsg then msg('[AddToOutfitAuto] FormID Detection Complete; Restructuring OTFT records');
+		{Debug} if debugMsg then msgList('[AddToOutfitAuto] slOutfit := ', slOutfit, '');
 		if not (slOutfit.Count > 0) then Continue;
-    for i := 0 to slOutfit.Count-1 do begin
+		for i := 0 to slOutfit.Count-1 do begin
 			OTFTcopy := nil;
 			OTFTrecord := WinningOverride(ObjectToElement(slOutfit.Objects[i])); {Debug} if debugMsg then msg('[AddToOutfitAuto] OTFTrecord := '+EditorID(OTFTrecord));
 			OTFTrecord_edid := EditorID(OTFTrecord);
@@ -647,7 +647,7 @@ begin
 					slTemp.CommaText := '"Use All"');
 					masterLevelList := createLeveledList(aPlugin, OTFTrecord_edid+'_Master', slTemp, 0);
 					for y := 0 to 3 do 
-						addToLeveledList(masterLevelList, vanillaLevelList, 1);		  
+						addToLeveledList(masterLevelList, vanillaLevelList, 1);			
 				end;
 				{Debug} if debugMsg then msg('[AddToOutfitAuto] if not LLcontains( '+EditorID(masterLevellist)+', '+EditorID(inputRecord)+' ) := '+BoolToStr(LLcontains(masterLevelList, inputRecord))+' then begin');
 				if not LLcontains(masterLevelList, inputRecord) then begin
@@ -664,7 +664,7 @@ begin
 				{Debug} if debugMsg then msg('[AddToOutfitAuto] OTFTcopy := wbCopyElementToFile('+OTFTrecord_edid+', '+GetFileName(aPlugin)+', False, True)');
 				OTFTcopy := wbCopyElementToFile(OTFTrecord, aPlugin, False, True);
 			end;
-  debugMsg := False;
+	debugMsg := False;
 // End debugMsg Section
 ////////////////////////////////////////////////////////////////////// ASSEMBLE OTFT FROM VANILLA ENTRIES - RECORD IDENTIFICATION /////////////////////////////////////////////////////////////////////////////
 // Begin debugMsg Section
@@ -749,7 +749,7 @@ begin
 						// {Debug} if debugMsg then msg('[AddToOutfitAuto] [Assemble OTFT From Vanilla Entries] slLevelList.Delete( '+slLevelList[0]+' );');
 						slLevelList.Delete(0);
 						if (slLevelList.Count = 0) then begin
-						  for z := 0 to slTempObject.Count-1 do begin
+							for z := 0 to slTempObject.Count-1 do begin
 								if not slContains(slLevelList, slTempObject[z]) then begin
 									// {Debug} if debugMsg then msg('[AddToOutfitAuto] [Assemble OTFT From Vanilla Entries] slLevelList.Add( '+slTempObject[z]+' );');
 									slLevelList.AddObject(slTempObject[z], ObjectToElement(slTempObject.Objects[z]));
@@ -760,10 +760,10 @@ begin
 						if (slLevelList.Count = -1) then Break;
 					end;					
 				end;
-				// If there are enchanted lists, replace them with a 'template' record.  For the sake of simplicity it will be replaced with the enchanted list later
-				{Debug} if debugMsg then msg('[AddToOutfitAuto] [Assemble OTFT From Vanilla Entries] If there are enchanted lists, make sure the original record is in the items list.  For the sake of simplicity it will be replaced with the enchanted list later');
+				// If there are enchanted lists, replace them with a 'template' record.	For the sake of simplicity it will be replaced with the enchanted list later
+				{Debug} if debugMsg then msg('[AddToOutfitAuto] [Assemble OTFT From Vanilla Entries] If there are enchanted lists, make sure the original record is in the items list.	For the sake of simplicity it will be replaced with the enchanted list later');
 				for x := 0 to slEnchantedList.Count-1 do begin
-					// Grab the template for the enchanted list.  These are also nested often
+					// Grab the template for the enchanted list.	These are also nested often
 					{Debug} if debugMsg then msg('[AddToOutfitAuto] [Assemble OTFT From Vanilla Entries] tempRecord := '+EditorID(WinningOverride(ObjectToElement(slEnchantedList.Objects[x]))));
 					tempRecord := WinningOverride(ObjectToElement(slEnchantedList.Objects[x]));
 					while (sig(tempRecord) = 'LVLI') do begin
@@ -787,6 +787,7 @@ begin
 					// Delete common junk words
 					slTemp.CommaText := 'Mask, Bracers, Armor, Helmet, Hood, Crown, Shield, Buckler, Cuirass, Greaves, Boots, Gloves, Gauntlets, Hood';	
 					slStringList.CommaText := full(WinningOverride(ObjectToElement(slItem.Objects[x])));
+					{Debug} if debugMsg then msgList('[AddToOutfitAuto] [Assemble OTFT From Vanilla Entries] slStringList := ', slStringList, '');				
 					{Debug} if debugMsg then msgList('[AddToOutfitAuto] [Assemble OTFT From Vanilla Entries] slStringList := ', slStringList, '');				
 					for y := 0 to slTemp.Count-1 do
 						if slContains(slStringList, slTemp[y]) then
@@ -995,7 +996,7 @@ begin
 														addToLeveledList(LLebi(tempLevelList, z), subLevelList, 1);
 														tempBoolean := True;
 														// Removes duplicate elements in the leveled list one level above
-														// Example: A sublist for slot 40 is created and contains all items that occupy slot 40.  There is already a list in tempLevelList for items with slot 40 and slot 42.
+														// Example: A sublist for slot 40 is created and contains all items that occupy slot 40.	There is already a list in tempLevelList for items with slot 40 and slot 42.
 														// This removes items that have slot bot slot 40 and slot 42, leaving only slot 40 items in the sublist
 														for b := 0 to Pred(LLec(tempLevelList)) do
 															if LLcontains(subLevelList, LLebi(tempLevelList, b)) then 
@@ -1205,7 +1206,7 @@ begin
 									end;
 								end;
 								// If the generated outfit does not cover all the BOD2 slots the master outfit contains, create a copy and use that instead
-								// Example: Leather outfits often generate with only a cuirass.  
+								// Example: Leather outfits often generate with only a cuirass.	
 								// In this case, if an outfit consists of LItemBanditHelmet, LItemBanditCuirass, and LItemBanditBoots (a common setup)
 								// a variant of the leveled list with just the leather cuirass would generate containing the leather cuirass, LItemBanditHelmet, and LItemBanditBoots
 								if not tempBoolean then begin
@@ -1238,11 +1239,11 @@ begin
 						slBlacklist.Add(slItem[x]);					
 				end;
 			end;
-      debugMsg := False;
+			debugMsg := False;
 // End debugMsg Section
 ////////////////////////////////////////////////////////////////////// SPECIFIC OTFT TYPES - PRE-CHECK ////////////////////////////////////////////////////////////////////////////////
 // Begin debugMsg Section
-      debugMsg := False;			
+			debugMsg := False;			
 			// Checks for integer-keyword pairs (e.g. Shield20 becomes 20=Shield)	
 			// This checks each OTFT item for an integer-keyword pair (e.g. Shield20 becomes 20=Shield)
 			slTemp.Clear;
@@ -1257,10 +1258,10 @@ begin
 						for y := 0 to slTemp.Count-1 do begin {Debug} if debugMsg then msg('[AddToOutfitAuto] [Pre-Check] if StrWithinStr( '+EditorID(tempRecord)+', '+slTemp[y]+' ) then begin');
 							if StrWithinStr(EditorID(tempRecord), slTemp[y]) then begin
 								for z := 0 to slpair.Count-1 do
-								  if slpair.Names[z] = slTemp[y] then
-									  tempBoolean := True;
-							  if not tempBoolean then begin
-								  slpair.Add(slAddValue(IntToStr(IntWithinStr(EditorID(tempRecord))), slTemp[y]));								
+									if slpair.Names[z] = slTemp[y] then
+										tempBoolean := True;
+								if not tempBoolean then begin
+									slpair.Add(slAddValue(IntToStr(IntWithinStr(EditorID(tempRecord))), slTemp[y]));								
 									{Debug} if debugMsg then msgList('[AddToOutfitAuto] [Pre-Check] slpair := ', slpair, '');
 								end;
 							end;
@@ -1287,7 +1288,7 @@ begin
 ////////////////////////////////////////////////////////////////////// SPECIFIC OTFT TYPES - INTEGER ////////////////////////////////////////////////////////////////////////////////
 			if (slPair.Count > 0) then begin {Debug} if debugMsg then msgList('[AddToOutfitAuto] [Integer] slpair := ', slPair, '');
 				// This is checking the input level list for keywords similiar to the identified keyword
-				// This is ghetto fuzzy logic.  Example: If the pre-check identifies 'Gauntlets' then this
+				// This is ghetto fuzzy logic.	Example: If the pre-check identifies 'Gauntlets' then this
 				// section would check the input record for entries containing 'Gauntlets, Gloves';				
 				tempBoolean := False;
 				{Debug} if debugMsg then msgList('[AddToOutfitAuto] [Integer] slpair := ', slpair, '');
@@ -1301,8 +1302,8 @@ begin
 						tempRecord := LLebi(inputRecord, y); {Debug} if debugMsg then msg('[AddToOutfitAuto] [Integer] tempRecord := '+EditorID(tempRecord));
 						for z := 0 to slTemp.Count-1 do begin {Debug} if debugMsg then msg('[AddToOutfitAuto] [Integer] if StrWithinStr( '+EditorID(tempRecord)+', '+slTemp[z]+' ) or StrWithinStr( '+full(tempRecord)+', '+slTemp[z]+' ) or HasKeyword( '+EditorID(tempRecord)+', Armor'+slTemp[z]+' ) or HasKeyword( '+EditorID(tempRecord)+', Clothing'+slTemp[z]+' ) then begin');
 							if StrWithinStr(EditorID(tempRecord), slTemp[z]) or StrWithinStr(full(tempRecord), slTemp[z]) or HasKeyword(tempRecord, 'Armor'+slTemp[z]) or HasKeyword(tempRecord, 'Clothing'+slTemp[z]) then begin
-							  // If more than one integer-keyword pair is detected we need to account for both (e.g. Shield20Helmet50
-							  tempString := nil;
+								// If more than one integer-keyword pair is detected we need to account for both (e.g. Shield20Helmet50
+								tempString := nil;
 								for a := 0 to slpair.Count-1 do
 									tempString := tempString+slpair.Names[a]+slpair.ValueFromIndex[a]; {Debug} if debugMsg then msg('[AddToOutfitAuto] [Integer] tempString := '+tempString);
 								// Check if aPlugin already has an identically named variant of inputRecord
@@ -1314,7 +1315,7 @@ begin
 										for b := 0 to slpair.Count-1 do
 											if StrWithinStr(EditorID(ebi(gbs(aPlugin, 'LVLI'), a)), EditorID(inputRecord)) and StrWithinStr(EditorID(ebi(gbs(aPlugin, 'LVLI'), a)), slpair.Names[b]+slpair.ValueFromIndex[b]) then 
 												tempInteger := tempInteger+1;
-										if (tempInteger = slpair.Count) then begin {Debug} if debugMsg then msg('[AddToOutfitAuto] [Integer] Pre-existing variant of inputRecord detected: '+EditorID(ebi(gbs(aPlugin, 'LVLI'), a)));								  
+										if (tempInteger = slpair.Count) then begin {Debug} if debugMsg then msg('[AddToOutfitAuto] [Integer] Pre-existing variant of inputRecord detected: '+EditorID(ebi(gbs(aPlugin, 'LVLI'), a)));									
 											tempLevelList := ebi(gbs(aPlugin, 'LVLI'), a);
 											Break;
 										end;
@@ -1342,7 +1343,7 @@ begin
 									subLevelList := createLeveledList(aPlugin, (EditorID(inputRecord)+'_SubList_'+slpair.Names[x]+slPair.ValueFromIndex[x]), slTemp, (100-StrToInt(slpair.ValueFromIndex[x])));
 									{Debug} if debugMsg then msg('[AddToOutfitAuto] [Integer] addToLeveledList( '+EditorID(subLevelList)+', '+EditorID(tempRecord)+', 1);');
 									addToLeveledList(subLevelList, tempRecord, 1);
-							  end;
+								end;
 								if Assigned(subLevelList) then begin
 									{Debug} if debugMsg then msg('[AddToOutfitAuto] [Integer] if not LLcontains( '+EditorID(tempLevelList)+', '+EditorID(subLevelList)+' ) := '+BoolToStr(LLcontains(tempLevelList, subLevelList))+' then begin');
 									if not LLcontains(tempLevelList, subLevelList) then begin
@@ -1370,7 +1371,7 @@ begin
 				slTemp.CommaText := 'Mask, Bracers, Helmet, Hood, Crown, Shield, Buckler, Cuirass, Greaves, Boots, Gloves, Gauntlets';	
 				for x := 0 to slTemp.Count-1 do begin
 					if StrWithinStr(EditorID(OTFTcopy), slTemp[x]) then begin
-					  tempString := slTemp[x];
+						tempString := slTemp[x];
 						slFuzzyItem(slTemp[x], slTemp);
 						Break;
 					end;
@@ -1492,10 +1493,10 @@ begin
 					{Debug} if debugMsg then msg('[AddToOutfitAuto] [Other] addToLeveledList( '+EditorID(masterLevelList)+', '+EditorID(tempLevelList)+', 1);');
 					{Debug} if debugMsg then msg('[AddToOutfitAuto] [Other] SetEditValue('+GetEditValue(ebi(ebp(OTFTcopy, 'INAM'), 0))+', '+ShortName(masterLevelList)+' );');
 					addToLeveledList(masterLevelList, tempLevelList, 1);
-					SetEditValue(OTFTitem, ShortName(masterLevelList));	    
+					SetEditValue(OTFTitem, ShortName(masterLevelList));			
 				end else SetEditValue(OTFTitem, ShortName(masterLevelList));
 			end else SetEditValue(OTFTitem, ShortName(masterLevelList));		
-	  end;
+		end;
 	end;
 	
 	// Finalize
@@ -1511,17 +1512,17 @@ begin
 	if Assigned(sl1) then sl1.Free;
 	if Assigned(sl2) then sl2.Free;
 	
-  debugMsg := False;
+	debugMsg := False;
 // End debugMsg Section
 end;
 
 // Find the type of Item
 function ItemKeyword(inputRecord: IInterface): String;
 var
-  KWDAentries, KWDAkeyword: IInterface;
-  debugMsg: Boolean;
-  slTemp: TStringList;
-  i: Integer;
+	KWDAentries, KWDAkeyword: IInterface;
+	debugMsg: Boolean;
+	slTemp: TStringList;
+	i: Integer;
 begin
 // Begin debugMsg section
 	debugMsg := False;
@@ -1529,24 +1530,24 @@ begin
 	if not Assigned(slTemp) then slTemp := TStringList.Create else slTemp.Clear;
 	
 	// Function
-  slTemp.CommaText := 'ArmorHelmet, ArmorCuirass, ArmorGauntlets, ArmorBoots, ArmorShield, ClothingHead, ClothingBody, ClothingHands, ClothingFeet, ClothingCirclet, ClothingRing, ClothingNecklace, WeapTypeBattleaxe, WeapTypeBow, WeapTypeDagger, WeapTypeGreatsword, WeapTypeMace, WeapTypeSword, WeapTypeWarAxe, WeapTypeWarhammer, VendorItemArrow';
-  {Debug} if debugMsg then for i := 0 to slTemp.Count-1 do msg('[ItemKeyword] '+slTemp[i]);
-  KWDAentries := ebp(inputRecord, 'KWDA'); {Debug} if debugMsg then msg('[ItemKeyword] Pred(ec(KWDAentries)) :='+IntToStr(Pred(ec(KWDAentries))));
-  for i := 0 to Pred(ec(KWDAentries)) do begin {Debug} if debugMsg then msg('[ItemKeyword] LinksTo(ebi(KWDAentries, i)) :='+EditorID(LinksTo(ebi(KWDAentries, i))));
-    KWDAkeyword := LinksTo(ebi(KWDAentries, i)); {Debug} if debugMsg then msg('[ItemKeyword] slTemp.Count-1 :='+IntToStr(slTemp.Count-1));
+	slTemp.CommaText := 'ArmorHelmet, ArmorCuirass, ArmorGauntlets, ArmorBoots, ArmorShield, ClothingHead, ClothingBody, ClothingHands, ClothingFeet, ClothingCirclet, ClothingRing, ClothingNecklace, WeapTypeBattleaxe, WeapTypeBow, WeapTypeDagger, WeapTypeGreatsword, WeapTypeMace, WeapTypeSword, WeapTypeWarAxe, WeapTypeWarhammer, VendorItemArrow';
+	{Debug} if debugMsg then for i := 0 to slTemp.Count-1 do msg('[ItemKeyword] '+slTemp[i]);
+	KWDAentries := ebp(inputRecord, 'KWDA'); {Debug} if debugMsg then msg('[ItemKeyword] Pred(ec(KWDAentries)) :='+IntToStr(Pred(ec(KWDAentries))));
+	for i := 0 to Pred(ec(KWDAentries)) do begin {Debug} if debugMsg then msg('[ItemKeyword] LinksTo(ebi(KWDAentries, i)) :='+EditorID(LinksTo(ebi(KWDAentries, i))));
+		KWDAkeyword := LinksTo(ebi(KWDAentries, i)); {Debug} if debugMsg then msg('[ItemKeyword] slTemp.Count-1 :='+IntToStr(slTemp.Count-1));
 	for i := 0 to slTemp.Count-1 do begin {Debug} if debugMsg then msg('[ItemKeyword] Result := '+slTemp[i]);
-	  Result := slTemp[i]; {Debug} if debugMsg then msg('[ItemKeyword] EditorID(KWDAkeyword) := '+EditorID(KWDAkeyword)+') = Result := '+slTemp[i]+') then Exit;');
-	  if (EditorID(KWDAkeyword) = Result) then begin
+		Result := slTemp[i]; {Debug} if debugMsg then msg('[ItemKeyword] EditorID(KWDAkeyword) := '+EditorID(KWDAkeyword)+') = Result := '+slTemp[i]+') then Exit;');
+		if (EditorID(KWDAkeyword) = Result) then begin
 			slTemp.Free;
 			Exit;
 		end;
 	end;
 	Result := nil;
-  end;
-  {Debug} if debugMsg then msg('[ItemKeyword] Result := nil; Exit;')
+	end;
+	{Debug} if debugMsg then msg('[ItemKeyword] Result := nil; Exit;')
 	
 	// Finalize
-  slTemp.Free;
+	slTemp.Free;
 	debugMsg := False;
 // End debugMsg section
 end;
@@ -1602,10 +1603,10 @@ end;
 // Creates an enchanted copy of the item record and returns it [From Generate Enchanted Versions]
 function CreateEnchantedVersion(aRecord, aPlugin, objEffect, enchRecord: IInterface; suffix: String; enchAmount: Integer; aBoolean: Boolean): IInterface;
 var
-  tempRecord: IInterface;
+	tempRecord: IInterface;
 	tempString: String;
 	debugMsg: Boolean;
-  enchCost: Integer;
+	enchCost: Integer;
 begin
 // Begin debugMsg section
 	debugMsg := False;
@@ -1640,7 +1641,7 @@ begin
 	end;
 	
 	{Debug} if debugMsg then msg('[CreateEnchantedVersions] Result := '+EditorID(enchRecord));
-  Result := enchRecord;
+	Result := enchRecord;
 	
 	debugMsg := False;
 // End debugMsg section
@@ -1649,47 +1650,47 @@ end;
 // Checks to see if a string ends with an entered substring [mte functions]
 function StrEndsWith(s1, s2: String): Boolean;
 var
-  i, n1, n2: Integer;
+	i, n1, n2: Integer;
 begin
-  Result := false;
-  n1 := Length(s1);
-  n2 := Length(s2);
-  if (n1 < n2) then Exit;
-  Result := (Copy(s1, n1-n2+1, n2) = s2);
+	Result := false;
+	n1 := Length(s1);
+	n2 := Length(s2);
+	if (n1 < n2) then Exit;
+	Result := (Copy(s1, n1-n2+1, n2) = s2);
 end;
 
 // Appends a string to the end of the input string if it's not already there (from mte functions)
 function AppendIfMissing(s1, s2: String): String;
 begin
-  Result := s1;
-  if not StrEndsWith(s1, s2) then Result := s1 + s2; 
+	Result := s1;
+	if not StrEndsWith(s1, s2) then Result := s1 + s2; 
 end;
 
 // This function will allow you to find the position of a substring in a string. If the iteration of the substring isn't found -1 is returned.
 function ItPos(substr: String; str: String; it: Integer): Integer;
 var
-  debugMsg: Boolean;
-  i, found: integer;
+	debugMsg: Boolean;
+	i, found: integer;
 begin
 // Begin debugMsg Section
-  debugMsg := False; 
-  {Debug} if debugMsg then msg('[ItPos] substr := '+substr);
-  {Debug} if debugMsg then msg('[ItPos] str := '+str);
-  {Debug} if debugMsg then msg('[ItPos] it := '+IntToStr(it)); 
-  {Debug} if debugMsg then msg('[ItPos] Result := -1');
-  Result := -1;
-  //msg('Called ItPos('+substr+', '+str+', '+IntToStr(it)+')');
-  if it = 0 then exit;
-  found := 0;
-  for i := 1 to Length(str) do begin
-    //msg('    Scanned substring: '+Copy(str, i, Length(substr)));
-    if (Copy(str, i, Length(substr)) = substr) then Inc(found);
-    if found = it then begin
-      Result := i;
-      Break;
-    end;
-  end;
-  debugMsg := False;
+	debugMsg := False; 
+	{Debug} if debugMsg then msg('[ItPos] substr := '+substr);
+	{Debug} if debugMsg then msg('[ItPos] str := '+str);
+	{Debug} if debugMsg then msg('[ItPos] it := '+IntToStr(it)); 
+	{Debug} if debugMsg then msg('[ItPos] Result := -1');
+	Result := -1;
+	//msg('Called ItPos('+substr+', '+str+', '+IntToStr(it)+')');
+	if it = 0 then exit;
+	found := 0;
+	for i := 1 to Length(str) do begin
+		//msg('		Scanned substring: '+Copy(str, i, Length(substr)));
+		if (Copy(str, i, Length(substr)) = substr) then Inc(found);
+		if found = it then begin
+			Result := i;
+			Break;
+		end;
+	end;
+	debugMsg := False;
 // End debugMsg Section
 end;
 
@@ -1711,21 +1712,21 @@ end;
 // Checks if a string contains integers and then returns those integers
 function IntWithinStr(aString: String): Integer;
 var
-  debugMsg: Boolean;
-  i, x, tempInteger: Integer;
-  slTemp, slItem: TStringList;
-  tempString: String;
+	debugMsg: Boolean;
+	i, x, tempInteger: Integer;
+	slTemp, slItem: TStringList;
+	tempString: String;
 begin
 // Begin debugMsg Section
-  debugMsg := False;
+	debugMsg := False;
 	// Initialize
-  if not Assigned(slTemp) then slTemp := TStringList.Create else slTemp.Clear;
-  if not Assigned(slItem) then slItem := TStringList.Create else slItem.Clear;
+	if not Assigned(slTemp) then slTemp := TStringList.Create else slTemp.Clear;
+	if not Assigned(slItem) then slItem := TStringList.Create else slItem.Clear;
 	
 	// Function
-  slTemp.CommaText := '0, 1, 2, 3, 4, 5, 6, 7, 8, 9';
-  for i := 1 to Length(aString) do begin
-    tempString := Copy(aString, i, 1);
+	slTemp.CommaText := '0, 1, 2, 3, 4, 5, 6, 7, 8, 9';
+	for i := 1 to Length(aString) do begin
+		tempString := Copy(aString, i, 1);
 		// {Debug} if debugMsg then msg('[IntWithinStr] tempString := '+tempString);
 		for x := 0 to slTemp.Count-1 do begin 
 			if (tempString = slTemp[x]) then begin {Debug} if debugMsg then msg('[IntWithinStr] '+tempString+' = '+slTemp[x]);
@@ -1733,7 +1734,7 @@ begin
 					slItem.Add(tempString); {Debug} if debugMsg then msg('[IntWithinStr] slItem.Add( '+tempString+' );');
 					tempInteger := i; {Debug} if debugMsg then msg('[IntWithinStr] tempInteger := '+IntToStr(tempInteger));
 				end else begin {Debug} if debugMsg then msg('[IntWithinStr] slItem.Count-1 <> 0'); 
-				  {Debug} if debugMsg then msg('[IntWithinStr] if not ( '+IntToStr(i)+' - '+IntToStr(tempInteger)+' > 1) then begin');
+					{Debug} if debugMsg then msg('[IntWithinStr] if not ( '+IntToStr(i)+' - '+IntToStr(tempInteger)+' > 1) then begin');
 					if not (i-tempInteger > 1) then begin {Debug} if debugMsg then msg('[IntWithinStr] slItem.Add( '+tempString+' );');
 						slItem.Add(tempString); {Debug} if debugMsg then msg('[IntWithinStr] if not '+IntToStr(i)+' - '+IntToStr(tempInteger)+' > 1) then begin');
 						tempInteger := i; {Debug} if debugMsg then msg('[IntWithinStr] tempInteger := '+IntToStr(i));
@@ -1741,22 +1742,22 @@ begin
 				end;
 			end;
 		end;
-  end;
+	end;
 	{Debug} if debugMsg then msg('[IntWithinStr] if not slItem.Count := '+IntToStr(slItem.Count)+' = 0 then begin');
 	tempString := nil;
-  if not (slItem.Count = 0) then begin
-    for i := 0 to slItem.Count-1 do begin
-		  {Debug} if debugMsg then msg('[IntWithinStr] tempString := '+tempString+' + '+slItem[i]);
-      tempString := tempString+slItem[i];
+	if not (slItem.Count = 0) then begin
+		for i := 0 to slItem.Count-1 do begin
+			{Debug} if debugMsg then msg('[IntWithinStr] tempString := '+tempString+' + '+slItem[i]);
+			tempString := tempString+slItem[i];
 		end;
 		if (length(tempString) > 0) then
 			Result := StrToInt(tempString);
 		{Debug} if debugMsg then msg('[IntWithinStr] Result := '+IntToStr(Result));
-  end else Result := -1;
+	end else Result := -1;
 	
 	// Finalize
-  slTemp.Free;
-  slItem.Free;
+	slTemp.Free;
+	slItem.Free;
 	debugMsg := False;
 // End debugMsg Section
 end;
@@ -1772,9 +1773,9 @@ begin
 	// Function
 	{Debug} if debugMsg then msg('[StrWithinStr] aString := '+aString);
 	{Debug} if debugMsg then msg('[StrWithinStr] bString := '+bString);
-  if ItPos(Lowercase(bString), Lowercase(aString), 1) <> -1 then 
-		Result := True   
-  else 
+	if ItPos(Lowercase(bString), Lowercase(aString), 1) <> -1 then 
+		Result := True	 
+	else 
 		Result := False; 
 		
 	debugMsg := False;
@@ -1984,56 +1985,56 @@ var
  debugMsg: Boolean;
 begin
 // Begin debugMsg Section
-  debugMsg := False; {Debug} if debugMsg then msg('[StrPosCopy] if StrWithinStr(inputString := '+inputString+', findString := '+findString+') then begin');
-  if StrWithinStr(inputString, findString) then begin 
-    {Debug} if debugMsg then msg('[StrPosCopy] if not inputBoolean := '+BoolToStr(inputBoolean)+' then');
-    if not inputBoolean then begin 
-	  Result := Copy(inputString, (ItPos(findString, inputString, 1)+length(findString)), (length(inputString)-ItPos(findstring, inputstring, 1))); 
-	  {Debug} if debugMsg then msg('[StrPosCopy] Copy(inputString := '+inputString+', (ItPos(findString := '+findString+' inputString := '+inputString+', 1)+length(findString) := '+IntToStr(length(findString))+') := '+IntToStr(ItPos(findString, inputString, 1))+', (length(inputString) := '+IntToStr(length(inputString))+' - ItPos(findstring, inputString, 1)) := '+IntToStr(ItPos(findstring, inputstring, 1))+')'); 
-	  {Debug} if debugMsg then msg('[StrPosCopy] Result := '+Copy(inputString, (ItPos(findString, inputString, 1)+length(findString)), (length(inputString)-ItPos(findstring, inputstring, 1))));
+	debugMsg := False; {Debug} if debugMsg then msg('[StrPosCopy] if StrWithinStr(inputString := '+inputString+', findString := '+findString+') then begin');
+	if StrWithinStr(inputString, findString) then begin 
+		{Debug} if debugMsg then msg('[StrPosCopy] if not inputBoolean := '+BoolToStr(inputBoolean)+' then');
+		if not inputBoolean then begin 
+		Result := Copy(inputString, (ItPos(findString, inputString, 1)+length(findString)), (length(inputString)-ItPos(findstring, inputstring, 1))); 
+		{Debug} if debugMsg then msg('[StrPosCopy] Copy(inputString := '+inputString+', (ItPos(findString := '+findString+' inputString := '+inputString+', 1)+length(findString) := '+IntToStr(length(findString))+') := '+IntToStr(ItPos(findString, inputString, 1))+', (length(inputString) := '+IntToStr(length(inputString))+' - ItPos(findstring, inputString, 1)) := '+IntToStr(ItPos(findstring, inputstring, 1))+')'); 
+		{Debug} if debugMsg then msg('[StrPosCopy] Result := '+Copy(inputString, (ItPos(findString, inputString, 1)+length(findString)), (length(inputString)-ItPos(findstring, inputstring, 1))));
 	end;
-    {Debug} if debugMsg then msg('[StrPosCopy] if inputBoolean := '+BoolToStr(inputBoolean)+' then');    
+		{Debug} if debugMsg then msg('[StrPosCopy] if inputBoolean := '+BoolToStr(inputBoolean)+' then');		
 	if inputBoolean then begin 
-	  Result := Copy(inputString, 0, (ItPos(findString, inputString, 1)-1)); 
-	  {Debug} if debugMsg then msg('[StrPosCopy] Copy(inputString := '+inputString+', 0, (ItPos(findString, inputString, 1)-1 := '+IntToStr(ItPos(findString, inputString, 1)-1)+'));'); 
-	  {Debug} if debugMsg then msg('[StrPosCopy] Result := '+Copy(inputString, 0, (ItPos(findString, inputString, 1)-1)));
+		Result := Copy(inputString, 0, (ItPos(findString, inputString, 1)-1)); 
+		{Debug} if debugMsg then msg('[StrPosCopy] Copy(inputString := '+inputString+', 0, (ItPos(findString, inputString, 1)-1 := '+IntToStr(ItPos(findString, inputString, 1)-1)+'));'); 
+		{Debug} if debugMsg then msg('[StrPosCopy] Result := '+Copy(inputString, 0, (ItPos(findString, inputString, 1)-1)));
 	end;
-  end else Result := Trim(inputString);
-  debugMsg := False;
+	end else Result := Trim(inputString);
+	debugMsg := False;
 // End debugMsg Section
 end;
 
 // Copies from end instead of beginning
 function StrPosCopyReverse(inputString: String; findString: String; inputBoolean: Boolean): String;
 begin
-  if StrWithinStr(inputString, findString) then begin
-    RemoveFromEnd(inputString, ' ');
-    if (findString = ' ') then 
-	  if Flip(inputBoolean) then Result := RemoveFromEnd(ReverseString(Copy(ReverseString(inputString), 0, ItPos(findString, ReverseString(inputString), 2)-length(findString))), ' ')
-	  else Result := RemoveFromEnd(ReverseString(Copy(ReverseString(inputString), ItPos(findString, ReverseString(inputString), 2)-length(findString)), (Length(ReverseString(inputString))-ItPos(findstring, inputstring, 2))), ' ')
+	if StrWithinStr(inputString, findString) then begin
+		RemoveFromEnd(inputString, ' ');
+		if (findString = ' ') then 
+		if Flip(inputBoolean) then Result := RemoveFromEnd(ReverseString(Copy(ReverseString(inputString), 0, ItPos(findString, ReverseString(inputString), 2)-length(findString))), ' ')
+		else Result := RemoveFromEnd(ReverseString(Copy(ReverseString(inputString), ItPos(findString, ReverseString(inputString), 2)-length(findString)), (Length(ReverseString(inputString))-ItPos(findstring, inputstring, 2))), ' ')
 	else Result := ReverseString(StrPosCopy(ReverseString(inputString), findString, Flip(inputBoolean)))
 	// msg('[StrPosCopyReverse]'+ReverseString(inputString));
 	// msg('[StrPosCopyReverse]'+StrPosCopy(ReverseString(inputString), ' ', Flip(inputBoolean)));
 	// msg('[StrPosCopyReverse]'+ReverseString(StrPosCopy(ReverseString(inputString), ' ', Flip(inputBoolean))));
-  end else Result := inputString;
+	end else Result := inputString;
 end;
 
 // Shortens geev
 function geev(e: IInterface; s: String): String;
 begin
-  Result := GetElementEditValues(e, s);
+	Result := GetElementEditValues(e, s);
 end;
 
 // Shortens GetElementNativeValues
 function genv(e: IInterface; s: String): String;
 begin
-  Result := GetElementNativeValues(e, s);
+	Result := GetElementNativeValues(e, s);
 end;
 
 // Shortens SetElementEditValues
 function seev(e: IInterface; v, s: String): String;
 begin
-  Result := SetElementEditValues(e, v, s);
+	Result := SetElementEditValues(e, v, s);
 end;
 
 // Shortens SetElementNativeValues
@@ -2045,19 +2046,19 @@ end;
 // Shortens ElementByName [mte functions]
 function ebn(e: IInterface; n: string): IInterface;
 begin
-  Result := ElementByName(e, n);
+	Result := ElementByName(e, n);
 end;
 
 //Shortens ElementByPath [mte functions]
 function ebp(e: IInterface; p: string): IInterface;
 begin
-  Result := ElementByPath(e, p);
+	Result := ElementByPath(e, p);
 end;
 
 // Shortens ElementByIndex [mte functions]
 function ebi(e: IInterface; i: integer): IInterface;
 begin
-  Result := ElementByIndex(e, i);
+	Result := ElementByIndex(e, i);
 end;
 
 // Shortens ElementBySignature
@@ -2129,10 +2130,10 @@ end;
 // This is just a ghetto way of replacing all the items with a single leveled list; Returns the first element in the list
 function RefreshList(aRecord: IInterface; aString: String): IInterface;
 var
-  debugMsg: Boolean;
+	debugMsg: Boolean;
 begin
 // Begin debugMsg Section
-  debugMsg := False;
+	debugMsg := False;
 	
 	{Debug} if debugMsg then msg('[AddToOutfitAuto] Remove(ebp('+geev(OTFTcopy, 'EditorID')+', '''+aString+'''));');
 	Remove(ebp(aRecord, aString));
@@ -2147,22 +2148,22 @@ end;
 // Find a record by name (e.x. 'IronSword')
 function RecordByName(aName: String; aGroupName: String; aFileName: String): IInterface;
 var
-  slTemp: TStringList;
-  i, slTempCount: Integer;
+	slTemp: TStringList;
+	i, slTempCount: Integer;
 begin
 	// Initialize
 	if not Assigned(slTemp) then slTemp := TStringList.Create else slTemp.Clear;
 	
 	// Function
-  if not (StrEndsWith(aFileName, '.esm') or StrEndsWith(aFileName, '.esl') or StrEndsWith(aFileName, '.exe')) then AppendIfMissing(aFileName, '.esp');
-  if (aFileName = 'Skyrim.esm') then begin
-    slTemp := TStringList.Create;
+	if not (StrEndsWith(aFileName, '.esm') or StrEndsWith(aFileName, '.esl') or StrEndsWith(aFileName, '.exe')) then AppendIfMissing(aFileName, '.esp');
+	if (aFileName = 'Skyrim.esm') then begin
+		slTemp := TStringList.Create;
 	slTemp.CommaText := 'Skyrim.esm, Dawnguard.esm, HearthFires.esm, Dragonborn.esm';
-  end else begin
-    slTemp := TStringList.Create;
+	end else begin
+		slTemp := TStringList.Create;
 	slTemp.Add(aFileName);
-  end;
-  for slTempCount := 0 to slTemp.Count-1 do begin
+	end;
+	for slTempCount := 0 to slTemp.Count-1 do begin
 		for i := 0 to Pred(ec(gbs(FileByName(slTemp[slTempCount]), aGroupName))) do begin
 			if StrWithinStr(EditorID(ebi(gbs(FileByName(slTemp[slTempCount]), aGroupName), i)), 'Ench') or StrWithinStr(full(ebi(gbs(FileByName(slTemp[slTempCount]), aGroupName), i)), 'Of') then begin
 				Continue;
@@ -2171,7 +2172,7 @@ begin
 				Exit;
 			end;
 		end;
-  end;
+	end;
 	
 	// Finalize
 	slTemp.Free;
@@ -2180,18 +2181,18 @@ end;
 // Removes s1 from the end of s2, if found [mte functions]
 function RemoveFromEnd(s1, s2: string): string; 
 begin
-  Result := s1;
-  if StrEndsWith(s1, s2) then Result := Copy(s1, 1, Length(s1) - Length(s2));  
+	Result := s1;
+	if StrEndsWith(s1, s2) then Result := Copy(s1, 1, Length(s1) - Length(s2));	
 end;
 
 // This adds a name-value pair in a way that allows for duplicate values
 function slAddValue(aName, aValue: String): String;
 var
-  slTemp: TStringList;
-  debugMsg: Boolean;
+	slTemp: TStringList;
+	debugMsg: Boolean;
 begin
 	// Initialize
-  if not Assigned(slTemp) then slTemp := TStringList.Create else slTemp.Clear;
+	if not Assigned(slTemp) then slTemp := TStringList.Create else slTemp.Clear;
 	
 	// Function
 	slTemp.Values[aValue] := aName;
@@ -2205,37 +2206,37 @@ end;
 // Reverses a string.
 function ReverseString(var s: string): string;
 var
-  i: integer;
+	i: integer;
 begin
-   Result := '';
-   for i := Length(s) downto 1 do begin
-     Result := Result + Copy(s, i, 1);
-   end;
+	 Result := '';
+	 for i := Length(s) downto 1 do begin
+		 Result := Result + Copy(s, i, 1);
+	 end;
 end;
 
 // find the last position of a substring in a string [mte Functions]
 function rPos(aString, substr: string): integer;
 var
-  i: integer;
+	i: integer;
 begin
-  Result := -1;
-  if (Length(aString) - Length(substr) < 0) then
-   Exit;
-  for i := Length(aString) - Length(substr) downto 1 do begin
-    if (Copy(aString, i, Length(substr)) = substr) then begin
-      Result := i;
-      Break;
-    end;
-  end;
+	Result := -1;
+	if (Length(aString) - Length(substr) < 0) then
+	 Exit;
+	for i := Length(aString) - Length(substr) downto 1 do begin
+		if (Copy(aString, i, Length(substr)) = substr) then begin
+			Result := i;
+			Break;
+		end;
+	end;
 end;
 
 // Converts a boolean value into a string [mte Functions]
 function BoolToStr(b: boolean): string;
 begin
-  if b then
-    Result := 'True'
-  else
-    Result := 'False';
+	if b then
+		Result := 'True'
+	else
+		Result := 'False';
 end;
 
 // Converts string to boolean
@@ -2433,60 +2434,60 @@ end;
 // Converts Hex FormID to String
 function HexToStr(aFormID: String): String;
 begin
-  Result := IntToStr(StrToInt(aFormID));
+	Result := IntToStr(StrToInt(aFormID));
 end;
 
 function Flip(inputBoolean: Boolean): Boolean;
 begin
-  if inputBoolean then Result := False    
-  else Result := True;
+	if inputBoolean then Result := False		
+	else Result := True;
 end;
 
 // gets record by IntToStr HEX FormID [SkyrimUtils]
 function getRecordByFormID(id: string): IInterface;
 var
-  tmp: IInterface;
+	tmp: IInterface;
 begin
-  // basically we took record like 00049BB7, and by slicing 2 first symbols, we get IntToStr file index, in this case Skyrim (00)
-  tmp := FileByLoadOrder(StrToInt('$' + Copy(id, 1, 2)));
+	// basically we took record like 00049BB7, and by slicing 2 first symbols, we get IntToStr file index, in this case Skyrim (00)
+	tmp := FileByLoadOrder(StrToInt('$' + Copy(id, 1, 2)));
 
-  // file was found
-  if Assigned(tmp) then begin
-    // look for this record in founded file, and return it
-    tmp := RecordByFormID(tmp, StrToInt('$' + id), true);
+	// file was found
+	if Assigned(tmp) then begin
+		// look for this record in founded file, and return it
+		tmp := RecordByFormID(tmp, StrToInt('$' + id), true);
 
-    // check that record was found
-    if Assigned(tmp) then begin
-      Result := tmp;
-    end else begin // return nil if not
-      Result := nil;
-    end;
+		// check that record was found
+		if Assigned(tmp) then begin
+			Result := tmp;
+		end else begin // return nil if not
+			Result := nil;
+		end;
 
-  end else begin // return nil if not
-    Result := nil;
-  end;
+	end else begin // return nil if not
+		Result := nil;
+	end;
 end;
 
 // Checks for keyword [SkyrimUtils]
 function HasKeyword(aRecord: IInterface; aString: String): boolean;
 var
-  tempRecord: IInterface;
+	tempRecord: IInterface;
 	debugMsg: Boolean;
-  i: Integer;
+	i: Integer;
 begin
 // Begin debugMsg section
 	debugMsg := False;
 	
-  Result := False;
-  tempRecord := ebp(aRecord, 'KWDA');
-  for i := 0 to Pred(ec(tempRecord)) do begin
+	Result := False;
+	tempRecord := ebp(aRecord, 'KWDA');
+	for i := 0 to Pred(ec(tempRecord)) do begin
 		{Debug} if debugMsg then msg('[HasKeyword] if ( '+EditorID(LinksTo(ebi(tempRecord, i)))+' = '+aString+' ) then begin');
-    if (EditorID(LinksTo(ebi(tempRecord, i))) = aString) then begin
+		if (EditorID(LinksTo(ebi(tempRecord, i))) = aString) then begin
 			{Debug} if debugMsg then msg('[HasKeyword] Result := True');
-      Result := True;
-      Break;
-    end;
-  end;
+			Result := True;
+			Break;
+		end;
+	end;
 	
 	debugMsg := False;
 // End debugMsg section
@@ -2495,14 +2496,14 @@ end;
 // Gets a keyword list [SkyrimUtils]
 Procedure slKeywordList(aRecord: IInterface; aList: TStringList);
 var
-  tempRecord: IInterface;
+	tempRecord: IInterface;
 	debugMsg: Boolean;
-  i: Integer;
+	i: Integer;
 begin
 // Begin debugMsg section
 	debugMsg := False;
-  tempRecord := ebp(aRecord, 'KWDA');
-  for i := 0 to Pred(ec(tempRecord)) do
+	tempRecord := ebp(aRecord, 'KWDA');
+	for i := 0 to Pred(ec(tempRecord)) do
 		aList.Add(EditorID(LinksTo(ebi(tempRecord, i))));
 	debugMsg := False;
 // End debugMsg section
@@ -2511,22 +2512,22 @@ end;
 // Adds keyword [SkyrimUtils]
 function AddKeyword(itemRecord: IInterface; keyword: IInterface): integer;
 var
-  keywordRef: IInterface;
+	keywordRef: IInterface;
 begin
-  // don't edit records, which already have this keyword
-  if not HasKeyword(itemRecord, EditorID(keyword)) then begin
-    // get all keyword entries of provided record
-    keywordRef := ElementByName(itemRecord, 'KWDA');
+	// don't edit records, which already have this keyword
+	if not HasKeyword(itemRecord, EditorID(keyword)) then begin
+		// get all keyword entries of provided record
+		keywordRef := ElementByName(itemRecord, 'KWDA');
 
-    // record doesn't have any keywords
-    if not Assigned(keywordRef) then begin
-      Add(itemRecord, 'KWDA', true);
-    end;
-    // add new record in keywords list
-    keywordRef := ElementAssign(ebp(itemRecord, 'KWDA'), HighInteger, nil, false);
-    // set provided keyword to the new entry
-    SetEditValue(keywordRef, GetEditValue(keyword));
-  end;
+		// record doesn't have any keywords
+		if not Assigned(keywordRef) then begin
+			Add(itemRecord, 'KWDA', true);
+		end;
+		// add new record in keywords list
+		keywordRef := ElementAssign(ebp(itemRecord, 'KWDA'), HighInteger, nil, false);
+		// set provided keyword to the new entry
+		SetEditValue(keywordRef, GetEditValue(keyword));
+	end;
 end;
 
 // Gets a template item of the comparable type (e.g. sword) and tier (e.g. ebony)
@@ -2737,7 +2738,7 @@ begin
 	{Debug} if debugMsg then msg('[GetTemplate] [Tier Assignment] Replace EditorID with GameValue');
 	for i := 0 to slItem.Count-1 do
 		slItem[i] := GetGameValue(ObjectToElement(slItem.Objects[i]));
-	// Checks the selected item against the tier list in order to assign the tier	  
+	// Checks the selected item against the tier list in order to assign the tier		
 	if Assigned(itemType) and Assigned(slItem) then begin
 		// Assigns the relevant value (Armor/Damage/Value) of the selected record
 		slItem.Sort;
@@ -2751,9 +2752,9 @@ begin
 		{Debug} if debugMsg then for i := 0 to slItem.Count-1 do msg(slItem[i]);
 		for i := 0 to slItem.Count-1 do begin {Debug} if debugMsg and not ((i+1) > slItem.Count-1) then msg('[GetTemplate] [Tier Detection] recordValue := '+IntToStr(recordValue)+' < StrToInt(slItem[i+1]) := '+slItem[i+1]); {Debug} if debugMsg then msg('[GetTemplate] [Tier Detection] slItem.Count-1 := '+IntToStr(slItem.Count-1)+' i := '+IntToStr(i));
 			// This checks the value of the selected record against the value of the next tier
-			// Example: Iron Sword.  This checks if the damage value of the iron sword is less than i+1 (the next tier).  
-			// The value of an iron sword is less than i+1 (steel). Therefore the sword is tier i (Iron).  
-			// The length() part is due to how TStringLists sort.  They sort by the first digit first.  Example:  2,3,4,10,11,12 would sort as 10,11,12,2,3,4.  
+			// Example: Iron Sword.	This checks if the damage value of the iron sword is less than i+1 (the next tier).	
+			// The value of an iron sword is less than i+1 (steel). Therefore the sword is tier i (Iron).	
+			// The length() part is due to how TStringLists sort.	They sort by the first digit first.	Example:	2,3,4,10,11,12 would sort as 10,11,12,2,3,4.	
 			// If a sword is 1-9 damage it has length = 1 so it will skip 10, 11, 12, and then start checking at 2.
 			// Min and max length are also useful for checking if the record value has fewer digits than the minimum or more than the maximum
 			if (i+1) > slItem.Count-1 then Break; 
@@ -2766,10 +2767,10 @@ begin
 				// msg('['+record_full+'] '+record_full+' assigned '+full(ObjectToElement(slItem.Objects[i]))+' template');
 				{Debug} if debugMsg then msg('[GetTemplate] Result := '+EditorID(ObjectToElement(slItem.Objects[i])));
 				Result := ObjectToElement(slItem.Objects[i]);
-				Break;		  
+				Break;			
 			end;
 			// This checks the max and min length of the values in the TStringList.
-			// Example: 9 damage sword.  But tier i is 8 damage and tier i+1 is 10 damage.  
+			// Example: 9 damage sword.	But tier i is 8 damage and tier i+1 is 10 damage.	
 			// In this case the section above won't assign the tier because 9 > 8 and length(9) =/= length(10).
 			slItemMaxValue := Max(StrToInt(slItem[i]), slItemMaxValue);
 			slItemMaxLength := Max(Length(slItem[i]), slItemMaxLength);
@@ -2793,7 +2794,7 @@ begin
 				{Debug} if debugMsg then msg('[GetTemplate] Result := '+EditorID(ObjectToElement(slItem.Objects[slItem.Count-1])));
 				Result := ObjectToElement(slItem.Objects[slItem.Count-1]);
 			// For item values with fewer digits than the minimum (e.x. min armor is 10 but item armor is 1)
-			end else if Length(IntToStr(recordValue)) < slItemMinLength then begin  
+			end else if Length(IntToStr(recordValue)) < slItemMinLength then begin	
 				// msg('['+record_full+'] '+record_full+' assigned '+full(ObjectToElement(slItem.Objects[0]))+' template');
 				{Debug} if debugMsg then msg('[GetTemplate] Result := '+EditorID(ObjectToElement(slItem.Objects[0])));
 				Result := ObjectToElement(slItem.Objects[0]);
@@ -2801,9 +2802,9 @@ begin
 			end else if Length(IntToStr(recordValue)) > slItemMaxLength then begin
 				// msg('['+record_full+'] '+record_full+' assigned '+full(ObjectToElement(slItem.Objects[slItem.Count-1]))+' template');
 				{Debug} if debugMsg then msg('[GetTemplate] Result := '+EditorID(ObjectToElement(slItem.Objects[slItem.Count-1])));
-				Result := ObjectToElement(slItem.Objects[slItem.Count-1]);   
-			end else msg('[ERROR] [GetTemplate] Game Value is out of bounds');  // This should not display under any circumstances
-		end;    
+				Result := ObjectToElement(slItem.Objects[slItem.Count-1]);	 
+			end else msg('[ERROR] [GetTemplate] Game Value is out of bounds');	// This should not display under any circumstances
+		end;		
 	end;
 	
 	// Finalize
@@ -2822,35 +2823,35 @@ end;
 // Adds requirement 'HasPerk' to Conditions list [SkyrimUtils]
 function addPerkCondition(aList: IInterface; aPerk: IInterface): IInterface;
 var
-  newCondition, tempRecord: IInterface;
+	newCondition, tempRecord: IInterface;
 	debugMsg: Boolean;
 begin
 // Begin debugMsg section
 	debugMsg := False;
-  if not (Name(aList) = 'Conditions') then begin
-    if sig(aList) = 'COBJ' then begin // record itself was provided
-      tempRecord := ebp(aList, 'Conditions');
-      if not Assigned(tempRecord) then begin
-        Add(aList, 'Conditions', True);
-        aList := ebp(aList, 'Conditions');
-        newCondition := ebi(aList, 0); // xEdit will create dummy condition if new list was added
-      end else
-        aList := tempRecord;
-    end;
-  end;
-  if not Assigned(newCondition) then
-    newCondition := ElementAssign(aList, HighInteger, nil, false);
-  // set type to Equal to
-  SetElementEditValues(newCondition, 'CTDA - \Type', '10000000');
-  // set some needed properties
+	if not (Name(aList) = 'Conditions') then begin
+		if sig(aList) = 'COBJ' then begin // record itself was provided
+			tempRecord := ebp(aList, 'Conditions');
+			if not Assigned(tempRecord) then begin
+				Add(aList, 'Conditions', True);
+				aList := ebp(aList, 'Conditions');
+				newCondition := ebi(aList, 0); // xEdit will create dummy condition if new list was added
+			end else
+				aList := tempRecord;
+		end;
+	end;
+	if not Assigned(newCondition) then
+		newCondition := ElementAssign(aList, HighInteger, nil, false);
+	// set type to Equal to
+	SetElementEditValues(newCondition, 'CTDA - \Type', '10000000');
+	// set some needed properties
 	SetElementEditValues(ebp(newCondition, 'CTDA'), 'Type', '10000000');
 	SetElementEditValues(ebp(newCondition, 'CTDA'), 'Comparison Value', '1');
-  SetElementEditValues(ebp(newCondition, 'CTDA'), 'Function', 'HasPerk'); 
-  SetElementEditValues(ebp(newCondition, 'CTDA'), 'Perk', GetEditValue(aPerk));
-  SetElementEditValues(ebp(newCondition, 'CTDA'), 'Run On', 'Subject');
-  SetElementEditValues(ebp(newCondition, 'CTDA'), 'Parameter #3', '-1');	
-  removeInvalidEntries(aList);
-  Result := newCondition;
+	SetElementEditValues(ebp(newCondition, 'CTDA'), 'Function', 'HasPerk'); 
+	SetElementEditValues(ebp(newCondition, 'CTDA'), 'Perk', GetEditValue(aPerk));
+	SetElementEditValues(ebp(newCondition, 'CTDA'), 'Run On', 'Subject');
+	SetElementEditValues(ebp(newCondition, 'CTDA'), 'Parameter #3', '-1');	
+	removeInvalidEntries(aList);
+	Result := newCondition;
 	debugMsg := False;
 // End debugMsg section
 end;
@@ -2859,15 +2860,15 @@ end;
 // Gets the relevant game value
 function GetGameValue(aRecord: IInterface): String;
 var
-  slTemp: TStringList;
-  i: Integer;
+	slTemp: TStringList;
+	i: Integer;
 begin
 	// Initialize
-  slTemp := TStringList.Create;	
+	slTemp := TStringList.Create;	
 
 	// Function
-  slTemp.CommaText := 'Circlet, Ring, Necklace';
-  if (sig(aRecord) = 'ARMO') then begin
+	slTemp.CommaText := 'Circlet, Ring, Necklace';
+	if (sig(aRecord) = 'ARMO') then begin
 		for i := 0 to slTemp.Count-1 do begin
 			if StrWithinStr(full(aRecord), slTemp[i]) or StrWithinStr(ItemKeyword(aRecord), slTemp[i]) or HasKeyword(aRecord, ('Clothing'+slTemp[i])) then begin 
 				Result := geev(aRecord, 'DATA\Value');
@@ -2876,10 +2877,10 @@ begin
 		end;
 		Result := StrPosCopy(geev(aRecord, 'DNAM'), '.', True);
 		Exit;
-  end else if (sig(aRecord) = 'AMMO') then begin
+	end else if (sig(aRecord) = 'AMMO') then begin
 		Result := StrPosCopy(geev(aRecord, 'DATA\Damage'), '.', True);
 		Exit;
-  end else begin
+	end else begin
 		Result := geev(aRecord, 'DATA\Damage');
 		Exit;
 	end;
@@ -2891,15 +2892,15 @@ end;
 // Gets the relevant game value type
 function GetGameValueType(inputRecord: IInterface): String;
 var
-  slTemp: TStringList;
-  i: Integer;
+	slTemp: TStringList;
+	i: Integer;
 begin
 	// Initialize
-  slTemp := TStringList.Create;
+	slTemp := TStringList.Create;
 	
 	//Function
-  slTemp.CommaText := 'Circlet, Ring, Necklace';
-  if sig(inputRecord) = 'ARMO' then begin
+	slTemp.CommaText := 'Circlet, Ring, Necklace';
+	if sig(inputRecord) = 'ARMO' then begin
 		for i := 0 to slTemp.Count-1 do begin
 			if StrWithinStr(geev(inputRecord, 'FULL'), slTemp[i]) or StrWithinStr(ItemKeyword(inputRecord), slTemp[i]) or (ItemKeyword(inputRecord) = ('Clothing'+slTemp[i])) then begin
 				Result := 'DATA\Value';
@@ -2920,43 +2921,43 @@ end;
 // Removes spaces from a string
 function RemoveSpaces(inputString: String): String;
 var
-  debugMsg: Boolean;
-  tempString: String;
+	debugMsg: Boolean;
+	tempString: String;
 begin
 // Begin debugMsg Section
-  debugMsg := False; {Debug} if debugMsg then msg('[RemoveSpaces] Trim(inputString := '+inputString+')');
-  Trim(inputString); {Debug} if debugMsg then msg('[RemoveSpaces] tempString := inputString);');
-  while (rPos(inputString, ' ') > 0) do begin 
-    {Debug} if debugMsg then msg('[RemoveSpaces] while (rPos(inputString, ' ') := '+IntToStr(rPos(inputString, ' '))+' > 0) do begin');
-    {Debug} if debugMsg then msg('[RemoveSpaces] inputString := '+inputString);
+	debugMsg := False; {Debug} if debugMsg then msg('[RemoveSpaces] Trim(inputString := '+inputString+')');
+	Trim(inputString); {Debug} if debugMsg then msg('[RemoveSpaces] tempString := inputString);');
+	while (rPos(inputString, ' ') > 0) do begin 
+		{Debug} if debugMsg then msg('[RemoveSpaces] while (rPos(inputString, ' ') := '+IntToStr(rPos(inputString, ' '))+' > 0) do begin');
+		{Debug} if debugMsg then msg('[RemoveSpaces] inputString := '+inputString);
 		{Debug} if debugMsg then msg('[RemoveSpaces] tempString := '+tempString);
-    Delete(inputString, rPos(inputString, ' '), 1);
-  end; 
+		Delete(inputString, rPos(inputString, ' '), 1);
+	end; 
 	{Debug} if debugMsg then msg('Result := '+inputString);
-  Result := inputString;
-  debugMsg := False;
+	Result := inputString;
+	debugMsg := False;
 // End debugMsg Section
 end;
 
 // Checks if a level list contains a record
 function LLcontains(aLevelList, aRecord: IInterface): Boolean;
 var
-  debugMsg: Boolean;
-  i: Integer;
+	debugMsg: Boolean;
+	i: Integer;
 begin
 // Begin debugMsg Section
-  debugMsg := False;
-  Result := False;
+	debugMsg := False;
+	Result := False;
 	{Debug} if debugMsg then msg('[LLcontains] LLcontains( '+EditorID(aLevelList)+', '+EditorID(aRecord)+' );');
-  for i := 0 to Pred(LLec(aLevelList)) do begin
+	for i := 0 to Pred(LLec(aLevelList)) do begin
 		{Debug} if debugMsg then msg('[LLcontains] LLebi := '+EditorID(LLebi(aLevelList, i)));
 		if StrWithinStr(EditorID(LLebi(aLevelList, i)), EditorID(aRecord)) then begin
 			{Debug} if debugMsg then msg('[LLcontains] if '+EditorID(LLebi(aLevelList, i))+' = '+EditorID(aRecord)+' then begin');
 			{Debug} if debugMsg then msg('[LLcontains] Result := True');
-		  Result := True;
+			Result := True;
 			Exit;
-	  end;
-  end;
+		end;
+	end;
 	if debugMsg then msg('[LLcontains] Result := False');
 	debugMsg := False;
 // End debugMsg Section
@@ -2979,19 +2980,19 @@ end;
 // Finds the nth record in a level list
 function IndexOfLL(aLevelList, aRecord): Integer;
 var
-  debugMsg: Boolean;
-  i: Integer;
+	debugMsg: Boolean;
+	i: Integer;
 begin
 // Begin debugMsg Section
-  debugMsg := False;
-  Result := False;
-  for i := 0 to Pred(LLec(aLevelList)) do begin
-	  if debugMsg then msg('[IndexOfLL] if '+geev(ebi(ebp(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference')+', '+ShortName(aRecord)+' then begin');
-	  if StrWithinStr(geev(ebi(ebp(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference'), EditorID(aRecord)) then begin
-		  Result := i;
+	debugMsg := False;
+	Result := False;
+	for i := 0 to Pred(LLec(aLevelList)) do begin
+		if debugMsg then msg('[IndexOfLL] if '+geev(ebi(ebp(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference')+', '+ShortName(aRecord)+' then begin');
+		if StrWithinStr(geev(ebi(ebp(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference'), EditorID(aRecord)) then begin
+			Result := i;
 			Exit;
-	  end;
-  end;
+		end;
+	end;
 	debugMsg := False;
 // End debugMsg Section
 end;
@@ -2999,25 +3000,25 @@ end;
 // Replaces aRecord with bRecord in aLevelList; Adds bRecord to aLevelList if aRecord is not detected; Returns true if replaced, false if added
 function LLreplace(aLevelList, aRecord, bRecord: IInterface): Boolean;
 var
-  debugMsg: Boolean;
-  i: Integer;
+	debugMsg: Boolean;
+	i: Integer;
 begin
 // Begin debugMsg Section
-  debugMsg := False;
+	debugMsg := False;
 	
-  Result := False;
-  for i := 0 to Pred(LLec(aLevelList)) do begin
+	Result := False;
+	for i := 0 to Pred(LLec(aLevelList)) do begin
 		if debugMsg then msg('[LLreplace] '+geev(ebi(ebp(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference'));
-	  if StrWithinStr(geev(ebi(ebp(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference'), EditorID(aRecord)) then begin
+		if StrWithinStr(geev(ebi(ebp(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference'), EditorID(aRecord)) then begin
 			if debugMsg then msg('[LLreplace] SetEditValue( '+geev(ebi(ebp(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference')+', '+ShortName(bRecord)+');');
 			SetEditValue(ebp(ebi(ebp(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference'), ShortName(bRecord));
 			Result := True;
 			if debugMsg then msg('[LLreplace] '+EditorID(LLebi(aLevelList, i))+' = '+EditorID(aRecord));
 			if debugMsg then msg('[LLreplace] Result := True');
-	  end;
-  end;
+		end;
+	end;
 	if not (Result = True) then begin
-	  addToLeveledList(aLevelList, bRecord, 1);
+		addToLeveledList(aLevelList, bRecord, 1);
 		if debugMsg then msg('[LLreplace] addToLeveledList( '+EditorID(aLevelList)+', '+EditorID(bRecord)+', 1);');
 	end;
 
@@ -3028,68 +3029,68 @@ end;
 // Check a records Flags for aFlag
 function FlagCheck(aRecord: IInterface; aFlag: String): Boolean;
 var
-  debugMsg: Boolean;
+	debugMsg: Boolean;
 begin
-  Result := False;
+	Result := False;
 	if ee(aRecord, 'LVLF') then // If this record has a 'Flags' section
-	  if ee(ebp(aRecord, 'LVLF'), aFlag) then // If this record has the flag, 'aFlag'
-		  Result := GetElementNativeValues(ebp(aRecord, 'LVLF'), aFlag); // Return an integer value for this flag.  IIRC it's a binary for Flag on/off
+		if ee(ebp(aRecord, 'LVLF'), aFlag) then // If this record has the flag, 'aFlag'
+			Result := GetElementNativeValues(ebp(aRecord, 'LVLF'), aFlag); // Return an integer value for this flag.	IIRC it's a binary for Flag on/off
 end;
 
 // Creates new record inside provided file [Skyrim Utils]
 function createRecord(recordFile: IwbFile; recordSignature: string): IInterface;
 var
-  newRecordGroup: IInterface;
+	newRecordGroup: IInterface;
 begin
-  newRecordGroup := gbs(recordFile, recordSignature);
-  if not Assigned(newRecordGroup) then
-    newRecordGroup := Add(recordFile, recordSignature, true);
-  Result := Add(newRecordGroup, recordSignature, true);
+	newRecordGroup := gbs(recordFile, recordSignature);
+	if not Assigned(newRecordGroup) then
+		newRecordGroup := Add(recordFile, recordSignature, true);
+	Result := Add(newRecordGroup, recordSignature, true);
 end;
 
 // Removes invalid entries from containers and recipe items, from Leveled lists, npcs and spells [SkyrimUtils]
 Procedure removeInvalidEntries(aRecord: IInterface);
 var
-  i, aList_ec: integer;
-  aList, tempRecord: IInterface;
-  record_sig, refName, countname: String;
+	i, aList_ec: integer;
+	aList, tempRecord: IInterface;
+	record_sig, refName, countname: String;
 begin
-  record_sig := sig(aRecord);
-  if (record_sig = 'CONT') or (record_sig = 'COBJ') then begin
-    aList := ElementByName(aRecord, 'Items');
-    refName := 'CNTO\Item';
-    countname := 'COCT';
-  end else if (record_sig = 'LVLI') or (record_sig = 'LVLN') or (record_sig = 'LVSP') then begin
-    aList := ElementByName(aRecord, 'Leveled List Entries');
-    refName := 'LVLO\Reference';
-    countname := 'LLCT';
-  end else if record_sig = 'OTFT' then begin
-    aList := ElementByName(aRecord, 'INAM');
-    refName := 'item';
-  end;
-  if not Assigned(aList) then
-    Exit;
-  aList_ec := ec(aList);
-  for i := aList_ec-1 downto 0 do begin
-    tempRecord := ebi(aList, i);
-    if Check(ElementByPath(tempRecord, refName)) <> '' then
-      Remove(tempRecord);
-  end;
-  if Assigned(countname) then begin
-    if (aList_ec <> ec(aList)) then begin
-      aList_ec := ec(aList);
-      if (aList_ec > 0) then
-        senv(aRecord, countname, aList_ec)
-      else
-        RemoveElement(aRecord, countname);
-    end;
-  end;
+	record_sig := sig(aRecord);
+	if (record_sig = 'CONT') or (record_sig = 'COBJ') then begin
+		aList := ElementByName(aRecord, 'Items');
+		refName := 'CNTO\Item';
+		countname := 'COCT';
+	end else if (record_sig = 'LVLI') or (record_sig = 'LVLN') or (record_sig = 'LVSP') then begin
+		aList := ElementByName(aRecord, 'Leveled List Entries');
+		refName := 'LVLO\Reference';
+		countname := 'LLCT';
+	end else if record_sig = 'OTFT' then begin
+		aList := ElementByName(aRecord, 'INAM');
+		refName := 'item';
+	end;
+	if not Assigned(aList) then
+		Exit;
+	aList_ec := ec(aList);
+	for i := aList_ec-1 downto 0 do begin
+		tempRecord := ebi(aList, i);
+		if Check(ElementByPath(tempRecord, refName)) <> '' then
+			Remove(tempRecord);
+	end;
+	if Assigned(countname) then begin
+		if (aList_ec <> ec(aList)) then begin
+			aList_ec := ec(aList);
+			if (aList_ec > 0) then
+				senv(aRecord, countname, aList_ec)
+			else
+				RemoveElement(aRecord, countname);
+		end;
+	end;
 end;
 
 // Adds item record reference to the list [SkyrimUtils]
 function addItem(aRecord: IInterface; aItem: IInterface; aCount: integer): IInterface;
 var
-  tempRecord: IInterface;
+	tempRecord: IInterface;
 	debugMsg: Boolean;
 begin
 // Begin debugMsg section
@@ -3109,18 +3110,18 @@ end;
 // Adds item reference to the leveled list [SkyrimUtils]
 function addToLeveledList(aLeveledList, aRecord: IInterface; aLevel: integer): IInterface;
 var
-  tempRecord: IInterface;
+	tempRecord: IInterface;
 	debugMsg: Boolean;
 begin
 // Begin debugMgs section
 	debugMsg := False;
 	
 	{Debug} if debugMsg then msg('[addToLeveledList] addToLeveledList( '+EditorID(aLeveledList)+', '+EditorID(aRecord)+', '+IntToStr(aLevel)+' );');
-  tempRecord := ElementAssign(ebp(aLeveledList, 'Leveled List Entries'), HighInteger, nil, False);
+	tempRecord := ElementAssign(ebp(aLeveledList, 'Leveled List Entries'), HighInteger, nil, False);
 	seev(tempRecord, 'LVLO\Reference', Name(aRecord));
-  seev(tempRecord, 'LVLO\Count', 1);
-  seev(tempRecord, 'LVLO\Level', aLevel);
-  Result := tempRecord;
+	seev(tempRecord, 'LVLO\Count', 1);
+	seev(tempRecord, 'LVLO\Level', aLevel);
+	Result := tempRecord;
 	
 	debugMsg := False;
 // End debugMsg section
@@ -3129,13 +3130,13 @@ end;
 // Creates COBJ record for item [SkyrimUtils]
 function createRecipe(aRecord, aPlugin: IInterface): IInterface;
 var
-  recipe: IInterface;
+	recipe: IInterface;
 begin
-  recipe := createRecord(aPlugin, 'COBJ');
-  SetElementEditValues(recipe, 'CNAM', Name(aRecord));
-  SetElementEditValues(recipe, 'NAM1', '1');
+	recipe := createRecord(aPlugin, 'COBJ');
+	SetElementEditValues(recipe, 'CNAM', Name(aRecord));
+	SetElementEditValues(recipe, 'NAM1', '1');
 	Add(aRecord, 'items', True);
-  Result := recipe;
+	Result := recipe;
 end;
 
 // Gets an item type for slFuzzyItem
@@ -3308,31 +3309,31 @@ end;
 // Takes a single armor keyword and returns a list of all keywords related to it
 Procedure slFuzzyItem(aString: String; aList: TStringList);
 var
-  slTemp: TStringList;
-  debugMsg: Boolean;
+	slTemp: TStringList;
+	debugMsg: Boolean;
 	i: Integer;
 begin
 // Begin debugMsg Section
-  debugMsg := False;
+	debugMsg := False;
 	
 	// Initialize
 	{Debug} if debugMsg then msg('[slFuzzyItem] inputString := '+aString);
-  if not Assigned(slTemp) then slTemp := TStringList.Create else slTemp.Clear;
+	if not Assigned(slTemp) then slTemp := TStringList.Create else slTemp.Clear;
 	
 	// Function
 	slTemp.CommaText := 'Helmet, Crown, Helm, Hood, Mask, Circlet, Headdress';
-  for i := 0 to slTemp.Count-1 do if aString = slHelmet[i] then 
+	for i := 0 to slTemp.Count-1 do if aString = slHelmet[i] then 
 		if not slContains(aList, slHelmet[i]) then
 			aList.Add(slHelmet[i]);
 	slTemp.CommaText := 'Bracers, Gloves, Gauntlets';
-  for i := 0 to slTemp.Count-1 do if aString = slGauntlets[i] then 
+	for i := 0 to slTemp.Count-1 do if aString = slGauntlets[i] then 
 		if not slContains(aList, slGauntlets[i]) then
 			aList.Add(slGauntlets[i]);
-  slTemp.CommaText := 'Boots, Shoes';
+	slTemp.CommaText := 'Boots, Shoes';
 	for i := 0 to slTemp.Count-1 do if aString = slBoots[i] then 
 		if not slContains(aList, slBoots[i]) then
 			aList.Add(slBoots[i]);
-  slTemp.CommaText := 'Cuirass, Armor';
+	slTemp.CommaText := 'Cuirass, Armor';
 	for i := 0 to slTemp.Count-1 do if aString = slCuirass[i] then 
 		if not slContains(aList, slCuirass[i]) then
 			aList.Add(slCuirass[i]);
@@ -3353,25 +3354,25 @@ end;
 // Reduces a list of armor keywords into a single armor keyword
 function GetFuzzyItem(aString: String): String;
 var
-  slTemp: TStringList;
-  debugMsg: Boolean;
+	slTemp: TStringList;
+	debugMsg: Boolean;
 	i: Integer;
 begin
 // Begin debugMsg Section
-  debugMsg := False;
+	debugMsg := False;
 	
 	// Initialize
 	{Debug} if debugMsg then msg('[slFuzzyItem] inputString := '+aString);
-  if not Assigned(slTemp) then slTemp := TStringList.Create else slTemp.Clear;
+	if not Assigned(slTemp) then slTemp := TStringList.Create else slTemp.Clear;
 	
 	// Function
 	slTemp.CommaText := 'Helmet, Crown, Helm, Hood, Mask, Circlet, Headdress';
-  for i := 0 to slTemp.Count-1 do if aString = slHelmet[i] then begin
+	for i := 0 to slTemp.Count-1 do if aString = slHelmet[i] then begin
 		Result := 'Helmet';
 		slTemp.Free;
 		Exit;
 	end;
-  slTemp.CommaText := 'Bracers, Gloves, Gauntlets';
+	slTemp.CommaText := 'Bracers, Gloves, Gauntlets';
 	for i := 0 to slTemp.Count-1 do if aString = slGauntlets[i] then begin
 		Result := 'Gauntlets';
  		slTemp.Free;
@@ -3382,7 +3383,7 @@ begin
 		Result := 'Boots';
 		slTemp.Free;
 		Exit;
-	end;  
+	end;	
 	slTemp.CommaText := 'Cuirass, Armor';
 	for i := 0 to slTemp.Count-1 do if aString = slCuirass[i] then begin
 		Result := 'Cuirass';
@@ -3407,25 +3408,25 @@ end;
 // Adds a TStringList to an msg on a single line
 Procedure msgList(s1: String; aList: TStringList; s2: String);
 var
-  debugMsg: Boolean;
-  i: Integer;
-  tempString: String;
+	debugMsg: Boolean;
+	i: Integer;
+	tempString: String;
 begin
 // Begin debugMsg section
 	debugMsg := False;
 	
-  if not Assigned(aList) or (aList.Count = 0) then begin
-	  msg(s1+'EMPTY LIST'+s2);
-	  Exit;
+	if not Assigned(aList) or (aList.Count = 0) then begin
+		msg(s1+'EMPTY LIST'+s2);
+		Exit;
 	end;
-  for i := 0 to aList.Count-1 do begin
+	for i := 0 to aList.Count-1 do begin
 		if (i = 0) then begin
 			tempString := aList[0];
 		end else begin
 			tempString := tempString+', '+aList[i];
 		end;
 	end;
-  msg(s1+tempString+s2);
+	msg(s1+tempString+s2);
 	
 	debugMsg := False;
 // End debugMsg section
@@ -3434,25 +3435,25 @@ end;
 // Adds a TStringList and its objects to an msg on a single line
 Procedure msgListObject(s1: String; aList: TStringList; s2: String);
 var
-  debugMsg: Boolean;
-  i: Integer;
-  tempString: String;
+	debugMsg: Boolean;
+	i: Integer;
+	tempString: String;
 begin
 // Begin debugMsg section
 	debugMsg := False;
 	
-  if not Assigned(aList) or (aList.Count = 0) then begin
-	  msg(s1+'EMPTY LIST'+s2);
-	  Exit;
+	if not Assigned(aList) or (aList.Count = 0) then begin
+		msg(s1+'EMPTY LIST'+s2);
+		Exit;
 	end;
-  for i := 0 to aList.Count-1 do begin
+	for i := 0 to aList.Count-1 do begin
 		if (i = 0) then begin
 			tempString := aList[0];
 		end else begin
 			tempString := tempString+', '+aList[i]+' ('+varTypeAsText(aList.Objects[i])+')';
 		end;
 	end;
-  msg(s1+tempString+s2);
+	msg(s1+tempString+s2);
 	
 	debugMsg := False;
 // End debugMsg section
@@ -3494,11 +3495,11 @@ end;
 function RemoveFileSuffix(inputString: String): String;
 var
 	slTemp: TStringList;
-  debugMsg: Boolean;
+	debugMsg: Boolean;
 	i: Integer;
 begin
 // Begin debugMsg Section
-  debugMsg := False;
+	debugMsg := False;
 	// Initialize
 	{Debug} if debugMsg then msg('[RemoveFileSuffix] inputString := '+inputString);
 	if not Assigned(slTemp) then slTemp := TStringList.Create else slTemp.Clear;
@@ -3506,7 +3507,7 @@ begin
 	// Function
 	Result := inputString;
 	slTemp.CommaText := '.esp, .esm, .exe, .esl';
-	for i := 0 to slTemp.Count-1 do begin  
+	for i := 0 to slTemp.Count-1 do begin	
 		{Debug} if debugMsg then msg('[RemoveFileSuffix] if StrEndsWith(inputString, '+slTemp[i]+') := '+BoolToStr(StrEndsWith(inputString, slTemp[i])));
 		if StrEndsWith(inputString, slTemp[i]) then begin
 			Result := RemoveFromEnd(inputString, slTemp[i]);
@@ -3517,7 +3518,7 @@ begin
 	
 	// Finalize
 	slTemp.Free;
-  debugMsg := False;
+	debugMsg := False;
 // End debugMsg Section
 end;
 
@@ -3638,11 +3639,11 @@ begin
 // Begin debugMsg section
 	debugMsg := False;
 	// The following section can be real confusing without examples.
-	// If I have a 10% chance I need a Leveled List with 9 copies of the regular item and 1 copy of the enchantment Leveled List.  In math this looks like 1/10 = 10/100 = 10%.
+	// If I have a 10% chance I need a Leveled List with 9 copies of the regular item and 1 copy of the enchantment Leveled List.	In math this looks like 1/10 = 10/100 = 10%.
 	// If I have a 9% chance I need a Leveled List (List A) with 9 copies of the regular item and 1 copy of the enchantment Leveled List.
-	// I also need ANOTHER list (List B) with 9 copies of the regular item and 1 copy of List A.  In math this looks like 1/10 * 9/10 = 9/100 (or 9%).
+	// I also need ANOTHER list (List B) with 9 copies of the regular item and 1 copy of List A.	In math this looks like 1/10 * 9/10 = 9/100 (or 9%).
 	// Similarly, if I have an 11% chance I need a Leveled List (List A) with 9 copies of the regular item and 1 copy of the enchantment Leveled List.
-	// I also need ANOTHER list with 8 copies of the regular item, 1 copy of List A, and 1 copy of the enchantment list.  In math this looks like 1/10 + (1/10 * 9/10) = 11/100 (or 11%).
+	// I also need ANOTHER list with 8 copies of the regular item, 1 copy of List A, and 1 copy of the enchantment list.	In math this looks like 1/10 + (1/10 * 9/10) = 11/100 (or 11%).
 	
 	// Initialize
 	if Chance = 0 then Exit;
@@ -3663,7 +3664,7 @@ begin
 			addToLeveledList(nestedChanceLevelList, aRecord, 1);
 		addToLeveledList(chanceLevelList, nestedChanceLevelList, 1); {Debug} if debugMsg then msg('[%Chance] while (LLec( '+EditorID(chanceLevelList)+' ) < 10) do addToLeveledList( '+EditorID(chanceLevelList)+', '+EditorID(aRecord)+', 1 );');
 		while (LLec(chanceLevelList) < 10) do 
-			addToLeveledList(chanceLevelList, aRecord, 1);				  
+			addToLeveledList(chanceLevelList, aRecord, 1);					
 	end else begin
 		// Grab the second digit; If the second digit is 0 we don't need the nested leveled list; Example: 10, 20, 30, etc.
 		{Debug} if debugMsg then msg('[%Chance] StrToInt(Copy(IntToStr(Chance), 2, 1)) := '+Copy(IntToStr(Chance), 2, 1));
@@ -3682,7 +3683,7 @@ begin
 				while (LLec(chanceLevelList) < 10) do 
 			addToLeveledList(chanceLevelList, aRecord, 1);
 		end else begin {Debug} if debugMsg then msg('[%Chance] Not tempBoolean; Beginning nested list generation');
-			// Create a nested leveled list for valid integers between 0 and 100 with a second digit greater than 0.  Example: 51, 52, 53, etc.
+			// Create a nested leveled list for valid integers between 0 and 100 with a second digit greater than 0.	Example: 51, 52, 53, etc.
 			{Debug} if debugMsg then msg('[%Chance] Creating and preparing nestedchanceLevelList');
 			nestedChanceLevelList := createLeveledList(aPlugin, Insert('nested', aName, ItPos(aName, 'e', 3)), slTemp, 0);
 			// Fill the nested and chance leveled lists based on Chance
@@ -4290,12 +4291,12 @@ begin
 		lblTier01.Caption := 'Tier 01 appears at level: ';
 		
 		// Tier 01 Drop Down
-    ddTier01 := TComboBox.Create(frm);
-    ddTier01.Parent := frm;
+		ddTier01 := TComboBox.Create(frm);
+		ddTier01.Parent := frm;
 		ddTier01.Height := lblTier01.Height;
-    ddTier01.Top := lblTier01.Top - 2;		
-    ddTier01.Left := 530;
-    ddTier01.Width := 80;
+		ddTier01.Top := lblTier01.Top - 2;		
+		ddTier01.Left := 530;
+		ddTier01.Width := 80;
 		if slContains(slGlobal, 'ItemTier01') then begin
 			ddTier01.Items.Add(IntToStr(slGlobal.Objects[slGlobal.IndexOf('ItemTier01')]));
 		end else begin
@@ -4312,12 +4313,12 @@ begin
 		lblTier02.Caption := 'Tier 02 appears at level: ';
 		
 		// Tier 02 Drop Down
-    ddTier02 := TComboBox.Create(frm);
-    ddTier02.Parent := frm;
+		ddTier02 := TComboBox.Create(frm);
+		ddTier02.Parent := frm;
 		ddTier02.Height := lblTier02.Height;
-    ddTier02.Top := lblTier02.Top - 2;		
-    ddTier02.Left := ddTier01.Left;
-    ddTier02.Width := ddTier01.Width;
+		ddTier02.Top := lblTier02.Top - 2;		
+		ddTier02.Left := ddTier01.Left;
+		ddTier02.Width := ddTier01.Width;
 		if slContains(slGlobal, 'ItemTier02') then begin
 			ddTier02.Items.Add(IntToStr(slGlobal.Objects[slGlobal.IndexOf('ItemTier02')]));
 		end else begin
@@ -4334,12 +4335,12 @@ begin
 		lblTier03.Caption := 'Tier 03 appears at level: ';
 		
 		// Tier 03 Drop Down
-    ddTier03 := TComboBox.Create(frm);
-    ddTier03.Parent := frm;
+		ddTier03 := TComboBox.Create(frm);
+		ddTier03.Parent := frm;
 		ddTier03.Height := lblTier03.Height;
-    ddTier03.Top := lblTier03.Top - 2;		
-    ddTier03.Left := ddTier01.Left;
-    ddTier03.Width := ddTier01.Width;
+		ddTier03.Top := lblTier03.Top - 2;		
+		ddTier03.Left := ddTier01.Left;
+		ddTier03.Width := ddTier01.Width;
 		if slContains(slGlobal, 'ItemTier03') then begin
 			ddTier03.Items.Add(IntToStr(slGlobal.Objects[slGlobal.IndexOf('ItemTier03')]));
 		end else begin
@@ -4356,12 +4357,12 @@ begin
 		lblTier04.Caption := 'Tier 04 appears at level: ';
 		
 		// Tier 04 Drop Down
-    ddTier04 := TComboBox.Create(frm);
-    ddTier04.Parent := frm;
+		ddTier04 := TComboBox.Create(frm);
+		ddTier04.Parent := frm;
 		ddTier04.Height := lblTier04.Height;
-    ddTier04.Top := lblTier04.Top - 2;		
-    ddTier04.Left := ddTier01.Left;
-    ddTier04.Width := ddTier01.Width;
+		ddTier04.Top := lblTier04.Top - 2;		
+		ddTier04.Left := ddTier01.Left;
+		ddTier04.Width := ddTier01.Width;
 		if slContains(slGlobal, 'ItemTier04') then begin
 			ddTier04.Items.Add(IntToStr(slGlobal.Objects[slGlobal.IndexOf('ItemTier04')]));
 		end else begin
@@ -4378,12 +4379,12 @@ begin
 		lblTier05.Caption := 'Tier 05 appears at level: ';	
 		
 		// Tier 05 Drop Down
-    ddTier05 := TComboBox.Create(frm);
-    ddTier05.Parent := frm;
+		ddTier05 := TComboBox.Create(frm);
+		ddTier05.Parent := frm;
 		ddTier05.Height := lblTier05.Height;
-    ddTier05.Top := lblTier05.Top - 2;		
-    ddTier05.Left := ddTier01.Left;
-    ddTier05.Width := ddTier01.Width;
+		ddTier05.Top := lblTier05.Top - 2;		
+		ddTier05.Left := ddTier01.Left;
+		ddTier05.Width := ddTier01.Width;
 		if slContains(slGlobal, 'ItemTier05') then begin
 			ddTier05.Items.Add(IntToStr(slGlobal.Objects[slGlobal.IndexOf('ItemTier05')]));
 		end else begin
@@ -4400,12 +4401,12 @@ begin
 		lblTier06.Caption := 'Tier 06 appears at level: ';	
 		
 		// Tier 06 Drop Down
-    ddTier06 := TComboBox.Create(frm);
-    ddTier06.Parent := frm;
+		ddTier06 := TComboBox.Create(frm);
+		ddTier06.Parent := frm;
 		ddTier06.Height := lblTier06.Height;
-    ddTier06.Top := lblTier06.Top-2;		
-    ddTier06.Left := ddTier01.Left;
-    ddTier06.Width := ddTier01.Width;
+		ddTier06.Top := lblTier06.Top-2;		
+		ddTier06.Left := ddTier01.Left;
+		ddTier06.Width := ddTier01.Width;
 		if slContains(slGlobal, 'ItemTier06') then begin
 			ddTier06.Items.Add(IntToStr(slGlobal.Objects[slGlobal.IndexOf('ItemTier06')]));
 		end else begin
@@ -4488,12 +4489,12 @@ begin
 		
 		// Temper Light Drop Down
 		{Debug} if debugMsg then msg('[Btn_Temper_OnClick] Temper Light Drop Down');
-    ddTemperLight := TComboBox.Create(frm);
-    ddTemperLight.Parent := frm;
+		ddTemperLight := TComboBox.Create(frm);
+		ddTemperLight.Parent := frm;
 		ddTemperLight.Height := lblTemperLight.Height;
-    ddTemperLight.Top := lblTemperLight.Top - 2;		
-    ddTemperLight.Left := 450;
-    ddTemperLight.Width := 80;
+		ddTemperLight.Top := lblTemperLight.Top - 2;		
+		ddTemperLight.Left := 450;
+		ddTemperLight.Width := 80;
 		if slContains(slGlobal, 'TemperLight') then begin
 			ddTemperLight.Items.Add(IntToStr(slGlobal.Objects[slGlobal.IndexOf('TemperLight')]));
 		end else begin
@@ -4512,12 +4513,12 @@ begin
 		
 		// Temper Heavy Drop Down
 		{Debug} if debugMsg then msg('[Btn_Temper_OnClick] Temper Heavy Drop Down');
-    ddTemperHeavy := TComboBox.Create(frm);
-    ddTemperHeavy.Parent := frm;
+		ddTemperHeavy := TComboBox.Create(frm);
+		ddTemperHeavy.Parent := frm;
 		ddTemperHeavy.Height := lblTemperHeavy.Height;
-    ddTemperHeavy.Top := lblTemperHeavy.Top - 2;		
-    ddTemperHeavy.Left := ddTemperLight.Left;
-    ddTemperHeavy.Width := ddTemperLight.Width;
+		ddTemperHeavy.Top := lblTemperHeavy.Top - 2;		
+		ddTemperHeavy.Left := ddTemperLight.Left;
+		ddTemperHeavy.Width := ddTemperLight.Width;
 		if slContains(slGlobal, 'TemperHeavy') then begin
 			ddTemperHeavy.Items.Add(IntToStr(slGlobal.Objects[slGlobal.IndexOf('TemperHeavy')]));
 		end else begin
@@ -4595,12 +4596,12 @@ begin
 		
 		// Breakdown Equipped Check Box
 		{Debug} if debugMsg then msg('[Btn_Temper_OnClick] Breakdown Equipped Check Box');
-    ckEquipped := TCheckBox.Create(frm);
-    ckEquipped.Parent := frm;
+		ckEquipped := TCheckBox.Create(frm);
+		ckEquipped.Parent := frm;
 		ckEquipped.Height := lblEquipped.Height;
-    ckEquipped.Top := lblEquipped.Top - 2;		
-    ckEquipped.Left := 465;
-    ckEquipped.Width := 80;
+		ckEquipped.Top := lblEquipped.Top - 2;		
+		ckEquipped.Left := 465;
+		ckEquipped.Width := 80;
 		if slContains(slGlobal, 'BreakdownEquipped') then begin
 			ckEquipped.Checked := Boolean(slGlobal.Objects[slGlobal.IndexOf('BreakdownEquipped')]);
 		end else
@@ -4617,12 +4618,12 @@ begin
 		
 		// Breakdown Enchanted Check Box
 		{Debug} if debugMsg then msg('[Btn_Temper_OnClick] Breakdown Enchanted Check Box');
-    ckEnchanted := TCheckBox.Create(frm);
-    ckEnchanted.Parent := frm;
+		ckEnchanted := TCheckBox.Create(frm);
+		ckEnchanted.Parent := frm;
 		ckEnchanted.Height := lblEnchanted.Height;
-    ckEnchanted.Top := lblEnchanted.Top - 2;		
-    ckEnchanted.Left := ckEquipped.Left;
-    ckEnchanted.Width := ckEquipped.Width;
+		ckEnchanted.Top := lblEnchanted.Top - 2;		
+		ckEnchanted.Left := ckEquipped.Left;
+		ckEnchanted.Width := ckEquipped.Width;
 		if slContains(slGlobal, 'BreakdownEnchanted') then begin		
 			ckEnchanted.Checked := Boolean(slGlobal.Objects[slGlobal.IndexOf('BreakdownEnchanted')]);
 		end else
@@ -4639,12 +4640,12 @@ begin
 		
 		// Breakdown Daedric Check Box
 		{Debug} if debugMsg then msg('[Btn_Temper_OnClick] Breakdown Daedric Check Box');
-    ckDaedric := TCheckBox.Create(frm);
-    ckDaedric.Parent := frm;
+		ckDaedric := TCheckBox.Create(frm);
+		ckDaedric.Parent := frm;
 		ckDaedric.Height := lblDaedric.Height;
-    ckDaedric.Top := lblDaedric.Top - 2;		
-    ckDaedric.Left := ckEquipped.Left;
-    ckDaedric.Width := ckEquipped.Width;
+		ckDaedric.Top := lblDaedric.Top - 2;		
+		ckDaedric.Left := ckEquipped.Left;
+		ckDaedric.Width := ckEquipped.Width;
 		if slContains(slGlobal, 'BreakdownDaedric') then begin		
 			ckDaedric.Checked := Boolean(slGlobal.Objects[slGlobal.IndexOf('BreakdownDaedric')]);
 		end else
@@ -4661,12 +4662,12 @@ begin
 		
 		// Breakdown DLC Check Box
 		{Debug} if debugMsg then msg('[Btn_Temper_OnClick] Breakdown DLC Check Box');
-    ckChitin := TCheckBox.Create(frm);
-    ckChitin.Parent := frm;
+		ckChitin := TCheckBox.Create(frm);
+		ckChitin.Parent := frm;
 		ckChitin.Height := lblChitin.Height;
-    ckChitin.Top := lblChitin.Top - 2;		
-    ckChitin.Left := ckEquipped.Left;
-    ckChitin.Width := ckEquipped.Width;
+		ckChitin.Top := lblChitin.Top - 2;		
+		ckChitin.Left := ckEquipped.Left;
+		ckChitin.Width := ckEquipped.Width;
 		if slContains(slGlobal, 'BreakdownDLC') then begin		
 			ckChitin.Checked := Boolean(slGlobal.Objects[slGlobal.IndexOf('BreakdownDLC')]);
 		end else
@@ -4755,12 +4756,12 @@ begin
 		
 		// Enable Scaling
 		{Debug} if debugMsg then msg('[Btn_Temper_OnClick] Enable Scaling Check Box');
-    ckScaling := TCheckBox.Create(frm);
-    ckScaling.Parent := frm;
+		ckScaling := TCheckBox.Create(frm);
+		ckScaling.Parent := frm;
 		ckScaling.Height := lblScaling.Height;
-    ckScaling.Top := lblScaling.Top - 2;		
-    ckScaling.Left := 465;
-    ckScaling.Width := 80;
+		ckScaling.Top := lblScaling.Top - 2;		
+		ckScaling.Left := 465;
+		ckScaling.Width := 80;
 		if StrWithinSL('RecipeScaling', slGlobal) then begin
 			for i := 0 to slGlobal.Count-1 do
 				if StrWithinStr(slGlobal[i], 'RecipeScaling') then				
@@ -4944,28 +4945,28 @@ end;
 Procedure GEV_GeneralSettings;
 var
 	lblpercent, lblEnchantmentMultiplier, lblEnchantmentPercent, lblAllowUnenchanting, lblAddtoLL: TLabel;
-  lblChance, lblDetectedItem, lblDetectedItemText, lblGEVfile, ckPercent, ckAllowUnenchanting, ckAddtoLL: TCheckBox;
-  btnOk, btnCancel, btnAdvanced, btnRemove, btnItemTierLevels, btnBulk, btnPatch: TButton;
+	lblChance, lblDetectedItem, lblDetectedItemText, lblGEVfile, ckPercent, ckAllowUnenchanting, ckAddtoLL: TCheckBox;
+	btnOk, btnCancel, btnAdvanced, btnRemove, btnItemTierLevels, btnBulk, btnPatch: TButton;
 	ddChance, ddEnchantmentMultiplier, ddGEVfile, ddAddtoLL: TComboBox;
 	debugMsg, tempBoolean: Boolean;
 	frm: TForm;
-  i: integer;
+	i: integer;
 begin
 // Begin debugMsg Section
-  debugMsg := False;
+	debugMsg := False;
 	
 	// Initialize Local
 	if not Assigned(slGlobal) then slGlobal := TStringList.Create;
 
-  frm := TForm.Create(nil);
-  try
-    // Parent Form; Entire Box
-    frm.Width := 650;
-    frm.Height := 180;
-    frm.Position := poScreenCenter;
-    frm.Caption := 'General Settings';
+	frm := TForm.Create(nil);
+	try
+		// Parent Form; Entire Box
+		frm.Width := 650;
+		frm.Height := 180;
+		frm.Position := poScreenCenter;
+		frm.Caption := 'General Settings';
 	
-	  // Currently Selected Item Label
+		// Currently Selected Item Label
 		lblDetectedItemText := TLabel.Create(frm);
 		lblDetectedItemText.Parent := frm;
 		lblDetectedItemText.Height := 24;
@@ -4973,7 +4974,7 @@ begin
 		lblDetectedItemText.Left := 60;
 		lblDetectedItemText.Caption := 'Currently Selected Item: ';
 		frm.Height := frm.Height+lblDetectedItemText.Height + 18;
-	  
+		
 		// Currently Selected Item
 		lblDetectedItem := TLabel.Create(frm);
 		lblDetectedItem.Parent := frm;
@@ -4983,20 +4984,20 @@ begin
 		lblDetectedItem.Caption := full(selectedRecord);
 	
 		// Output Plugin Label
-    lblGEVfile := TLabel.Create(frm);
-    lblGEVfile.Parent := frm;
+		lblGEVfile := TLabel.Create(frm);
+		lblGEVfile.Parent := frm;
 		lblGEVfile.Height := lblDetectedItemText.Height;
-    lblGEVfile.Top := lblDetectedItemText.Top + lblDetectedItemText.Height + 18;
-    lblGEVfile.Left := lblDetectedItemText.Left;		
-    lblGEVfile.Caption := 'Output Plugin: ';
+		lblGEVfile.Top := lblDetectedItemText.Top + lblDetectedItemText.Height + 18;
+		lblGEVfile.Left := lblDetectedItemText.Left;		
+		lblGEVfile.Caption := 'Output Plugin: ';
 		frm.Height := frm.Height+lblGEVfile.Height + 18;
-    
+		
 		// Output Plugin Edit Box
-    ddGEVfile := TComboBox.Create(frm);
-    ddGEVfile.Parent := frm;
+		ddGEVfile := TComboBox.Create(frm);
+		ddGEVfile.Parent := frm;
 		ddGEVfile.Height := lblDetectedItemText.Height;
-    ddGEVfile.Top := lblGEVfile.Top - 2;		
-    ddGEVfile.Left := lblGEVfile.Left + (9*Length(lblGEVfile.Caption)) + 36;
+		ddGEVfile.Top := lblGEVfile.Top - 2;		
+		ddGEVfile.Left := lblGEVfile.Left + (9*Length(lblGEVfile.Caption)) + 36;
 		ddGEVfile.Width := 280;
 		if slContains(slGlobal, 'GEVfile') then begin
 			ddGEVfile.Items.Add(GetFileName(ObjectToElement(GetObject('GEVfile', slGlobal))));
@@ -5004,7 +5005,7 @@ begin
 			ddGEVfile.Items.Add(defaultOutputPlugin);
 		ddGEVfile.ItemIndex := 0;	
 
-	  // Item Tier Levels
+		// Item Tier Levels
 		btnItemTierLevels := TButton.Create(frm);
 		btnItemTierLevels.Parent := frm;
 		btnItemTierLevels.Top := lblGEVfile.Top + lblGEVfile.Height + 18;
@@ -5016,78 +5017,78 @@ begin
 		btnItemTierLevels.OnClick := Btn_ItemTierLevels_OnClick;
 		
 		// Replace in Leveled List Label
-    lblAddtoLL := TLabel.Create(frm);
-    lblAddtoLL.Parent := frm;
+		lblAddtoLL := TLabel.Create(frm);
+		lblAddtoLL.Parent := frm;
 		lblAddtoLL.Height := lblDetectedItemText.Height;
-    lblAddtoLL.Top := btnItemTierLevels.Top + btnItemTierLevels.Height + 18;;
-    lblAddtoLL.Left := lblGEVfile.Left;
-    lblAddtoLL.Caption := 'Replace in Leveled Lists: ';
+		lblAddtoLL.Top := btnItemTierLevels.Top + btnItemTierLevels.Height + 18;;
+		lblAddtoLL.Left := lblGEVfile.Left;
+		lblAddtoLL.Caption := 'Replace in Leveled Lists: ';
 		frm.Height := frm.Height+lblAddtoLL.Height + 18;
-    
+		
 		// Replace in Leveled List Check Box
-    ckAddtoLL := TCheckBox.Create(frm);
-    ckAddtoLL.Parent := frm;
+		ckAddtoLL := TCheckBox.Create(frm);
+		ckAddtoLL.Parent := frm;
 		ckAddtoLL.Height := lblAddtoLL.Height;
-    ckAddtoLL.Left := 485;
-    ckAddtoLL.Top := lblAddtoLL.Top;
+		ckAddtoLL.Left := 485;
+		ckAddtoLL.Top := lblAddtoLL.Top;
 		if slContains(slGlobal, 'ReplaceInLeveledList') then begin
 			ckAddtoLL.Checked := Boolean(GetObject('ReplaceInLeveledList', slGlobal));
 		end else
 			ckAddtoLL.Checked := True;
 		
 		// Allow Unenchanting Label
-    lblAllowUnenchanting := TLabel.Create(frm);
-    lblAllowUnenchanting.Parent := frm;
+		lblAllowUnenchanting := TLabel.Create(frm);
+		lblAllowUnenchanting.Parent := frm;
 		lblAllowUnenchanting.Height := 24;
-    lblAllowUnenchanting.Top := lblAddtoLL.Top+lblAddtoLL.Height + 18;		
-    lblAllowUnenchanting.Left := lblGEVfile.Left;
-    lblAllowUnenchanting.Caption := 'Allow Unenchanting: ';
+		lblAllowUnenchanting.Top := lblAddtoLL.Top+lblAddtoLL.Height + 18;		
+		lblAllowUnenchanting.Left := lblGEVfile.Left;
+		lblAllowUnenchanting.Caption := 'Allow Unenchanting: ';
 		frm.Height := frm.Height + lblAllowUnenchanting.Height + 18;
-    
+		
 		// Allow Unenchanting Check Box
-    ckAllowUnenchanting := TCheckBox.Create(frm);
-    ckAllowUnenchanting.Parent := frm;
+		ckAllowUnenchanting := TCheckBox.Create(frm);
+		ckAllowUnenchanting.Parent := frm;
 		ckAllowUnenchanting.Height := 24;
-	  ckAllowUnenchanting.Top := lblAllowUnenchanting.Top;
-    ckAllowUnenchanting.Left := ckAddtoLL.Left;
+		ckAllowUnenchanting.Top := lblAllowUnenchanting.Top;
+		ckAllowUnenchanting.Left := ckAddtoLL.Left;
 		if slContains(slGlobal, 'AllowDisenchanting') then begin
 			ckAllowUnenchanting.Checked := Boolean(GetObject('AllowDisenchanting', slGlobal));
 		end else
 			ckAllowUnenchanting.Checked := True;	
 
 		// Percent Chance Label
-    lblChance := TLabel.Create(frm);
-    lblChance.Parent := frm;
-    lblChance.Left := lblGEVfile.Left;
-    lblChance.Top := lblAllowUnenchanting.Top + lblAllowUnenchanting.Height + 18;
-    lblChance.Caption := 'Use Percent Chance: ';
+		lblChance := TLabel.Create(frm);
+		lblChance.Parent := frm;
+		lblChance.Left := lblGEVfile.Left;
+		lblChance.Top := lblAllowUnenchanting.Top + lblAllowUnenchanting.Height + 18;
+		lblChance.Caption := 'Use Percent Chance: ';
 		frm.Height := frm.Height+lblChance.Height + 8;
-    
+		
 		// Percent Chance Check Box
-    ckPercent := TCheckBox.Create(frm);
-    ckPercent.Parent := frm;
+		ckPercent := TCheckBox.Create(frm);
+		ckPercent.Parent := frm;
 		ckPercent.Height := lblGEVfile.Height;
-    ckPercent.Left := ckAddtoLL.Left;
-    ckPercent.Top := lblChance.Top;
+		ckPercent.Left := ckAddtoLL.Left;
+		ckPercent.Top := lblChance.Top;
 		if slContains(slGlobal, 'ChanceBoolean') then begin
 			ckPercent.Checked := Boolean(GetObject('ChanceBoolean', slGlobal));
 		end else
 			ckPercent.Checked := True;	
 
 		// Generate Enchanted Versions % Chance Label
-    lblpercent := TLabel.Create(frm);
-    lblpercent.Parent := frm;
+		lblpercent := TLabel.Create(frm);
+		lblpercent.Parent := frm;
 		lblpercent.Height := ddGEVfile.Height;
-    lblpercent.Left := ckPercent.Left + 20;
-    lblpercent.Top := lblChance.Top;
+		lblpercent.Left := ckPercent.Left + 20;
+		lblpercent.Top := lblChance.Top;
 		lblpercent.Caption := '%';
 		
 		// Generate Enchanted Versions % Chance Edit Box
-    ddChance := TComboBox.Create(frm);
-    ddChance.Parent := frm;
+		ddChance := TComboBox.Create(frm);
+		ddChance.Parent := frm;
 		ddChance.Height := lblpercent.Height;
-    ddChance.Left := lblpercent.Left + 25;
-    ddChance.Top := lblChance.Top - 3;
+		ddChance.Left := lblpercent.Left + 25;
+		ddChance.Top := lblChance.Top - 3;
 		ddChance.Width := 80;
 		if slContains(slGlobal, 'ChanceMultiplier') then begin
 			ddChance.Items.Add(IntToStr(Integer(slGlobal.Objects[slGlobal.IndexOf('ChanceMultiplier')])));
@@ -5096,19 +5097,19 @@ begin
 		ddChance.ItemIndex := 0;
 		
 		// Enchantment Multiplier Label
-    lblEnchantmentMultiplier := TLabel.Create(frm);
-    lblEnchantmentMultiplier.Parent := frm;
-    lblEnchantmentMultiplier.Left := lblGEVfile.Left;
-    lblEnchantmentMultiplier.Top := lblChance.Top+lblChance.Height + 18;
-    lblEnchantmentMultiplier.Caption := 'Enchantment Strength: ';
+		lblEnchantmentMultiplier := TLabel.Create(frm);
+		lblEnchantmentMultiplier.Parent := frm;
+		lblEnchantmentMultiplier.Left := lblGEVfile.Left;
+		lblEnchantmentMultiplier.Top := lblChance.Top+lblChance.Height + 18;
+		lblEnchantmentMultiplier.Caption := 'Enchantment Strength: ';
 		frm.Height := frm.Height + lblEnchantmentMultiplier.Height + 18;
-    
+		
 		// Enchantment Multiplier Edit Box
-    ddEnchantmentMultiplier := TComboBox.Create(frm);
-    ddEnchantmentMultiplier.Parent := frm;
+		ddEnchantmentMultiplier := TComboBox.Create(frm);
+		ddEnchantmentMultiplier.Parent := frm;
 		ddEnchantmentMultiplier.Height := lblEnchantmentMultiplier.Height;
-    ddEnchantmentMultiplier.Left := ddChance.Left;
-    ddEnchantmentMultiplier.Top := lblEnchantmentMultiplier.Top - 1;
+		ddEnchantmentMultiplier.Left := ddChance.Left;
+		ddEnchantmentMultiplier.Top := lblEnchantmentMultiplier.Top - 1;
 		ddEnchantmentMultiplier.Width := ddChance.Width;
 		if slContains(slGlobal, 'EnchMultiplier') then begin
 			ddEnchantmentMultiplier.Items.Add(IntToStr(Integer(slGlobal.Objects[slGlobal.IndexOf('EnchMultiplier')])));
@@ -5118,11 +5119,11 @@ begin
 		ddEnchantmentMultiplier.ItemIndex := 0;	
 
 		// Generate Enchanted Versions % Chance Label
-    lblEnchantmentPercent := TLabel.Create(frm);
-    lblEnchantmentPercent.Parent := frm;
+		lblEnchantmentPercent := TLabel.Create(frm);
+		lblEnchantmentPercent.Parent := frm;
 		lblEnchantmentPercent.Height := ddEnchantmentMultiplier.Height;
-    lblEnchantmentPercent.Left := lblpercent.Left;
-    lblEnchantmentPercent.Top := ddEnchantmentMultiplier.Top + 4;
+		lblEnchantmentPercent.Left := lblpercent.Left;
+		lblEnchantmentPercent.Top := ddEnchantmentMultiplier.Top + 4;
 		lblEnchantmentPercent.Caption := '%';
 		
 		if StrWithinSL('NoButtons', slGlobal) then begin
@@ -5158,24 +5159,24 @@ begin
 		end;
 
 		// Ok Button
-    btnOk := TButton.Create(frm);
-    btnOk.Parent := frm;
-    btnOk.Caption := 'Ok';
-    btnOk.ModalResult := mrOk;
-    btnOk.Left := (frm.Width div 2)-btnOk.Width - 8;
-    btnOk.Top := frm.Height - 80;
+		btnOk := TButton.Create(frm);
+		btnOk.Parent := frm;
+		btnOk.Caption := 'Ok';
+		btnOk.ModalResult := mrOk;
+		btnOk.Left := (frm.Width div 2)-btnOk.Width - 8;
+		btnOk.Top := frm.Height - 80;
 	
 		// Cancel Button
-    btnCancel := TButton.Create(frm);
-    btnCancel.Parent := frm;
-    btnCancel.Caption := 'Cancel';
-    btnCancel.ModalResult := mrCancel;
-    btnCancel.Left := btnOk.Left + btnOk.Width + 16;
-    btnCancel.Top := btnOk.Top;	
+		btnCancel := TButton.Create(frm);
+		btnCancel.Parent := frm;
+		btnCancel.Caption := 'Cancel';
+		btnCancel.ModalResult := mrCancel;
+		btnCancel.Left := btnOk.Left + btnOk.Width + 16;
+		btnCancel.Top := btnOk.Top;	
 	
 		// What happens when Ok is pressed
 		frm.ShowModal;
-    if (frm.ModalResult = mrOk) then begin
+		if (frm.ModalResult = mrOk) then begin
 			if not StrEndsWith(ddGEVfile.Caption, '.esl') then AppendIfMissing(ddGEVfile.Caption, '.esp');			
 			SetObject('CancelAll', False, slGlobal);
 			SetObject('GEVfile', FileByName(ddGEVfile.Caption), slGlobal);				
@@ -5191,23 +5192,23 @@ begin
 			{Debug} if debugMsg then msg('[GEV_GeneralSettings] ChanceMultiplier := '+IntToStr(Integer(GetObject('ChanceMultiplier', slGlobal))));
 			{Debug} if debugMsg then msg('[GEV_GeneralSettings] AllowDisenchanting := '+BoolToStr(Boolean(GetObject('AllowDisenchanting', slGlobal))));
 			{Debug} if debugMsg then msg('[GEV_GeneralSettings] EnchMultiplier := '+IntToStr(Integer(GetObject('EnchMultiplier', slGlobal))));
-    end;
-  finally
-    frm.Free;
-  end;
+		end;
+	finally
+		frm.Free;
+	end;
 	
-  debugMsg := False;
+	debugMsg := False;
 // End debugMsg Section
 end;
 
 // Generates enchanted versions of a list of records from a list of input files
 Procedure GenerateEnchantedVersionsAuto;
 var
-  tempRecord, tempElement, objEffect, enchLevelList, chanceLevelList, GEVfile: IInterface;
-  tempString, suffix, record_sig, record_edid, PatchFile: String;	
-  slTemp, slItemTiers, slIndex, slFiles, slTempList, slRecords, slEnchanted, slExistingRecords: TStringList;
-  i, x, y, z, tempInteger: Integer;	
-  debugMsg, tempBoolean, AllowDisenchanting, ReplaceInLeveledList: Boolean;
+	tempRecord, tempElement, objEffect, enchLevelList, chanceLevelList, GEVfile: IInterface;
+	tempString, suffix, record_sig, record_edid, PatchFile: String;	
+	slTemp, slItemTiers, slIndex, slFiles, slTempList, slRecords, slEnchanted, slExistingRecords: TStringList;
+	i, x, y, z, tempInteger: Integer;	
+	debugMsg, tempBoolean, AllowDisenchanting, ReplaceInLeveledList: Boolean;
 	enchAmount, enchMultiplier: Float;	
 begin
 // Begin debugMsg section
@@ -5285,7 +5286,7 @@ begin
 		if (sig(tempRecord) = 'ARMO') then begin
 			slGetFlagValues(tempRecord, slTemp, False);
 			// Non-vanilla armor types prioritize keywords over BOD2
-			slTempList.CommaText :=  '30, 32, 33, 37, 39'; // 30 - Head, 32 - Body, 33 - Gauntlers, 37 - Feet, 39 - Shield
+			slTempList.CommaText :=	'30, 32, 33, 37, 39'; // 30 - Head, 32 - Body, 33 - Gauntlers, 37 - Feet, 39 - Shield
 			tempBoolean := False;
 			for z := 0 to slTempList.Count-1 do
 				if slContains(slTemp, slTempList[z]) then
@@ -5385,7 +5386,7 @@ begin
 			// {Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] ElementType := '+tempString);
 			slGetFlagValues(selectedRecord, slTemp, False);
 			// Non-vanilla armor types prioritize keywords over BOD2
-			slTempList.CommaText :=  '30, 32, 33, 37, 39'; // 30 - Head, 32 - Body, 33 - Gauntlets, 37 - Feet, 39 - Shield
+			slTempList.CommaText :=	'30, 32, 33, 37, 39'; // 30 - Head, 32 - Body, 33 - Gauntlets, 37 - Feet, 39 - Shield
 			if StrWithinStrSL(slTemp, slTempList) then begin
 				for x := 0 to slTemp.Count-1 do begin
 					// Slot 32 is armor and needs to differentiate between clothes (usually robes) and armor
@@ -5422,7 +5423,7 @@ begin
 			if Assigned(objEffect) then begin
 				// Skip rare enchantments that are only applied to a single item
 				// if (rbc(objEffect) <= 1) then Continue;
-				// Skip weapon enchantments on armor pieces.  Not sure this happens yet.
+				// Skip weapon enchantments on armor pieces.	Not sure this happens yet.
 				if (sig(selectedRecord) = 'ARMO') and StrWithinStr(EditorID(objEffect), 'Weapon') then Continue;
 				tempInteger := GetEnchLevel(objEffect, slItemTiers); {Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] enchLevel := '+IntToStr(tempInteger));
 				if (tempInteger >= 0) then begin					
@@ -5459,7 +5460,7 @@ begin
 		end;
 		// Leveled Lists
 		if ReplaceInLeveledList then begin
-			//  Add to enchanted lists
+			//	Add to enchanted lists
 			tempElement := nil;
 			if (sig(selectedRecord) = 'WEAP') then begin
 				tempElement := ebEDID(gbs(FileByName('Skyrim.esm'), 'LVLI'), 'LItemEnch'+EditorID(ObjectToElement(GetObject(EditorID(selectedRecord)+'Template', slGlobal)))); {Debug} if debugMsg then msg('tempElement := '+EditorID(tempElement));
@@ -5552,7 +5553,7 @@ begin
 	{Debug} if debugMsg then msg('[IsHighestOverride] if GetLoadOrder( '+GetFileName(GetFile(aRecord))+' ) := '+IntToStr(GetLoadOrder(GetFile(aRecord)))+' = '+IntToStr(GetLoadOrder(GetFile(HighestOverrideOrSelf(aRecord, aInteger))))+' := GetLoadOrder( '+GetFileName(GetFile(HighestOverrideOrSelf(aRecord, aInteger)))+' ) then');
 	if (GetLoadOrder(GetFile(aRecord)) = GetLoadOrder(GetFile(HighestOverrideOrSelf(aRecord, aInteger)))) then
 		Result := True;
-	{Debug}  if debugMsg then msg('[IsHighestOverride] Result := '+BoolToStr(Result));
+	{Debug}	if debugMsg then msg('[IsHighestOverride] Result := '+BoolToStr(Result));
 	
 	debugMsg := False;
 // End debugMsg section
@@ -5561,12 +5562,12 @@ end;
 // Creates new COBJ record to make item temperable [SkyrimUtils]
 function MakeTemperable(aRecord: IInterface; lightInteger, heavyInteger: Integer; aPlugin: IInterface): IInterface;
 var
-  recipeTemper, recipeCondition, tempRecord: IInterface;
+	recipeTemper, recipeCondition, tempRecord: IInterface;
 	tempBoolean: Boolean;
 	slTemp: TStringList;
 	record_sig: String;
 	debugMsg: Boolean;
-  i: Integer;
+	i: Integer;
 begin
 // Begin debugMsg section
 	debugMsg := False;
@@ -5581,7 +5582,7 @@ begin
 	record_sig := sig(aRecord);
 	{Debug} if debugMsg then msg('[MakeTemperable] record_sig := '+record_sig);
 	
-  // Filter invalid records
+	// Filter invalid records
 	tempBoolean := False;
 	if Assigned(ebp(aRecord, 'CNAM')) then 
 		tempBoolean := True;
@@ -5606,29 +5607,29 @@ begin
 			
 	// Add conditions
 	{Debug} if debugMsg then msg('[MakeTemperable] Add conditions');
-  recipeTemper := createRecipe(aRecord, aPlugin);
-  Add(recipeTemper, 'Conditions', True);
+	recipeTemper := createRecipe(aRecord, aPlugin);
+	Add(recipeTemper, 'Conditions', True);
 	RemoveInvalidEntries(recipeTemper);
-  recipeCondition := ebp(recipeTemper, 'Conditions');
+	recipeCondition := ebp(recipeTemper, 'Conditions');
 	seev(ebp(recipeCondition, 'Condition\CTDA'), 'Type', '00010000');
 	seev(ebp(recipeCondition, 'Condition\CTDA'), 'Comparison Value', '1');
-  seev(ebp(recipeCondition, 'Condition\CTDA'), 'Function', 'EPTemperingItemIsEnchanted'); 
-  seev(ebp(recipeCondition, 'Condition\CTDA'), 'Run On', 'Subject');
-  seev(ebp(recipeCondition, 'Condition\CTDA'), 'Parameter #3', '-1');
+	seev(ebp(recipeCondition, 'Condition\CTDA'), 'Function', 'EPTemperingItemIsEnchanted'); 
+	seev(ebp(recipeCondition, 'Condition\CTDA'), 'Run On', 'Subject');
+	seev(ebp(recipeCondition, 'Condition\CTDA'), 'Parameter #3', '-1');
 	AddPerkCondition(ebp(recipeTemper, 'Conditions'), GetRecordByFormID('0005218E')); // ArcaneBlacksmith
-  
+	
 	{Debug} if debugMsg then msg('[MakeTemperable] if record_sig := '+record_sig+' = WEAP then begin');
-  if (record_sig = 'WEAP') then begin
-    seev(recipeTemper, 'BNAM', GetEditValue(GetRecordByFormID('00088108')));
+	if (record_sig = 'WEAP') then begin
+		seev(recipeTemper, 'BNAM', GetEditValue(GetRecordByFormID('00088108')));
 		{Debug} if debugMsg then msg('[MakeTemperable] GetFileName(GetFile(aRecord)) := '+GetFileName(GetFile(aRecord)));
-    seev(recipeTemper, 'EDID', 'TemperWeapon_'+Trim(RemoveSpaces(RemoveFileSuffix(GetFileName(GetFile(aRecord)))))+'_'+Trim(EditorID(aRecord)));	
-  end;
+		seev(recipeTemper, 'EDID', 'TemperWeapon_'+Trim(RemoveSpaces(RemoveFileSuffix(GetFileName(GetFile(aRecord)))))+'_'+Trim(EditorID(aRecord)));	
+	end;
 	{Debug} if debugMsg then msg('[MakeTemperable] if record_sig := '+record_sig+' = ARMO then begin');
 	if (record_sig = 'ARMO') then begin
-    seev(recipeTemper, 'BNAM', GetEditValue(GetRecordByFormID('000ADB78')));
+		seev(recipeTemper, 'BNAM', GetEditValue(GetRecordByFormID('000ADB78')));
 		{Debug} if debugMsg then msg('[MakeTemperable] GetFileName(GetFile(aRecord)) := '+GetFileName(GetFile(aRecord)));
-    seev(recipeTemper, 'EDID', 'TemperArmor_'+Trim(RemoveSpaces(RemoveFileSuffix(GetFileName(GetFile(aRecord)))))+'_'+Trim(EditorID(aRecord)));
-  end;
+		seev(recipeTemper, 'EDID', 'TemperArmor_'+Trim(RemoveSpaces(RemoveFileSuffix(GetFileName(GetFile(aRecord)))))+'_'+Trim(EditorID(aRecord)));
+	end;
 	// Add valid combinations
 	slTemp.Clear;
 	// Weapon
@@ -5696,9 +5697,9 @@ begin
 		Remove(recipeTemper);
 		Exit;
 	end;
-  removeInvalidEntries(recipeTemper);
+	removeInvalidEntries(recipeTemper);
 	// If a vanilla keyword is not detected
-  if (geev(recipeTemper, 'COCT') = '') then begin
+	if (geev(recipeTemper, 'COCT') = '') then begin
 		tempRecord := GetTemplate(aRecord);
 		for i := 0 to slTemp.Count-1 do begin
 			{Debug} if debugMsg then msg('[MakeTemperable] if HasKeyword( '+EditorID(tempRecord)+', '+slTemp[i]+' ) then begin');
@@ -5711,7 +5712,7 @@ begin
 					end else if (geev(aRecord, 'BOD2\Armor Type') = 'Light Armor') then
 						addItem(recipeTemper, ObjectToElement(slTemp.Objects[i]), lightInteger);
 				end else if ee(aRecord, 'DNAM\Skill') or ee(aRecord, 'DNAM\Animation Type') then begin
-					if (geev(aRecord, 'DNAM\Skill') =  'Two Handed') or StrWithinStr(geev(aRecord, 'DNAM\Animation Type'), 'TwoHand') then begin
+					if (geev(aRecord, 'DNAM\Skill') =	'Two Handed') or StrWithinStr(geev(aRecord, 'DNAM\Animation Type'), 'TwoHand') then begin
 						addItem(recipeTemper, ObjectToElement(slTemp.Objects[i]), heavyInteger);
 					end else
 						addItem(recipeTemper, ObjectToElement(slTemp.Objects[i]), lightInteger);
@@ -5721,7 +5722,7 @@ begin
 		end;		
 	end;
 	{Debug} if debugMsg then msg('[makeTemperable] Result := '+EditorID(recipeTemper));
-  Result := recipeTemper;
+	Result := recipeTemper;
 	
 	// Finalize
 	slTemp.Free;
@@ -5841,31 +5842,31 @@ end;
 // Add get item count condition
 Procedure AddGetItemCountCondition(rec: IInterface; s: string; aBoolean: Boolean);
 var
-  conditions, condition: IInterface;
+	conditions, condition: IInterface;
 begin
-  conditions := ebp(rec, 'Conditions');
-  if not Assigned(conditions) then begin
-    Add(rec, 'Conditions', True);
-    conditions := ebp(rec, 'Conditions');
-    condition := ebp(ebi(conditions, 0), 'CTDA');
-  end else
-    condition := ElementAssign(conditions, HighInteger, nil, False);
-  seev(condition, 'Type', '11000000'); // Greater than or equal to
-  seev(condition, 'Comparison Value', '1.0');
-  seev(condition, 'Function', 'GetItemCount');
-  seev(condition, 'Inventory Object', s);
-  if aBoolean then begin
-    condition := ElementAssign(conditions, HighInteger, nil, False);
-    seev(condition, 'Type', '10010000'); // Equal to / OR
-    seev(condition, 'Comparison Value', '0.0');
-    seev(condition, 'Function', 'GetEquipped');
-    seev(condition, 'Inventory Object', s);
-    condition := ElementAssign(conditions, HighInteger, nil, False);
-    seev(condition, 'Type', '11000000'); // Greater than or equal to
-    seev(condition, 'Comparison Value', '2.0');
-    seev(condition, 'Function', 'GetItemCount');
-    seev(condition, 'Inventory Object', s);
-  end;
+	conditions := ebp(rec, 'Conditions');
+	if not Assigned(conditions) then begin
+		Add(rec, 'Conditions', True);
+		conditions := ebp(rec, 'Conditions');
+		condition := ebp(ebi(conditions, 0), 'CTDA');
+	end else
+		condition := ElementAssign(conditions, HighInteger, nil, False);
+	seev(condition, 'Type', '11000000'); // Greater than or equal to
+	seev(condition, 'Comparison Value', '1.0');
+	seev(condition, 'Function', 'GetItemCount');
+	seev(condition, 'Inventory Object', s);
+	if aBoolean then begin
+		condition := ElementAssign(conditions, HighInteger, nil, False);
+		seev(condition, 'Type', '10010000'); // Equal to / OR
+		seev(condition, 'Comparison Value', '0.0');
+		seev(condition, 'Function', 'GetEquipped');
+		seev(condition, 'Inventory Object', s);
+		condition := ElementAssign(conditions, HighInteger, nil, False);
+		seev(condition, 'Type', '11000000'); // Greater than or equal to
+		seev(condition, 'Comparison Value', '2.0');
+		seev(condition, 'Function', 'GetItemCount');
+		seev(condition, 'Inventory Object', s);
+	end;
 end;
 
 function MakeBreakdown(aRecord, aPlugin: IInterface): IInterface;
@@ -5874,7 +5875,7 @@ var
 	i, tempInteger, count, LeatherCount, x, hc, rc: integer;
 	debugMsg, tempBoolean: Boolean;
 	slTemp, slItem: TStringList;
-  edid: string;
+	edid: string;
 begin
 // Begin debugMsg section
 	debugMsg := False;
@@ -6013,7 +6014,7 @@ begin
 		senv(recipeRecord, 'CNAM', $000800E4); // LeatherStrips
 		seev(recipeRecord, 'NAM1', 2);
 		Inc(rc);
-  end;
+	end;
 
 	// Finalize
 	slTemp.Free;
@@ -6043,23 +6044,23 @@ end;
 // Checks if an input record has an item matching the input EditorID.
 function HasItem(aRecord: IInterface; s: string): Boolean;
 var
-  name: string;
-  items, li: IInterface;
-  i: integer;
+	name: string;
+	items, li: IInterface;
+	i: integer;
 begin
-  Result := False;
-  items := ebp(aRecord, 'Items');
-  if not Assigned(items) then 
-    exit;
-  
-  for i := 0 to Pred(ec(items)) do begin
-    li := ebi(items, i);
-    name := EditorID(LinksTo(ebp(li, 'CNTO - Item\Item')));
-    if (name = s) then begin
-      Result := True;
-      Break;
-    end;
-  end;
+	Result := False;
+	items := ebp(aRecord, 'Items');
+	if not Assigned(items) then 
+		exit;
+	
+	for i := 0 to Pred(ec(items)) do begin
+		li := ebi(items, i);
+		name := EditorID(LinksTo(ebp(li, 'CNTO - Item\Item')));
+		if (name = s) then begin
+			Result := True;
+			Break;
+		end;
+	end;
 end;
 
 // Clears empty TStringList entries
@@ -6347,7 +6348,7 @@ begin
 		Result := 1;
 end;
 
-//  A copy function that allows you to copy from one position to another [mte functions]
+//	A copy function that allows you to copy from one position to another [mte functions]
 function StrPosCopyBetween(inputString, aString, bString: String): String;
 var
 	i, p1, p2: Integer;
@@ -6356,7 +6357,7 @@ begin
 // Begin debugMsg section
 	debugMsg := False;
 	
-  Result := '';
+	Result := '';
 	Result := StrPosCopy(StrPosCopy(inputString, aString, False), bString, True);
 	{Debug} if debugMsg then msg('[StrPosCopyBetween] Result := '+Result);
 	
@@ -6406,15 +6407,15 @@ var
 	debugMsg: Boolean;
 	i: Integer;
 begin
-  Result := False;
-  Keywords := ebp(aRecord, 'KWDA');
-  for i := 0 to ec(Keywords) - 1 do begin
+	Result := False;
+	Keywords := ebp(aRecord, 'KWDA');
+	for i := 0 to ec(Keywords) - 1 do begin
 		tempString := EditorID(LinksTo(ebi(Keywords, i)));
-    if StrWithinStr(tempString, 'Male') or StrWithinStr(tempString, 'Female') then begin
-      Result := True;
-      Break;
-    end;
-  end;
+		if StrWithinStr(tempString, 'Male') or StrWithinStr(tempString, 'Female') then begin
+			Result := True;
+			Break;
+		end;
+	end;
 end;
 
 function GetGenderFromKeyword(aRecord: IInterface): String;
@@ -6424,18 +6425,18 @@ var
 	debugMsg: Boolean;
 	i: Integer;
 begin
-  Result := '';
-  Keywords := ebp(aRecord, 'KWDA');
-  for i := 0 to ec(Keywords) - 1 do begin
+	Result := '';
+	Keywords := ebp(aRecord, 'KWDA');
+	for i := 0 to ec(Keywords) - 1 do begin
 		tempString := EditorID(LinksTo(ebi(Keywords, i)));
-    if StrWithinStr(tempString, 'Male') then begin
+		if StrWithinStr(tempString, 'Male') then begin
 			Result := 'Male';
 			Break;
 		end else if StrWithinStr(tempString, 'Female') then begin
-      Result := 'Female';
-      Break;
-    end;
-  end;
+			Result := 'Female';
+			Break;
+		end;
+	end;
 end;
 
 function IsClothing(aRecord: IInterface): Boolean;
@@ -6452,13 +6453,13 @@ begin
 		Result := True;
 		Exit;
 	end;
-  for i := 0 to ec(Keywords) - 1 do begin
+	for i := 0 to ec(Keywords) - 1 do begin
 		tempString := EditorID(LinksTo(ebi(Keywords, i)));
-    if StrWithinStr(tempString, 'Clothing') then begin
+		if StrWithinStr(tempString, 'Clothing') then begin
 			Result := True;
 			Exit;
 		end;
-  end;
+	end;
 	if ee(aRecord, 'DNAM') then begin
 		if genv(aRecord, 'DNAM') = 0 then begin
 			Result := True;
