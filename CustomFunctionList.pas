@@ -6713,6 +6713,111 @@ Procedure addProcessTime(aFunctionName: String; aTime: Integer);
 begin
 	SetObject(aFunctionName, Integer(GetObject(aFunctionName, slProcessTime))+aTime, slProcessTime);
 end;
+function SpellTomes(bookRecord:IInterface):IInterface;
+var
+	books, flags, tempSpellRecord: IInterface;
+	halfCostPerk: string;
+begin
+	flags := ebp(bookRecord, 'DATA/FLAGS');
+	if not (genv(flags, 'Teaches Spell') = -1) then begin//checks if book is tome
+		tempSpellRecord := LinksTo(ebp(bookRecord, 'DATA/Spell'));//spell from tome
+		if not (LinksTo(ebp(tempSpellRecord, 'SPIT/Half-cost Perk')) = -1) then begin
+			halfCostPerk := geev(ebp(tempSpellRecord, 'SPIT/Half-cost Perk'));
+			case exractInts(halfCostPerk, 1) of
+			00	:	begin
+						case ebp(halfCostPerk, 'Novice', True) of
+							'Alteration'	:	Result :=GetRecordByFormID('0009E2A7');
+							'Conjuration'	:	Result :=GetRecordByFormID('0009E2AA');
+							'Destruction'	:	Result :=GetRecordByFormID('0009CD52');
+							'Illusion'		:	Result :=GetRecordByFormID('0009E2AD');
+							'Restoration'	:	Result :=GetRecordByFormID('0009E2AE');
+						end;
+					end;
+			25	:	begin
+						case ebp(halfCostPerk, 'Apprentice', True) of
+							'Alteration'	:	Result :=GetRecordByFormID('000A26E3');
+							'Conjuration'	:	Result :=GetRecordByFormID('0009CD54');
+							'Destruction'	:	Result :=GetRecordByFormID('000A2702');
+							'Illusion'		:	Result :=GetRecordByFormID('000A270F');
+							'Restoration'	:	Result :=GetRecordByFormID('000A2720');
+						end;
+					end;
+			50	:	begin
+						case ebp(halfCostPerk, 'Adept', True) of
+							'Alteration'	:	Result :=GetRecordByFormID('000A26E7');
+							'Conjuration'	:	Result :=GetRecordByFormID('000A26EE');
+							'Destruction'	:	Result :=GetRecordByFormID('000A2708');
+							'Illusion'		:	Result :=GetRecordByFormID('000A2714');
+							'Restoration'	:	Result :=GetRecordByFormID('0010F64D');
+						end;
+					end;
+			75	:	begin
+						case ebp(halfCostPerk, 'Expert', True) of
+							'Alteration'	:	Result :=GetRecordByFormID('000A26E8');
+							'Conjuration'	:	Result :=GetRecordByFormID('000A26F7');
+							'Destruction'	:	Result :=GetRecordByFormID('0010F7F4');
+							'Illusion'		:	Result :=GetRecordByFormID('000A2718');
+							'Restoration'	:	Result :=GetRecordByFormID('000A2729');
+						end;
+					end;
+			100	:	begin
+						case ebp(halfCostPerk, 'Master', True) of
+							'Alteration'	:	Result :=GetRecordByFormID('000DD646');
+							'Conjuration'	:	Result :=GetRecordByFormID('000A26FA');
+							'Destruction'	:	Result :=GetRecordByFormID('000A270D');
+							'Illusion'		:	Result :=GetRecordByFormID('000A2719');
+							'Restoration'	:	Result :=GetRecordByFormID('000FDE7B');
+						end;
+					end;
+			end;
+		else do //uses restoration books as level list base
+			case StrToInt(geev(ebp(tempSpellRecord, 'SPIT/BASE COST'))) of
+				0..96		: Result :=GetRecordByFormID('0009E2AE');//novice
+				97..156		: Result :=GetRecordByFormID('000A2720');//aprentice
+				157..250	: Result :=GetRecordByFormID('0010F64D');//adept
+				251..644	: Result :=GetRecordByFormID('000A2729');//expert
+			else
+				Result :=GetRecordByFormID('000FDE7B');//master
+			end;
+		end;
+	end;
+end;
 
+
+//extracts the specified integer (Natural Numbers only) from an input; returns -1 if no suitable number is not found
+//	O(10n) time complexity
+function extractInts(inputString: string; intToPull: integer): integer;//tested and works
+const
+    ints = '1234567890';
+var
+    i, j, currentInt: integer;
+    flag1, flag2 : boolean;
+	resultString : string;
+begin
+    resultString := '';
+    CurrentInt := 0;
+    flag1 := true;
+    flag2 := true;
+    for i := 0 to (length(inputString) - 1) do
+    begin
+        j := 0;
+        while j < 10 do
+        begin
+            if copy(inputString, i+1, 1) = copy(ints, j+1, 1) then
+            begin
+                 if flag1 then currentInt := currentInt + 1;
+                 if (currentInt = intToPull) then resultString := resultString + copy(inputString, i+1, 1);
+                 flag1 := false;
+                 flag2 := false;
+                 break;
+            end;
+            j := j + 1;
+        end;
+        if flag2 then flag1 := true;
+        flag2 := true;
+    end;
+	if not (resultString = '') then result := StrToInt(resultString)
+	else result := -1
+end;
 end.
 
