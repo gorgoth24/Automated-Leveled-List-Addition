@@ -9,7 +9,7 @@ uses CustomFunctionList;
 
 // Global variables are set at the beginning so you are not prompted for each selected record
 var 
-  slGlobal: TStringList;
+  slGlobal, slProcessTime: TStringList;
   selectedRecord, templateRecord: IInterface;
 	CancelAll: Boolean;
 
@@ -39,6 +39,7 @@ const
 	defaultItemTier06 = 40;
 	defaultTemperLight = 1;
 	defaultTemperHeavy = 2;
+	ProcessTime = True;
 	Constant = True;
 
 ////////////////////////////////////////////////////////////////////// SCRIPT-SPECIFIC FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +64,7 @@ begin
 	// Set sender form components
 	{Debug} if debugMsg then msg('[ELLR_Btn_SelectedItem] Set sender form components');
 	frm := Sender.Parent;
-	tempRecord := ObjectToElement(Sender.Items.Objects[Sender.ItemIndex]);
+	tempRecord := ote(Sender.Items.Objects[Sender.ItemIndex]);
 	lblSelectedItemText := ComponentByCaption('Selected Item: ', frm);
 	{Debug} if debugMsg then msg('[ELLR_Btn_SelectedItem] lblSelectedItemText.Caption := '+lblSelectedItemText.Caption);
 	ddSelectedItem := AssociatedComponent('Selected Item: ', frm);
@@ -109,8 +110,8 @@ begin
 	if CaptionExists('Item: ', frm) then begin
 		tempObject := AssociatedComponent('Item: ', frm);
 		if (tempObject.Text <> '') then begin
-			tempRecord := ObjectToElement(tempObject.Items.Objects[tempObject.ItemIndex]);
-			if MessageDlg('Do you wish to change the template of '+full(selectedRecord)+' from '+full(ObjectToElement(GetObject(EditorID(selectedRecord)+'Template', slGlobal)))+' to '+full(ObjectToElement(tempObject.Items.Objects[tempObject.ItemIndex]))+'?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+			tempRecord := ote(tempObject.Items.Objects[tempObject.ItemIndex]);
+			if MessageDlg('Do you wish to change the template of '+full(selectedRecord)+' from '+full(ote(GetObject(EditorID(selectedRecord)+'Template', slGlobal)))+' to '+full(ote(tempObject.Items.Objects[tempObject.ItemIndex]))+'?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
 				slGlobal.Objects[slGlobal.IndexOf(EditorID(selectedRecord)+'Template')] := TObject(tempRecord);
 		end;
 	end;
@@ -160,10 +161,10 @@ begin
 	
 	// Suggested Template
 	if CaptionExists('Current: ', frm) then
-		ComponentByTop(ComponentByCaption('Current: ', frm).Top + 1, frm).Caption := full(ObjectToElement(slGlobal.Objects[slGlobal.IndexOf(EditorID(ObjectToElement(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')]))+' ('+StrPosCopy(GetGameValueType(ObjectToElement(slGlobal.Objects[slGlobal.IndexOf(EditorID(ObjectToElement(ddSelectedItem.Items.Objects[ComponentByTop(lblSelectedItemText.Top - 2, frm).ItemIndex]))+'Template')])), '\', False)+': '+GetGameValue(ObjectToElement(slGlobal.Objects[slGlobal.IndexOf(EditorID(ObjectToElement(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')]))+')';
+		ComponentByTop(ComponentByCaption('Current: ', frm).Top + 1, frm).Caption := full(ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(ote(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')]))+' ('+StrPosCopy(GetGameValueType(ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(ote(ddSelectedItem.Items.Objects[ComponentByTop(lblSelectedItemText.Top - 2, frm).ItemIndex]))+'Template')])), '\', False)+': '+GetGameValue(ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(ote(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')]))+')';
 	
 	// Finalize
-	selectedRecord := ObjectToElement(Sender.Items.Objects[Sender.ItemIndex]);
+	selectedRecord := ote(Sender.Items.Objects[Sender.ItemIndex]);
 	slTemp.Free;
 	
 	debugMsg := False;
@@ -231,9 +232,9 @@ begin
 		ddSelectedItem.Width := 480;
 		for i := 0 to slGlobal.Count-1 do
 			if StrWithinStr(slGlobal[i], 'Original') then
-				ddSelectedItem.Items.AddObject(full(ObjectToElement(slGlobal.Objects[i])), slGlobal.Objects[i]);
+				ddSelectedItem.Items.AddObject(full(ote(slGlobal.Objects[i])), slGlobal.Objects[i]);
 		ddSelectedItem.ItemIndex := 0;
-		tempRecord := ObjectToElement(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]);
+		tempRecord := ote(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]);
 		{Debug} if debugMsg then msg('[ELLR_Btn_SelectedItem] tempRecord := '+EditorID(tempRecord));
 		ddSelectedItem.OnClick := ELLR_OnClick_SelectedItem;
 		
@@ -318,7 +319,7 @@ begin
 		// What happens when Ok is pressed
 		selectedRecord := tempRecord;
 		frm.ShowModal;
-		tempRecord := ObjectToElement(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]);
+		tempRecord := ote(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]);
 		tempBoolean := False;
 		if (frm.ModalResult = mrOk) then begin
 			Sender.Caption := ddSelectedItem.Items[ddSelectedItem.ItemIndex];
@@ -345,12 +346,12 @@ begin
 						end else 
 							outputFile := FileByName(tempString);
 					end else 
-						outputFile := ObjectToElement(GetObject('ALLAfile', slGlobal));
+						outputFile := ote(GetObject('ALLAfile', slGlobal));
 					GenderOnlyArmor(ddSex.Text, tempRecord, outputFile);
 				end;
 				if (ddSelectedItem.Text <> full(tempRecord)) and (Length(full(tempRecord)) > 0) then begin
 					slGlobal[slGlobal.IndexOf(EditorID(tempRecord))] := ddSelectedItem.Text;
-					{Debug} if debugMsg then msg('[ELLR_Btn_SelectedItem] tempRecord := '+EditorID(ObjectToElement(GetObject(EditorID(tempRecord)+'Template', slGlobal))));
+					{Debug} if debugMsg then msg('[ELLR_Btn_SelectedItem] tempRecord := '+EditorID(ote(GetObject(EditorID(tempRecord)+'Template', slGlobal))));
 					slGlobal[slGlobal.IndexOf(EditorID(tempRecord)+'Template')] := ddSelectedItem.Text+'Template';
 					seev(tempRecord, 'FULL', ddSelectedItem.Text); 
 					{Debug} if debugMsg then msg('seev(tempRecord, ''FULL'', full(tempRecord) := '+full(tempRecord)+' )'); 
@@ -430,7 +431,7 @@ begin
     ddGEVfile.Left := lblGEVfile.Left;
 		ddGEVfile.Width := 500;
 		if slContains(slGlobal, 'GEVfile') then begin
-			ddGEVfile.Items.Add(GetFileName(ObjectToElement(GetObject('GEVfile', slGlobal))));
+			ddGEVfile.Items.Add(GetFileName(ote(GetObject('GEVfile', slGlobal))));
 		end else
 			ddGEVfile.Items.Add(tempComponent.Caption);
 		ddGEVfile.ItemIndex := 0;
@@ -452,7 +453,7 @@ begin
     ddRecipefile.Left := lblRecipefile.Left;
 		ddRecipefile.Width := 500;
 		if slContains(slGlobal, 'RecipeFile') then begin
-			ddRecipefile.Items.Add(GetFileName(ObjectToElement(GetObject('RecipeFile', slGlobal))));
+			ddRecipefile.Items.Add(GetFileName(ote(GetObject('RecipeFile', slGlobal))));
 		end else
 			ddRecipefile.Items.Add(tempComponent.Caption);
 		ddRecipefile.ItemIndex := 0;
@@ -808,8 +809,8 @@ begin
 	
 	frm := Sender.Parent;
 	tempObject := AssociatedComponent('Current Lists: ', frm);	
-	// SetObject(EditorID(ObjectToElement(tempObject.Items.Objects[tempObject.ItemIndex]))+'-//-'+EditorID(selectedRecord), tempObject.Items.Objects[tempObject.ItemIndex], slGlobal);
-	SetObject(EditorID(ObjectToElement(tempObject.Items.Objects[tempObject.ItemIndex]))+'-/Level/-'+EditorID(selectedRecord), 0, slGlobal);
+	// SetObject(EditorID(ote(tempObject.Items.Objects[tempObject.ItemIndex]))+'-//-'+EditorID(selectedRecord), tempObject.Items.Objects[tempObject.ItemIndex], slGlobal);
+	SetObject(EditorID(ote(tempObject.Items.Objects[tempObject.ItemIndex]))+'-/Level/-'+EditorID(selectedRecord), 0, slGlobal);
 	if (tempObject.ItemIndex > -1) then
 		tempObject.Items.Delete(tempObject.ItemIndex);
 	tempElement := ComponentByTop(83, frm);
@@ -830,8 +831,8 @@ begin
 	if MessageDlg('Clear all leveled lists [YES] or [NO]?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
 		tempObject := AssociatedComponent('Current Lists: ', frm);
 		for i := 0 to tempObject.Items.Count-1 do begin
-			SetObject(EditorID(ObjectToElement(tempObject.Items.Objects[i]))+'-//-'+EditorID(selectedRecord), tempObject.Items.Objects[i], slGlobal);
-			SetObject(EditorID(ObjectToElement(tempObject.Items.Objects[i]))+'-/Level/-'+EditorID(selectedRecord), 0, slGlobal);
+			SetObject(EditorID(ote(tempObject.Items.Objects[i]))+'-//-'+EditorID(selectedRecord), tempObject.Items.Objects[i], slGlobal);
+			SetObject(EditorID(ote(tempObject.Items.Objects[i]))+'-/Level/-'+EditorID(selectedRecord), 0, slGlobal);
 		end
 		tempObject.Items.Clear;
 		tempObject.Text := '';
@@ -914,7 +915,7 @@ begin
 	tempInteger := IntWithinStr(AssociatedComponent('Level: ', frm).Text);
 	ddLeveledList := AssociatedComponent('Leveled List: ', frm); {Debug} if debugMsg then msg('[ELLR_OnClick_ddFile] Assigned(ddLeveledList) := '+BoolToStr(Assigned(ddLeveledList)));
 	if (ddLeveledList.ItemIndex = -1) then Exit;
-	tempRecord := ObjectToElement(ddLeveledList.Items.Objects[ddLeveledList.ItemIndex]); {Debug} if debugMsg then msg('[ELLR_OnClick_ddFile] tempRecord := '+EditorID(tempRecord));
+	tempRecord := ote(ddLeveledList.Items.Objects[ddLeveledList.ItemIndex]); {Debug} if debugMsg then msg('[ELLR_OnClick_ddFile] tempRecord := '+EditorID(tempRecord));
 	ddSuggested := AssociatedComponent('Current Lists: ', frm);
 	tempBoolean := False;
 	for i := 0 to ddSuggested.Items.Count-1 do
@@ -924,7 +925,7 @@ begin
 		ddSuggested.Items.AddObject(EditorID(tempRecord)+' (Level: '+IntToStr(IntWithinStr(AssociatedComponent('Level: ', frm).Caption))+')', TObject(tempRecord));
 		if not slContains(slGlobal, '-/-'+tempString) then
 			slGlobal.AddObject('-/-'+tempString+'='+IntToStr(tempInteger), TObject(tempRecord));
-		if CaptionExists('Added', frm) then \
+		if CaptionExists('Added', frm) then begin
 			AssociatedComponent('Added', frm).Caption := ddLeveledList.Items[ddLeveledList.ItemIndex];
 		end else begin
 			tempObject := TLabel.Create(frm);
@@ -1081,13 +1082,13 @@ begin
 		// Process old form components
 		ddSuggested.Items[ddSuggested.ItemIndex] := StrPosCopy(ddSuggested.Items[ddSuggested.ItemIndex], ':', True) + ': '+IntToStr(IntWithinStr(ddLevel.Text))+')';
 		for i := 0 to ddSuggested.Items.Count-1 do begin
-			SetObject(EditorID(ObjectToElement(ddSuggested.Items.Objects[i]))+'-//-'+EditorID(selectedRecord), ddSuggested.Items.Objects[i], slGlobal);
-			SetObject(EditorID(ObjectToElement(ddSuggested.Items.Objects[i]))+'-/Level/-'+EditorID(selectedRecord), StrToInt(Trim(StrPosCopyBetween(ddSuggested.Items[i], ':', ')'))), slGlobal);
+			SetObject(EditorID(ote(ddSuggested.Items.Objects[i]))+'-//-'+EditorID(selectedRecord), ddSuggested.Items.Objects[i], slGlobal);
+			SetObject(EditorID(ote(ddSuggested.Items.Objects[i]))+'-/Level/-'+EditorID(selectedRecord), StrToInt(Trim(StrPosCopyBetween(ddSuggested.Items[i], ':', ')'))), slGlobal);
 		end;
 		
 		// Create new form components
 		// Record
-		selectedRecord := ObjectToElement(Sender.Items.Objects[Sender.ItemIndex]);
+		selectedRecord := ote(Sender.Items.Objects[Sender.ItemIndex]);
 		templateRecord := ObjectToElment(slGlobal.Objects[slGlobal.IndexOf(EditorID(selectedRecord)+'Template')]);
 		tempObject.Items.Clear;
 		tempObject.Text := '';
@@ -1096,14 +1097,14 @@ begin
 			// Filter Invalid Entries
 			if StrWithinStr(EditorID(LLrecord), '++') or not (Length(EditorID(LLrecord)) > 0) or not IsHighestOverride(LLrecord, GetLoadOrder(ALLAfile)) or not (sig(LLrecord) = 'LVLI') or FlagCheck(LLrecord, 'Use All') or FlagCheck(LLrecord, 'Special Loot') then Continue;
 			if slContains(slGlobal, EditorID(LLrecord)) then 
-				if (EditorID(selectedRecord) = EditorID(ObjectToElement(slGlobal.Objects[slGlobal.IndexOf(EditorID(LLrecord))]))) then 
+				if (EditorID(selectedRecord) = EditorID(ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(LLrecord))]))) then 
 					Continue;
 			tempObject.Items.AddObject(EditorID(tempRecord), TObject(tempRecord));
 		end;		
 	end;
 	// Level
 	tempInteger := 0;
-	LLrecord := ObjectToElement(tempObject.Items.Objects[tempObject.ItemIndex]);
+	LLrecord := ote(tempObject.Items.Objects[tempObject.ItemIndex]);
 	for x := 0 to Pred(LLec(LLrecord)) do begin // {Debug} if debugMsg then msg('[ELLR_Btn_AddToLeveledList] LLebi(LLrecord, x) := '+EditorID(LLebi(LLrecord, x)));
 		tempRecord := LLebi(LLrecord, x);
 		if (geev(tempRecord, 'LVLO\Reference') = Name(selectedRecord)) then	begin													
@@ -1144,15 +1145,15 @@ begin
 	{Debug} if debugMsg then msgList('[ELLR_Btn_AddToLeveledList] slGlobal := ', slGlobal, '');
 	Result := False;
 	slTemp := TStringList.Create;
-	ALLAfile := ObjectToElement(GetObject('ALLAfile', slGlobal));
+	ALLAfile := ote(GetObject('ALLAfile', slGlobal));
 	if not Assigned(selectedRecord) then begin
 		for i := 0 to slGlobal.Count-1 do begin
 			if not StrWithinStr(slGlobal[i], 'Original') then Continue;
-			selectedRecord := ObjectToElement(slGlobal.Objects[i]);
+			selectedRecord := ote(slGlobal.Objects[i]);
 			Break;
 		end;
 	end;
-	templateRecord := ObjectToElement(slGlobal.Objects[slGlobal.IndexOf(EditorID(selectedRecord)+'Template')]);
+	templateRecord := ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(selectedRecord)+'Template')]);
 	{Debug} if debugMsg then msg('[ELLR_Btn_AddToLeveledList] templateRecord := '+EditorID(templateRecord));
 
 	frm := TForm.Create(nil);
@@ -1178,7 +1179,7 @@ begin
 		ddSelectedItem.Width := 680;
 		for i := 0 to slGlobal.Count-1 do
 			if StrWithinStr(slGlobal[i], 'Original') then
-				ddSelectedItem.Items.AddObject(full(ObjectToElement(slGlobal.Objects[i])), slGlobal.Objects[i]);
+				ddSelectedItem.Items.AddObject(full(ote(slGlobal.Objects[i])), slGlobal.Objects[i]);
 		if (tempString <> '') and (ddSelectedItem.Items.IndexOf(tempString) <> -1) then begin
 			ddSelectedItem.ItemIndex := ddSelectedItem.Items.IndexOf(tempString);
 			tempString := nil;
@@ -1214,7 +1215,7 @@ begin
 			// Filter Invalid Entries
 			if StrWithinStr(EditorID(LLrecord), '++') or not (Length(EditorID(LLrecord)) > 0) or not IsHighestOverride(LLrecord, GetLoadOrder(ALLAfile)) or not (sig(LLrecord) = 'LVLI') or FlagCheck(LLrecord, 'Use All') or FlagCheck(LLrecord, 'Special Loot') then Continue;
 			if slContains(slGlobal, EditorID(LLrecord)) then 
-				if (EditorID(selectedRecord) = EditorID(ObjectToElement(slGlobal.Objects[slGlobal.IndexOf(EditorID(LLrecord))]))) then 
+				if (EditorID(selectedRecord) = EditorID(ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(LLrecord))]))) then 
 					Continue;
 			// Previous custom input info
 			CustomLevel := False;
@@ -1321,9 +1322,9 @@ begin
 				ddSuggested.Items[ddSuggested.ItemIndex] := StrPosCopy(ddSuggested.Items[ddSuggested.ItemIndex], ':', True) + ': '+IntToStr(IntWithinStr(ddLevel.Text))+')';
 			if (ddSuggested.Items.Count > 0) then
 				for i := 0 to ddSuggested.Items.Count-1 do begin
-					{Debug} if debugMsg then msg('[ELLR_Btn_AddToLeveledList] SetObject( '+EditorID(ObjectToElement(ddSuggested.Items.Objects[i]))+'-//-'+EditorID(selectedRecord)+', '+Trim(StrPosCopyBetween(ddSuggested.Items[i], ':', ')'))+' );');
-					SetObject(EditorID(ObjectToElement(ddSuggested.Items.Objects[i]))+'-//-'+EditorID(selectedRecord), ddSuggested.Items.Objects[i], slGlobal);
-					SetObject(EditorID(ObjectToElement(ddSuggested.Items.Objects[i]))+'-/Level/-'+EditorID(selectedRecord), StrToInt(Trim(StrPosCopyBetween(ddSuggested.Items[i], ':', ')'))), slGlobal);
+					{Debug} if debugMsg then msg('[ELLR_Btn_AddToLeveledList] SetObject( '+EditorID(ote(ddSuggested.Items.Objects[i]))+'-//-'+EditorID(selectedRecord)+', '+Trim(StrPosCopyBetween(ddSuggested.Items[i], ':', ')'))+' );');
+					SetObject(EditorID(ote(ddSuggested.Items.Objects[i]))+'-//-'+EditorID(selectedRecord), ddSuggested.Items.Objects[i], slGlobal);
+					SetObject(EditorID(ote(ddSuggested.Items.Objects[i]))+'-/Level/-'+EditorID(selectedRecord), StrToInt(Trim(StrPosCopyBetween(ddSuggested.Items[i], ':', ')'))), slGlobal);
 				end;
 			{Debug} if debugMsg then msgList('[ELLR_Btn_AddToLeveledList] slGlobal := ', slGlobal, '');
 			{Debug} if debugMsg then for i := 0 to slGlobal.Count-1 do if StrWithinStr(slGlobal[i], '-//-') then msg('[ELLR_Btn_AddToLeveledList] '+slGlobal[i]+' := '+IntToStr(Integer(slGlobal.Objects[i])));
@@ -1399,7 +1400,7 @@ begin
 		ddSelectedItem.Left := 170;
 		ddSelectedItem.Top := lblSelectedItemText.Top - 2;
 		ddSelectedItem.Width := 480;
-		tempElement := ObjectToElement(slGlobal.Objects[i]);
+		tempElement := ote(slGlobal.Objects[i]);
 		// User-selected items are added to slGlobal with the 'Original' suffix.  This is grabbing all the user-input files.
 		for i := 0 to slGlobal.Count-1 do
 			if StrWithinStr(slGlobal[i], 'Original') then
@@ -1410,7 +1411,7 @@ begin
 		end else
 			ddSelectedItem.ItemIndex := 0;
 		ddSelectedItem.OnClick := ELLR_OnClick_SelectedItem;
-		tempRecord := ObjectToElement(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]);
+		tempRecord := ote(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]);
 		{Debug} if debugMsg then msg('[ELLR_Btn_SetTemplate] tempRecord := '+EditorID(tempRecord));
 		
 		// Game Value Label
@@ -1501,10 +1502,10 @@ begin
 		lblTemplateText.Left := ddSelectedItem.Left;
 		lblTemplateText.Top := lblTemplate.Top + 1;
 		// This madness is just to set the caption as 'Armor: ', 'Damage: ', or 'Value: '
-		if (GetGameValueType(ObjectToElement(slGlobal.Objects[slGlobal.IndexOf(EditorID(ObjectToElement(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')]))= 'DNAM') then begin
-			lblTemplateText.Caption := full(ObjectToElement(slGlobal.Objects[slGlobal.IndexOf(EditorID(ObjectToElement(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')]))+' (Armor: '+GetGameValue(ObjectToElement(slGlobal.Objects[slGlobal.IndexOf(EditorID(ObjectToElement(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')]))+')';
+		if (GetGameValueType(ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(ote(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')]))= 'DNAM') then begin
+			lblTemplateText.Caption := full(ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(ote(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')]))+' (Armor: '+GetGameValue(ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(ote(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')]))+')';
 		end else
-			lblTemplateText.Caption := full(ObjectToElement(slGlobal.Objects[slGlobal.IndexOf(EditorID(ObjectToElement(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')]))+' ('+StrPosCopy(GetGameValueType(ObjectToElement(slGlobal.Objects[slGlobal.IndexOf(EditorID(ObjectToElement(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')])), '\', False)+': '+GetGameValue(ObjectToElement(slGlobal.Objects[slGlobal.IndexOf(EditorID(ObjectToElement(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')]))+')';
+			lblTemplateText.Caption := full(ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(ote(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')]))+' ('+StrPosCopy(GetGameValueType(ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(ote(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')])), '\', False)+': '+GetGameValue(ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(ote(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]))+'Template')]))+')';
 
 		// Ok Button
 		btnOk := TButton.Create(frm);
@@ -1544,12 +1545,12 @@ begin
 		// What happens when Ok is pressed
 		selectedRecord := tempRecord;
 		frm.ShowModal;
-		tempRecord := ObjectToElement(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]);
+		tempRecord := ote(ddSelectedItem.Items.Objects[ddSelectedItem.ItemIndex]);
 		tempBoolean := False;
 		if (frm.ModalResult = mrOk) then begin
 			// Change template record
 			if (ddEditorID.Text <> '') then begin
-				if MessageDlg('Do you wish to change the template of '+full(tempRecord)+' from '+full(ObjectToElement(slGlobal.Objects[slGlobal.IndexOf(EditorID(tempRecord)+'Template')]))+' to '+full(ObjectToElement(ddEditorID.Items.Objects[ddEditorID.ItemIndex]))+'?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+				if MessageDlg('Do you wish to change the template of '+full(tempRecord)+' from '+full(ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(tempRecord)+'Template')]))+' to '+full(ote(ddEditorID.Items.Objects[ddEditorID.ItemIndex]))+'?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
 					slTemp.Clear;
 					for i := 0 to slGlobal.Count-1 do 
 						if StrWithinStr(slGlobal[i], '-//-') then
@@ -1557,7 +1558,7 @@ begin
 					for i := 0 to slTemp.Count-1 do
 						if (slGlobal.IndexOf(slTemp[i]) > -1) then
 							slGlobal.Delete(slGlobal.IndexOf(slTemp[i]));
-					templateRecord := ObjectToElement(ddEditorID.Items.Objects[ddEditorID.ItemIndex]); {Debug} if debugMsg then msg('[ELLR_Btn_SetTemplate] templateRecord := '+EditorID(templateRecord));
+					templateRecord := ote(ddEditorID.Items.Objects[ddEditorID.ItemIndex]); {Debug} if debugMsg then msg('[ELLR_Btn_SetTemplate] templateRecord := '+EditorID(templateRecord));
 					SetObject(EditorID(tempRecord)+'Template', TObject(templateRecord), slGlobal);
 					ParentForm := Sender.Parent;
 					tempObject := AssociatedComponent('Current Lists: ', ParentForm);
@@ -1565,9 +1566,9 @@ begin
 					for i := 0 to Pred(rbc(templateRecord)) do begin
 						LLrecord := rbi(templateRecord, i); // {Debug} if debugMsg then msg('[ELLR_Btn_SetTemplate] LLrecord := '+EditorID(LLrecord));
 						// Filter Invalid Entries
-						if StrWithinStr(EditorID(LLrecord), '++') or not (Length(EditorID(LLrecord)) > 0) or not IsHighestOverride(LLrecord, GetLoadOrder(ObjectToElement(GetObject('ALLAfile', slGlobal)))) or not (sig(LLrecord) = 'LVLI') or FlagCheck(LLrecord, 'Use All') or FlagCheck(LLrecord, 'Special Loot') then Continue;
+						if StrWithinStr(EditorID(LLrecord), '++') or not (Length(EditorID(LLrecord)) > 0) or not IsHighestOverride(LLrecord, GetLoadOrder(ote(GetObject('ALLAfile', slGlobal)))) or not (sig(LLrecord) = 'LVLI') or FlagCheck(LLrecord, 'Use All') or FlagCheck(LLrecord, 'Special Loot') then Continue;
 						if slContains(slGlobal, EditorID(LLrecord)) then 
-							if (EditorID(selectedRecord) = EditorID(ObjectToElement(slGlobal.Objects[slGlobal.IndexOf(EditorID(LLrecord))]))) then 
+							if (EditorID(selectedRecord) = EditorID(ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(LLrecord))]))) then 
 								Continue;
 						if slContains(slGlobal, EditorID(LLrecord)+'-/Level/-'+EditorID(selectedRecord)) then begin
 							tempInteger := Integer(GetObject(EditorID(LLrecord)+'-/Level/-'+EditorID(selectedRecord), slGlobal));
@@ -1920,7 +1921,7 @@ begin
 	if not Assigned(selectedRecord) then begin
 		for i := 0 to slGlobal.Count-1 do begin
 			if StrWithinStr(slGlobal[i], 'Original') then begin
-				selectedRecord := ObjectToElement(slGlobal.Objects[i]);
+				selectedRecord := ote(slGlobal.Objects[i]);
 				Break;
 			end;
 		end;
@@ -1946,7 +1947,7 @@ begin
 		btnDetectedItem.Parent := frm;
 		btnDetectedItem.Left := 330;
 		btnDetectedItem.Top := lblDetectedItem.Top + 1;
-		btnDetectedItem.Caption := full(ObjectToElement(slGlobal.Objects[0]));
+		btnDetectedItem.Caption := full(ote(slGlobal.Objects[0]));
 		btnDetectedItem.Width := 160;
 		btnDetectedItem.OnClick := ELLR_Btn_SelectedItem;
 
@@ -1964,7 +1965,7 @@ begin
     btnPlugin.Top := lblPlugin.Top - 2;		
     btnPlugin.Left := lblPlugin.Left + (9*Length(lblPlugin.Caption)) + 20;
 		if slContains(slGlobal, 'ALLAfile') then begin
-			btnPlugin.Caption := GetFileName(ObjectToElement(GetObject('ALLAfile', slGlobal)));
+			btnPlugin.Caption := GetFileName(ote(GetObject('ALLAfile', slGlobal)));
 		end else
 			btnPlugin.Caption := defaultOutputPlugin;
 		btnPlugin.Width := 245;
@@ -2150,6 +2151,7 @@ begin
 	msg('If you get an ''Out of Memory'' error use the 64bit xEdit.exe ');
 	
 	// Initialize Global
+	slProcessTime := TStringList.Create;
 	slGlobal := TStringList.Create;
 	
 	// Finalize Local
@@ -2161,13 +2163,13 @@ function Process(aRecord: IInterface): Integer;
 var
 	debugMsg: Boolean;
 	tempRecord: IInterface;
+	startTime, stopTime: TDateTime;
 	slTemp: TStringList;
 	i, x: Integer;
 begin
-// Begin debugMsg Section
-	debugMsg := False;
-	
 	// Initialize
+	debugMsg := False;
+	startTime := Time;
 	slTemp := TStringList.Create;
 	
 	// Record selected
@@ -2204,6 +2206,8 @@ begin
 	
 	// Finalize
 	slTemp.Free;
+	stopTime := Time;
+	addProcessTime('Process', TimeBtwn(stopTime, startTime));
 	
 	debugMsg := False;
 // End debugMsg Section
@@ -2212,17 +2216,17 @@ end;
 ////////////////////////////////////////////////////////////////////// MAIN SECTION BEGIN ///////////////////////////////////////////////////////////////////////////////////
 function Finalize: integer;
 var
+	slTemp, slIndex, slOutfit, slRecords, slTemplate, slFiles: TStringList;
+	tempRecord, ALLAfile, RecipeFile, outfitLevelList: IInterface;
+	i, x, y, z, tempInteger: Integer;
   debugMsg, tempBoolean: Boolean;
-  tempRecord, ALLAfile, RecipeFile, outfitLevelList: IInterface;
+	startTime, stopTime: TDateTime;
 	tempString: String; 
-  slTemp, slIndex, slOutfit, slRecords, slTemplate, slFiles: TStringList;
-  i, x, y, z, tempInteger: Integer;
 begin
 ////////////////////////////////////////////////////////////////////// PREP SECTION /////////////////////////////////////////////////////////////////////////////////////////
-// Begin debugMsg Section
-  debugMsg := False;
-	
-	// Initialize Local
+	// Initialize
+	debugMsg := False;
+	startTime := Time;
 	slTemplate := TStringList.Create;
 	slRecords := TStringList.Create;
 	slOutfit := TStringList.Create;
@@ -2235,7 +2239,7 @@ begin
 		if DoesFileExist(slTemp[i]) then
 			slFiles.AddObject(Trim(slTemp[i]), TObject(FileByName(slTemp[i])));	
 	// {Debug} if debugMsg then msgList('slFiles := ', slFiles, '');
-	// {Debug} if debugMsg then for i := 0 to slFiles.Count-1 do msg('[GetTemplate] slFiles.Objects['+IntToStr(i)+'] := '+GetFileName(ObjectToElement(slFiles.Objects[i])));
+	// {Debug} if debugMsg then for i := 0 to slFiles.Count-1 do msg('[GetTemplate] slFiles.Objects['+IntToStr(i)+'] := '+GetFileName(ote(slFiles.Objects[i])));
 	// Set default; Settings are easily found at the top of the code, this is just setting the variables
 	SetObject('GenerateEnchantedVersions', defaultGenerateEnchantedVersions, slGlobal);
 	SetObject('ReplaceInLeveledList', defaultReplaceInLeveledList, slGlobal);
@@ -2268,8 +2272,8 @@ begin
 	// Assign ALLAfile
 	if not Assigned(ALLAfile)	then begin		
 		ELLR_GeneralSettings;
-		ALLAfile := ObjectToElement(GetObject('ALLAfile', slGlobal));
-		RecipeFile := ObjectToElement(GetObject('RecipeFile', slGlobal));
+		ALLAfile := ote(GetObject('ALLAfile', slGlobal));
+		RecipeFile := ote(GetObject('RecipeFile', slGlobal));
 		{Debug} if debugMsg then msg('ALLAfile := '+GetFileName(ALLAfile));
 	end;
 	if Assigned(ALLAfile) then begin
@@ -2296,10 +2300,10 @@ begin
 	// Load valid records into lists
 	for i := 0 to slGlobal.Count-1 do
 		if StrWithinStr(slGlobal[i], 'Original') then
-			if (GetLoadOrder(ALLAfile) >= GetLoadOrder(GetFile(ObjectToElement(slGlobal.Objects[i])))) then
+			if (GetLoadOrder(ALLAfile) >= GetLoadOrder(GetFile(ote(slGlobal.Objects[i])))) then
 				SetObject(StrPosCopy(slGlobal[i], 'Original', True), slGlobal.Objects[i], slRecords);
 	for i := 0 to slRecords.Count-1 do
-		slTemplate.AddObject(EditorID(ObjectToElement(GetObject(slRecords[i]+'Template', slGlobal))), slRecords.Objects[i]);
+		slTemplate.AddObject(EditorID(ote(GetObject(slRecords[i]+'Template', slGlobal))), slRecords.Objects[i]);
 	{Debug} if debugMsg then msgList('slGlobal := ', slGlobal, '');
 	{Debug} if debugMsg then msgList('slRecords := ', slRecords, '');
 	
@@ -2315,7 +2319,7 @@ begin
 	
 	// Process Male/Female-only Records
 	for i := 0 to slRecords.Count-1 do begin
-		tempRecord := ObjectToElement(slRecords.Objects[i]);
+		tempRecord := ote(slRecords.Objects[i]);
 		// Check both Keyword and EditorID
 		if HasGenderKeyword(tempRecord) then begin
 			GenderOnlyArmor(GetGenderFromKeyword(tempRecord), tempRecord, ALLAfile);
@@ -2330,7 +2334,7 @@ begin
 	if Boolean(GetObject('GenerateRecipes', slGlobal)) then begin
 		{Debug} if debugMsg then msgList('[GenerateRecipes] slRecords := ', slRecords, '');
 		for i := 0 to slRecords.Count-1 do begin
-			tempRecord := ObjectToElement(slRecords.Objects[i]);
+			tempRecord := ote(slRecords.Objects[i]);
 			if Boolean(GetObject('Crafting', slGlobal)) then
 				MakeCraftable(tempRecord, RecipeFile);
 			if Boolean(GetObject('Temper', slGlobal)) then
@@ -2350,8 +2354,8 @@ begin
 	if not CancelAll then begin
 		if Boolean(GetObject('OutfitSet', slGlobal)) then begin
 			for i := 0 to slRecords.Count-1 do
-				slOutfit.AddObject(slRecords[i], ObjectToElement(slRecords.Objects[i]));
-			tempString := 'LLOutfit_'+RemoveSpaces(RemoveFileSuffix(GetFileName(ObjectToElement(slOutfit.Objects[0]))))+'_'+LongestCommonString(slOutfit);
+				slOutfit.AddObject(slRecords[i], ote(slRecords.Objects[i]));
+			tempString := 'LLOutfit_'+RemoveSpaces(RemoveFileSuffix(GetFileName(ote(slOutfit.Objects[0]))))+'_'+LongestCommonString(slOutfit);
 			// msg('['+tempString+'] Beginning OTFT integration');			
 			if not Assigned(outfitLevelList) then
 				outfitLevelList := ebEDID(gbs(ALLAfile, 'LVLI'), tempString);
@@ -2359,32 +2363,36 @@ begin
 				slTemp.CommaText := '"Use All"';
 				outfitLevelList := createLeveledList(ALLAfile, tempString, slTemp, 0);
 				for i := 0 to slOutfit.Count-1 do 
-					addToLeveledList(outfitLevelList, ObjectToElement(slOutfit.Objects[i]), 1);
+					addToLeveledList(outfitLevelList, ote(slOutfit.Objects[i]), 1);
 			end;		
 			if Assigned(outfitLevelList) then begin
 				{Debug} if debugMsg then msgList('[Finalization] slRecords := ', slRecords, '');
 				// for i := 0 to slRecords.Count-1 do begin
 					// msg('['+EditorID(outfitLevelList)+'] Adding '+EditorID(outfitLevelList)+' to '+slRecords[0]+' Outfits');
-					AddToOutfitAuto(ObjectToElement(slRecords.Objects[0]), outfitLevelList, ALLAfile);
+					AddToOutfitAuto(ote(slRecords.Objects[0]), outfitLevelList, ALLAfile);
 				// end;
 			end else msg('[ERROR] [Finalization] Could not assign a valid record');
 		end;	
 	end;
 
 	// Finalize
-	if Assigned(slTemplate) then slTemplate.Free;
-	if Assigned(slRecords) then slRecords.Free;	
-	if Assigned(slOutfit) then slOutfit.Free;
-	if Assigned(slGlobal) then slGlobal.Free;
-	if Assigned(slFiles) then slFiles.Free;
-	if Assigned(slTemp) then slTemp.Free;
+	stopTime := Time;
+	addProcessTime('Finalize', TimeBtwn(startTime, stopTime));
+	if ProcessTime then
+		for i := 0 to slProcessTime.Count-1 do
+			msg(slProcessTime[i]+': '+IntegerToTime(Integer(slProcessTime.Objects[i])));
+	slProcessTime.Free;
+	slTemplate.Free;
+	slRecords.Free;	
+	slOutfit.Free;
+	slGlobal.Free;
+	slFiles.Free;
+	slTemp.Free;
 ////////////////////////////////////////////////////////////////////// MAIN SECTION END //////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////// SCRIPT FINALIZATION ///////////////////////////////////////////////////////////////////////////////////////
   msg('---Ending Generator---');
   Result := 0;
-  debugMsg := False;
-// End debugMsg Section
 end;
 
 end.
