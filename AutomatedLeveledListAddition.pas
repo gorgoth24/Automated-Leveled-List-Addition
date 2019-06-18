@@ -2173,7 +2173,7 @@ begin
 	slTemp := TStringList.Create;
 	
 	// Record selected
-	slTemp.CommaText := 'ARMO, AMMO, WEAP'+{', BOOK'};
+	slTemp.CommaText := 'ARMO, AMMO, WEAP'{+', BOOK'};
 	if (ElementType(aRecord) = etMainRecord) then begin
 		// Filter invalid records
 		{Debug} if debugMsg then msg('[AutoDetect] Filtering Invalid Records');
