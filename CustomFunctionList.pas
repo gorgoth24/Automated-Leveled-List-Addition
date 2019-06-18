@@ -2846,7 +2846,7 @@ end;
 				end;	
 			// For item values greater than the maximum (Daedric/Dragonscale/GoldDiamond/etc.)
 			end else if (recordValue > slItemMaxValue) then begin
-				// msg('['+record_full+'] '+record_full+' assigned '+full(ote(slItem.Objects[slItem.Count-1]))+' template');
+				//msg('['+record_full+'] '+record_full+' assigned '+full(ote(slItem.Objects[slItem.Count-1]))+' template');
 				{Debug} if debugMsg then msg('[GetTemplate] Result := '+EditorID(ote(slItem.Objects[slItem.Count-1])));
 				if (slItem.Count-1 >= 0) then
 					Result := ote(slItem.Objects[slItem.Count-1]);
@@ -2877,19 +2877,20 @@ end;
 	end;
 
 //gets templetes for books
+//todo fix paths for SPIT\Half-cost Perk and SPIT/BASE COST
 function BookTemplate(bookRecord:IInterface):IInterface;
 var
 	books, flags, tempSpellRecord: IInterface;
 	halfCostPerk: string;
 begin
-	flags := ebp(bookRecord, 'DATA/FLAGS');
-	if not (genv(flags, 'Teaches Spell') = -1) then begin//checks if book is tome
-		tempSpellRecord := LinksTo(ebp(bookRecord, 'DATA/Spell'));//spell from tome
-		if not (LinksTo(ebp(tempSpellRecord, 'SPIT/Half-cost Perk')) = -1) then begin
-			halfCostPerk := geev(ebp(tempSpellRecord, 'SPIT/Half-cost Perk'));
-			case exractInts(halfCostPerk, 1) of
+	if (GetEditValue(elementbypath(selectedRecord, 'DATA\Flags\Teaches spell'))) = '1' then begin//checks if book is tome
+		tempSpellRecord := LinksTo(elementbypath(bookRecord, 'DATA\Flags\Teaches'));//spell from tome
+		if not (LinksTo(elementbypath(tempSpellRecord, 'SPIT\Half-cost Perk')) = nil) then begin
+			halfCostPerk := GetElementEditValues(tempSpellRecord, 'SPIT\Half-cost Perk');
+			{Debug} msg('halfCostPerk' + halfCostPerk);
+			case extractInts(halfCostPerk, 1) of
 			00	:	begin
-						case ebp(halfCostPerk, 'Novice', True) of
+						case elementbypath(halfCostPerk, 'Novice', True) of
 							'Alteration'	:	Result :=GetRecordByFormID('0009E2A7');
 							'Conjuration'	:	Result :=GetRecordByFormID('0009E2AA');
 							'Destruction'	:	Result :=GetRecordByFormID('0009CD52');
@@ -2898,7 +2899,7 @@ begin
 						end;
 					end;
 			25	:	begin
-						case ebp(halfCostPerk, 'Apprentice', True) of
+						case elementbypath(halfCostPerk, 'Apprentice', True) of
 							'Alteration'	:	Result :=GetRecordByFormID('000A26E3');
 							'Conjuration'	:	Result :=GetRecordByFormID('0009CD54');
 							'Destruction'	:	Result :=GetRecordByFormID('000A2702');
@@ -2907,7 +2908,7 @@ begin
 						end;
 					end;
 			50	:	begin
-						case ebp(halfCostPerk, 'Adept', True) of
+						case elementbypath(halfCostPerk, 'Adept', True) of
 							'Alteration'	:	Result :=GetRecordByFormID('000A26E7');
 							'Conjuration'	:	Result :=GetRecordByFormID('000A26EE');
 							'Destruction'	:	Result :=GetRecordByFormID('000A2708');
@@ -2916,7 +2917,7 @@ begin
 						end;
 					end;
 			75	:	begin
-						case ebp(halfCostPerk, 'Expert', True) of
+						case elementbypath(halfCostPerk, 'Expert', True) of
 							'Alteration'	:	Result :=GetRecordByFormID('000A26E8');
 							'Conjuration'	:	Result :=GetRecordByFormID('000A26F7');
 							'Destruction'	:	Result :=GetRecordByFormID('0010F7F4');
@@ -2925,7 +2926,7 @@ begin
 						end;
 					end;
 			100	:	begin
-						case ebp(halfCostPerk, 'Master', True) of
+						case elementbypath(halfCostPerk, 'Master', True) of
 							'Alteration'	:	Result :=GetRecordByFormID('000DD646');
 							'Conjuration'	:	Result :=GetRecordByFormID('000A26FA');
 							'Destruction'	:	Result :=GetRecordByFormID('000A270D');
@@ -2934,8 +2935,9 @@ begin
 						end;
 					end;
 			end;
-		else do //uses restoration books as level list base
-			case StrToInt(geev(ebp(tempSpellRecord, 'SPIT/BASE COST'))) of
+		end
+		else begin //uses restoration books as level list base
+			case StrToInt(GetElementEditValues(tempSpellRecord, 'SPIT/BASE COST')) of
 				0..96		: Result :=GetRecordByFormID('0009E2AE');//novice
 				97..156		: Result :=GetRecordByFormID('000A2720');//aprentice
 				157..250	: Result :=GetRecordByFormID('0010F64D');//adept
@@ -6816,6 +6818,40 @@ Procedure addProcessTime(aFunctionName: String; aTime: Integer);
 begin
 	SetObject(aFunctionName, Integer(GetObject(aFunctionName, slProcessTime))+aTime, slProcessTime);
 end;
-
+//extracts the specified integer (Natural Numbers only) from an input; returns -1 if no suitable number is not found
+//	O(10n) time complexity
+function extractInts(inputString: string; intToPull: integer): integer;//tested and works
+const
+    ints = '1234567890';
+var
+    i, j, currentInt: integer;
+    flag1, flag2 : boolean;
+	resultString : string;
+begin
+    resultString := '';
+    CurrentInt := 0;
+    flag1 := true;
+    flag2 := true;
+    for i := 0 to (length(inputString) - 1) do
+    begin
+        j := 0;
+        while j < 10 do
+        begin
+            if copy(inputString, i+1, 1) = copy(ints, j+1, 1) then
+            begin
+                 if flag1 then currentInt := currentInt + 1;
+                 if (currentInt = intToPull) then resultString := resultString + copy(inputString, i+1, 1);
+                 flag1 := false;
+                 flag2 := false;
+                 break;
+            end;
+            j := j + 1;
+        end;
+        if flag2 then flag1 := true;
+        flag2 := true;
+    end;
+	if not (resultString = '') then result := StrToInt(resultString)
+	else result := -1
+end;
 end.
 
