@@ -6819,7 +6819,7 @@ begin
 	SetObject(aFunctionName, Integer(GetObject(aFunctionName, slProcessTime))+aTime, slProcessTime);
 end;
 //extracts the specified integer (Natural Numbers only) from an input; returns -1 if no suitable number is not found
-//	O(10n) time complexity
+// O(10n) time complexity n =input string length
 function extractInts(inputString: string; intToPull: integer): integer;//tested and works
 const
     ints = '1234567890';
@@ -6852,6 +6852,28 @@ begin
     end;
 	if not (resultString = '') then result := StrToInt(resultString)
 	else result := -1
+end;
+//checks to see if a string is contained in another string
+// O(n) n = length of inputstring
+function DoesContain(inputString, compareString : String): boolean;
+var
+    i, j, inputLength, compareLength : integer;
+begin
+    j := 1;
+    DoesContain := false;
+    inputLength :=  length(inputstring);
+    compareLength := length(compareString);
+    for i := 1 to inputLength do begin
+        if (i > (inputLength - compareLength)+1) AND (j = 1) then break; //dont bother looking if there isnt engou characters left
+        if copy(inputString, i, 1) = copy(compareString, j, 1) then begin
+            j := j + 1;
+            if j = compareLength then begin
+                DoesContain := true;
+                break;
+            end;
+        end 
+        else j := 1;
+    end;
 end;
 end.
 
