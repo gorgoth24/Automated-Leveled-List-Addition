@@ -35,7 +35,7 @@ const
 	defaultItemTier06 = 40;
 	defaultTemperLight = 1;
 	defaultTemperHeavy = 2;
-	ProcessTime = True;
+	ProcessTime = False;
 	Constant = True;
 
 var 
@@ -108,11 +108,13 @@ Procedure ReplaceInLeveledListAuto(inputRecord, replaceRecord, aPlugin: IInterfa
 var
   LLrecord, LLcopy, masterRecord: IInterface;
 	debugMsg, tempBoolean: Boolean;
+	startTime, stopTime: TDateTime;
 	tempString: String;
   i, x: Integer;
 begin
-// Begin debugMsg section
+	// Initialize
 	debugMsg := False;
+	startTime := Time;
 	
 	{Debug} if debugMsg then msg('[ReplaceInLeveledListAuto] ReplaceInLeveledListAuto( '+EditorID(inputRecord)+', '+EditorID(replaceRecord)+', '+GetFileName(aPlugin)+' );');
 	masterRecord := MasterOrSelf(inputRecord);
@@ -163,8 +165,9 @@ begin
 		end;
 	end;
 
-	debugMsg := False;
-// End debugMsg section
+	// Finalize
+	stopTime := Time;
+	if ProcessTime then addProcessTime('ReplaceInLeveledListAuto', TimeBtwn(startTime, stopTime));
 end;
 
 // Find where the selected record is referenced in leveled lists and make a 'Copy as Override' into a specified file.  Then replace all instances of inputRecord with replaceRecord in the override
@@ -183,7 +186,7 @@ begin
 	slTemp := TStringList.Create;
 	slLL := TStringList.Create;
 	
-	{Debug} if debugMsg then msg('[ReplaceInLeveledListByList] AddToLeveledListByList( aList, bList, '+GetFileName(aPlugin)+' );');
+	{Debug} if debugMsg then msg('[ReplaceInLeveledListByList] ReplaceInLeveledListByList( aList, bList, '+GetFileName(aPlugin)+' );');
 	{Debug} if debugMsg then msgList('[ReplaceInLeveledListByList] aList := ', aList, ' );');
 	{Debug} if debugMsg then msg(' ');
 	{Debug} if debugMsg then msgList('[ReplaceInLeveledListByList] bList := ', bList, ' );');
@@ -380,10 +383,10 @@ end;
 Procedure AddToLeveledListByList(aList, bList: TStringList; aPlugin: IInterface);
 var
   LLrecord, LLcopy, masterRecord, tempRecord, tempElement: IInterface;
+	startTime, stopTime, tempStart, tempStop: TDateTime;
 	i, x, y, tempInteger, LoadOrder: Integer;
   debugMsg, tempBoolean, Patch: Boolean;
 	slLL, slTemp, slMessage: TStringList;
-  startTime, stopTime: TDateTime;
 	tempString: String;
 begin
 	// Initialize
@@ -461,8 +464,10 @@ begin
 	end;
 	{Debug} if debugMsg then msgList('[AddToLeveledListByList] slLL := ', slLL, ' );');
 	// Add Masters
-	msg('Adding Leveled List Masters (This may take a while)');
-	AddMastersList(slLL, aPlugin);	
+	tempStart := Time;
+	AddMastersList(slLL, aPlugin);
+	tempStop := Time;
+	// addProcessTime('Add Masters', TimeBtwn(tempStart, tempStop));
 	for i := 0 to slLL.Count-1 do begin
 		slMessage.Clear;
 		slTemp.Clear;
@@ -499,14 +504,14 @@ begin
 					LLcopy := LLrecord;
 				if (tempInteger = 0) then
 					tempInteger := 1;
-				if not slContains(slTemp, EditorID(tempRecord)) then
+				if not slContains(slTemp, EditorID(tempRecord)) then begin
 					addToLeveledList(LLcopy, tempRecord, tempInteger); {Debug} if debugMsg then msg('[AddToLeveledListByList] addToLeveledList( '+EditorID(LLcopy)+', '+EditorID(tempRecord)+', '+IntToStr(tempInteger)+' )');
-				if not slContains(slMessage, EditorID(LLcopy)) then
-					slMessage.Add(EditorID(LLcopy));
+					slMessage.Add(EditorID(tempRecord));
+				end;
 			end;
 		end;
 		if (slMessage.Count > 0) then
-			msgList(EditorID(tempRecord)+' added to ', slMessage, '');
+			msgList('['+IntToStr(i+1)+'/'+IntToStr(slLL.Count)+'] '+EditorID(LLrecord)+' added: ', slMessage, '');
   end;
 	
 	// Finalize
@@ -573,8 +578,8 @@ begin
 						tempBoolean := False;
 						if (rbc(OTFTrecord) > 1) then tempBoolean := True;
 						if not tempBoolean then
-							for y := 0 to Pred(ec(ebp(OTFTrecord, 'INAM'))) do
-								if (sig(ebi(ebp(OTFTrecord, 'INAM'), y)) = 'LVLI') then
+							for y := 0 to Pred(ec(ElementByPath(OTFTrecord, 'INAM'))) do
+								if (sig(ebi(ElementByPath(OTFTrecord, 'INAM'), y)) = 'LVLI') then
 									tempBoolean := True;
 						if tempBoolean and (sig(OTFTrecord) = 'OTFT') then
 							if not slContains(slOutfit, EditorID(OTFTrecord)) then
@@ -607,7 +612,7 @@ begin
 			OTFTrecord_edid := EditorID(OTFTrecord);
 			// Add Masters
 			AddMastersAuto(GetFile(OTFTrecord), aPlugin);
-			OTFTitems := ebp(OTFTrecord, 'INAM');
+			OTFTitems := ElementByPath(OTFTrecord, 'INAM');
 			// Check for a previous script run
 			if (ec(OTFTitems) = 1) and (sig(LinksTo(ebi(OTFTitems, 0))) = 'LVLI') then begin			
 				{Debug} if debugMsg then msg('[AddToOutfitAuto] if tempInteger = 1 end else begin');
@@ -676,8 +681,8 @@ begin
 			// Check if OTFT contains LVLI
 			tempBoolean := False;
 			// Checks if OTFT has a LVLI to be processed
-			for x := 0 to Pred(ec(ebp(OTFTcopy, 'INAM'))) do begin
-				if (sig(LinksTo(ebi(ebp(OTFTcopy, 'INAM'), x))) = 'LVLI') then begin
+			for x := 0 to Pred(ec(ElementByPath(OTFTcopy, 'INAM'))) do begin
+				if (sig(LinksTo(ebi(ElementByPath(OTFTcopy, 'INAM'), x))) = 'LVLI') then begin
 					tempBoolean := True;
 					Break;
 				end;
@@ -686,10 +691,10 @@ begin
 			// Get a complete list of all items and enchanted sets
 			{Debug} if debugMsg then msg('[AddToOutfitAuto] [Assemble OTFT From Vanilla Entries] Get a complete list of all items and enchanted sets');
 			if tempBoolean then begin
-				for x := 0 to Pred(ec(ebp(OTFTcopy, 'INAM'))) do begin
+				for x := 0 to Pred(ec(ElementByPath(OTFTcopy, 'INAM'))) do begin
 					// Commonly used functions; This is just to reduce the number of complicated functions that are called (and therefore reduce processing time)
 					{Debug} if debugMsg then msg('[AddToOutfitAuto] [Assemble OTFT From Vanilla Entries] Commonly used functions');
-					tempRecord := WinningOverride(LinksTo(ebi(ebp(OTFTcopy, 'INAM'), x)));
+					tempRecord := WinningOverride(LinksTo(ebi(ElementByPath(OTFTcopy, 'INAM'), x)));
 					Record_edid := EditorID(tempRecord);
 					// {Debug} if debugMsg then msg('[AddToOutfitAuto] [Assemble OTFT From Vanilla Entries] tempRecord := '+EditorID(tempRecord));
 					tempBoolean := False;
@@ -1117,7 +1122,7 @@ begin
 						for z := 0 to Pred(ec(ElementBySignature(OTFTcopy, 'INAM'))) do begin
 							sl1.Clear;
 							sl2.Clear;
-							tempRecord := WinningOverride(LinksTo(ebi(ebp(OTFTcopy, 'INAM'), z)));
+							tempRecord := WinningOverride(LinksTo(ebi(ElementByPath(OTFTcopy, 'INAM'), z)));
 							// Get a list of expected BOD2 slots
 							{Debug} if debugMsg then msg('[AddToOutfitAuto] [Assemble OTFT From Vanilla Entries - Outfit Variations] Get a list of expected BOD2 slots for '+EditorID(tempRecord));
 							if (sig(tempRecord) = 'LVLI') then begin
@@ -1248,8 +1253,8 @@ begin
 			slpair.Clear;			
 			slTemp.CommaText := 'Bracers, Helmet, Hood, Crown, Shield, Buckler, Cuirass, Greaves, Boots, Gloves, Gauntlets';	
 			tempBoolean := False;
-			for x := 0 to Pred(ec(ebp(OTFTcopy, 'INAM'))) do begin 
-				tempRecord := LinksTo(ebi(ebp(OTFTcopy, 'INAM'), x)); {Debug} if debugMsg then msg('[AddToOutfitAuto] [Pre-Check] tempRecord := '+EditorID(tempRecord));	
+			for x := 0 to Pred(ec(ElementByPath(OTFTcopy, 'INAM'))) do begin 
+				tempRecord := LinksTo(ebi(ElementByPath(OTFTcopy, 'INAM'), x)); {Debug} if debugMsg then msg('[AddToOutfitAuto] [Pre-Check] tempRecord := '+EditorID(tempRecord));	
 				{Debug} if debugMsg then msg('[AddToOutfitAuto] [Pre-Check] if sig( '+EditorID(tempRecord)+' ) := '+sig(tempRecord)+' = ''LVLI'' then begin');
 				if (sig(tempRecord) = 'LVLI') then begin {Debug} if debugMsg then msg('[AddToOutfitAuto] [Pre-Check] if (IntWithinStr(EditorID(tempRecord)) := '+IntToStr(IntWithinStr(EditorID(tempRecord)))+' ) <> -1) then begin');
 					if (IntWithinStr(EditorID(tempRecord)) <> -1) then begin
@@ -1357,7 +1362,7 @@ begin
 				// Add the finished variant of the inputRecord level list to the OTFT
 				if Assigned(tempLevelList) then begin
 					{Debug} if debugMsg then msg('[AddToOutfitAuto] [Integer] LLreplace( '+EditorID(masterLevelList)+', '+EditorID(tempLevelList)+', 1);');
-					{Debug} if debugMsg then msg('[AddToOutfitAuto] [Integer] SetEditValue('+GetEditValue(ebi(ebp(OTFTcopy, 'INAM'), 0))+', '+ShortName(masterLevelList)+');');
+					{Debug} if debugMsg then msg('[AddToOutfitAuto] [Integer] SetEditValue('+GetEditValue(ebi(ElementByPath(OTFTcopy, 'INAM'), 0))+', '+ShortName(masterLevelList)+');');
 					LLreplace(masterLevelList, inputRecord, tempLevelList);
 					SetEditValue(OTFTitem, ShortName(masterLevelList)); {Debug} if debugMsg then msg('[AddToOutfitAuto] [Integer] SetEditValue( '+GetEditValue(OTFTitem)+', ShortName( '+EditorID(tempLevelList)+' ) := '+ShortName(tempLevelList)+' )');
 				end else 
@@ -1393,13 +1398,13 @@ begin
 				if tempBoolean then begin
 					tempLevelList := CopyRecordToFile(inputRecord, aPlugin, True, True);
 					SetElementEditValues(tempLevelList, 'EDID', EditorID(inputRecord)+'_No'+tempString);
-					Remove(ebi(ebp(inputRecord, 'Leveled List Entries'), tempInteger));
+					Remove(ebi(ElementByPath(inputRecord, 'Leveled List Entries'), tempInteger));
 					{Debug} if debugMsg then msg('[AddToOutfitAuto] [No/Without] addToLeveledList( '+EditorID(masterLevelList)+', '+EditorID(tempLevelList)+', 1);');
-					{Debug} if debugMsg then msg('[AddToOutfitAuto] [No/Without] SetEditValue('+GetEditValue(ebi(ebp(OTFTcopy, 'INAM'), 0))+', '+ShortName(masterLevelList)+');');
+					{Debug} if debugMsg then msg('[AddToOutfitAuto] [No/Without] SetEditValue('+GetEditValue(ebi(ElementByPath(OTFTcopy, 'INAM'), 0))+', '+ShortName(masterLevelList)+');');
 					addToLeveledList(masterLevelList, tempLevelList, 1);
 					SetEditValue(OTFTitem, ShortName(masterLevelList));
 				end else begin
-					{Debug} if debugMsg then msg('[AddToOutfitAuto] [No/Without] SetEditValue('+GetEditValue(ebi(ebp(OTFTcopy, 'INAM'), 0))+', '+ShortName(masterLevelList)+');');
+					{Debug} if debugMsg then msg('[AddToOutfitAuto] [No/Without] SetEditValue('+GetEditValue(ebi(ElementByPath(OTFTcopy, 'INAM'), 0))+', '+ShortName(masterLevelList)+');');
 					SetEditValue(OTFTitem, ShortName(masterLevelList));
 				end;
 ////////////////////////////////////////////////////////////////////// SPECIFIC OTFT TYPES - SIMPLE ////////////////////////////////////////////////////////////////////////////////
@@ -1408,7 +1413,7 @@ begin
 				{Debug} if debugMsg then msg('[AddToOutfitAuto] [Simple] Simple OTFT detected');
 				tempLevelList := CopyRecordToFile(inputRecord, aPlugin, True, True);
 				SetElementEditValues(tempLevelList, 'EDID', EditorID(inputRecord)+'_Simple');
-				Remove(ebp(tempLevelList, 'Leveled List Entries'));
+				Remove(ElementByPath(tempLevelList, 'Leveled List Entries'));
 				Add(tempLevelList, 'Leveled List Entries', True);
 				RemoveInvalidEntries(tempLevelList);
 				// Checking FULL, EditorID, and Keywords for relevant item types
@@ -1453,19 +1458,19 @@ begin
 						addToLeveledList(subLevelList, LLebi(inputRecord, tempInteger), 1);
 					end;
 					{Debug} if debugMsg then msg('[AddToOutfitAuto] [Simple] addToLeveledList( '+EditorID(masterLevelList)+', '+EditorID(tempLevelList)+', 1);');
-					{Debug} if debugMsg then msg('[AddToOutfitAuto] [Simple] SetEditValue('+GetEditValue(ebi(ebp(OTFTcopy, 'INAM'), 0))+', '+ShortName(masterLevelList)+');');
+					{Debug} if debugMsg then msg('[AddToOutfitAuto] [Simple] SetEditValue('+GetEditValue(ebi(ElementByPath(OTFTcopy, 'INAM'), 0))+', '+ShortName(masterLevelList)+');');
 					addToLeveledList(masterLevelList, tempLevelList, 1);
 					SetEditValue(OTFTitem, ShortName(masterLevelList));
 				end else begin
-					{Debug} if debugMsg then msg('[AddToOutfitAuto] [Simple] SetEditValue('+GetEditValue(ebi(ebp(OTFTcopy, 'INAM'), 0))+', '+ShortName(masterLevelList)+');');
+					{Debug} if debugMsg then msg('[AddToOutfitAuto] [Simple] SetEditValue('+GetEditValue(ebi(ElementByPath(OTFTcopy, 'INAM'), 0))+', '+ShortName(masterLevelList)+');');
 					SetEditValue(OTFTitem, ShortName(masterLevelList));
 				end;
 ////////////////////////////////////////////////////////////////////// SPECIFIC OTFT TYPES - OTHER ////////////////////////////////////////////////////////////////////////////////				
 			end else begin
-			{Debug} if debugMsg then msg('[AddToOutfitAuto] [Other] Other OTFT detected; SetEditValue('+GetEditValue(ebi(ebp(OTFTcopy, 'INAM'), 0))+', '+ShortName(masterLevelList)+' );');
+			{Debug} if debugMsg then msg('[AddToOutfitAuto] [Other] Other OTFT detected; SetEditValue('+GetEditValue(ebi(ElementByPath(OTFTcopy, 'INAM'), 0))+', '+ShortName(masterLevelList)+' );');
 			slTemp.CommaText := 'Shield, Buckler';
 			tempBoolean := False;
-			for y := 0 to Pred(ec(ebp(OTFTrecord, 'INAM'))) do begin
+			for y := 0 to Pred(ec(ElementByPath(OTFTrecord, 'INAM'))) do begin
 				for z := 0 to slTemp.Count-1 do begin
 					if StrWithinStr(EditorID(LLentry), slTemp[z]) then tempBoolean := True;
 					if StrWithinStr(full(LLentry), slTemp[z]) then tempBoolean := True;
@@ -1487,9 +1492,9 @@ begin
 				if tempBoolean then begin
 					tempLevelList := CopyRecordToFile(inputRecord, aPlugin, True, True);
 					SetElementEditValues(tempLevelList, 'EDID', EditorID(inputRecord)+'_NoShield');
-					RemoveElement(ebi(ebp(tempLevelList, 'Leveled List Entries'), tempInteger));
+					RemoveElement(ebi(ElementByPath(tempLevelList, 'Leveled List Entries'), tempInteger));
 					{Debug} if debugMsg then msg('[AddToOutfitAuto] [Other] addToLeveledList( '+EditorID(masterLevelList)+', '+EditorID(tempLevelList)+', 1);');
-					{Debug} if debugMsg then msg('[AddToOutfitAuto] [Other] SetEditValue('+GetEditValue(ebi(ebp(OTFTcopy, 'INAM'), 0))+', '+ShortName(masterLevelList)+' );');
+					{Debug} if debugMsg then msg('[AddToOutfitAuto] [Other] SetEditValue('+GetEditValue(ebi(ElementByPath(OTFTcopy, 'INAM'), 0))+', '+ShortName(masterLevelList)+' );');
 					addToLeveledList(masterLevelList, tempLevelList, 1);
 					SetEditValue(OTFTitem, ShortName(masterLevelList));	    
 				end else SetEditValue(OTFTitem, ShortName(masterLevelList));
@@ -1530,7 +1535,7 @@ begin
 	// Function
   slTemp.CommaText := 'ArmorHelmet, ArmorCuirass, ArmorGauntlets, ArmorBoots, ArmorShield, ClothingHead, ClothingBody, ClothingHands, ClothingFeet, ClothingCirclet, ClothingRing, ClothingNecklace, WeapTypeBattleaxe, WeapTypeBow, WeapTypeDagger, WeapTypeGreatsword, WeapTypeMace, WeapTypeSword, WeapTypeWarAxe, WeapTypeWarhammer, VendorItemArrow';
   {Debug} if debugMsg then for i := 0 to slTemp.Count-1 do msg('[ItemKeyword] '+slTemp[i]);
-  KWDAentries := ebp(inputRecord, 'KWDA'); {Debug} if debugMsg then msg('[ItemKeyword] Pred(ec(KWDAentries)) :='+IntToStr(Pred(ec(KWDAentries))));
+  KWDAentries := ElementByPath(inputRecord, 'KWDA'); {Debug} if debugMsg then msg('[ItemKeyword] Pred(ec(KWDAentries)) :='+IntToStr(Pred(ec(KWDAentries))));
   for i := 0 to Pred(ec(KWDAentries)) do begin {Debug} if debugMsg then msg('[ItemKeyword] LinksTo(ebi(KWDAentries, i)) :='+EditorID(LinksTo(ebi(KWDAentries, i))));
     KWDAkeyword := LinksTo(ebi(KWDAentries, i)); {Debug} if debugMsg then msg('[ItemKeyword] slTemp.Count-1 :='+IntToStr(slTemp.Count-1));
 	for i := 0 to slTemp.Count-1 do begin {Debug} if debugMsg then msg('[ItemKeyword] Result := '+slTemp[i]);
@@ -1601,13 +1606,15 @@ end;
 // Creates an enchanted copy of the item record and returns it [From Generate Enchanted Versions]
 function CreateEnchantedVersion(aRecord, aPlugin, objEffect, enchRecord: IInterface; suffix: String; enchAmount: Integer; aBoolean: Boolean): IInterface;
 var
+	startTime, stopTime: TDateTime;
   tempRecord: IInterface;
 	tempString: String;
 	debugMsg: Boolean;
   enchCost: Integer;
 begin
-// Begin debugMsg section
+	// Initialize
 	debugMsg := False;
+	startTime := Time;
 	
 	{Debug} if debugMsg then msg('[CreateEnchantedVersion] Begin');
 	{Debug} if debugMsg then msg('[CreateEnchantedVersions] CreateEnchantedVersion( '+EditorID(aRecord)+', '+GetFileName(aPlugin)+', '+EditorID(objEffect)+', '+EditorID(enchRecord)+', '+suffix+', '+IntToStr(enchAmount)+' );');
@@ -1638,11 +1645,11 @@ begin
 		end;
 	end;
 	
+	// Finalize
 	{Debug} if debugMsg then msg('[CreateEnchantedVersions] Result := '+EditorID(enchRecord));
   Result := enchRecord;
-	
-	debugMsg := False;
-// End debugMsg section
+	stopTime := Time;
+	if ProcessTime then addProcessTime('createEnchantedVersion', TimeBtwn(startTime, stopTime));
 end;
 
 // Checks to see if a string ends with an entered substring [mte functions]
@@ -1863,9 +1870,9 @@ begin
 	// Function
 	if (sig(e) = 'ARMO') then begin
 		{Debug} if debugMsg then msgList('[slGetFlagValues] slGetFlagValues( '+EditorID(e)+', ', aList, ', '+BoolToStr(aBoolean));
-		slTemp.CommaText := FlagValues(ebp(ElementBySignature(e, GetElementType(e)), 'First Person Flags'));
+		slTemp.CommaText := FlagValues(ElementByPath(ElementBySignature(e, GetElementType(e)), 'First Person Flags'));
 		{Debug} if debugMsg then msgList('[slGetFlagValues] FlagValues := ', slTemp, '');
-		BinaryList := GetEditValue(ebp(ElementBySignature(e, GetElementType(e)), 'First Person Flags'));
+		BinaryList := GetEditValue(ElementByPath(ElementBySignature(e, GetElementType(e)), 'First Person Flags'));
 		{Debug} if debugMsg then msg('[slGetFlagValues] BinaryList := '+BinaryList);
 		if aBoolean then begin
 			for i := 1 to Length(BinaryList) do	begin
@@ -1923,9 +1930,9 @@ begin
 	// Function
 	{Debug} if debugMsg then msgList('[slSetFlagValues] slSetFlagValues( '+EditorID(e)+', ', aList, ' )');
 	if (sig(e) = 'ARMO') then begin
-		slTemp.CommaText := FlagValues(ebp(ElementBySignature(e, GetElementType(e)), 'First Person Flags'));
+		slTemp.CommaText := FlagValues(ElementByPath(ElementBySignature(e, GetElementType(e)), 'First Person Flags'));
 		{Debug} if debugMsg then msgList('[slSetFlagValues] FlagValues := ', slTemp, '');
-		BinaryList := GetEditValue(ebp(ElementBySignature(e, GetElementType(e)), 'First Person Flags'));
+		BinaryList := GetEditValue(ElementByPath(ElementBySignature(e, GetElementType(e)), 'First Person Flags'));
 		{Debug} if debugMsg then msg('[slSetFlagValues] BinaryList := '+BinaryList);
 		for i := 0 to slTemp.Count-1 do	begin
 			// {Debug} if debugMsg then msg('[slSetFlagValues] if ( '+IntToStr(i+2)+' <= '+IntToStr(slTemp.Count-1)+' ) then begin');
@@ -1948,7 +1955,7 @@ begin
 		end;
 		{Debug} if debugMsg then msg('[slSetFlagValues] New BinaryList := '+tempString);
 		if StrWithinStr(tempString, '1') then
-			SetEditValue(ebp(ElementBySignature(e, GetElementType(e)), 'First Person Flags'), Copy(tempString, 0, rPos(tempString, '1')));
+			SetEditValue(ElementByPath(ElementBySignature(e, GetElementType(e)), 'First Person Flags'), Copy(tempString, 0, rPos(tempString, '1')));
 	end else if (sig(e) = 'LVLI') then begin
 		// Make a copy of the list
 		tempRecord := ebEDID(gbs(aPlugin, 'LVLI'), EditorID(e));
@@ -2058,11 +2065,11 @@ begin
   Result := ElementByName(e, n);
 end;
 
-//Shortens ElementByPath [mte functions]
-function ebp(e: IInterface; p: string): IInterface;
+{ //Shortens ElementByPath [mte functions]
+function ElementByPath(e: IInterface; p: string): IInterface;
 begin
   Result := ElementByPath(e, p);
-end;
+end;}
 
 // Shortens ElementByIndex [mte functions]
 function ebi(e: IInterface; i: integer): IInterface;
@@ -2149,7 +2156,7 @@ begin
 end;
 
 // Shortens wbCopyElementToFile
-Procedure CopyRecordToFile(aRecord, aFile: IInterface; aBoolean, bBoolean: Boolean);
+Function CopyRecordToFile(aRecord, aFile: IInterface; aBoolean, bBoolean: Boolean): IInterface;
 var
 	startTime, stopTime: TDateTime;
 begin
@@ -2167,11 +2174,11 @@ begin
 // Begin debugMsg Section
   debugMsg := False;
 	
-	{Debug} if debugMsg then msg('[AddToOutfitAuto] Remove(ebp('+geev(OTFTcopy, 'EditorID')+', '''+aString+'''));');
-	Remove(ebp(aRecord, aString));
+	{Debug} if debugMsg then msg('[AddToOutfitAuto] Remove(ElementByPath('+geev(OTFTcopy, 'EditorID')+', '''+aString+'''));');
+	Remove(ElementByPath(aRecord, aString));
 	{Debug} if debugMsg then msg('[AddToOutfitAuto] Add('+GetFileName(aPlugin)+', '''+aString+''', True);');
 	Add(aRecord, aString, True);
-	Result := ebi(ebp(aRecord, aString), 0);
+	Result := ebi(ElementByPath(aRecord, aString), 0);
 	
 	debugMsg := False;
 // End debugMsg Section
@@ -2525,7 +2532,7 @@ begin
 	debugMsg := False;
 	
   Result := False;
-  tempRecord := ebp(aRecord, 'KWDA');
+  tempRecord := ElementByPath(aRecord, 'KWDA');
   for i := 0 to Pred(ec(tempRecord)) do begin
 		{Debug} if debugMsg then msg('[HasKeyword] if ( '+EditorID(LinksTo(ebi(tempRecord, i)))+' = '+aString+' ) then begin');
     if (EditorID(LinksTo(ebi(tempRecord, i))) = aString) then begin
@@ -2548,7 +2555,7 @@ var
 begin
 // Begin debugMsg section
 	debugMsg := False;
-  tempRecord := ebp(aRecord, 'KWDA');
+  tempRecord := ElementByPath(aRecord, 'KWDA');
   for i := 0 to Pred(ec(tempRecord)) do
 		aList.Add(EditorID(LinksTo(ebi(tempRecord, i))));
 	debugMsg := False;
@@ -2570,7 +2577,7 @@ begin
       Add(itemRecord, 'KWDA', true);
     end;
     // add new record in keywords list
-    keywordRef := ElementAssign(ebp(itemRecord, 'KWDA'), HighInteger, nil, false);
+    keywordRef := ElementAssign(ElementByPath(itemRecord, 'KWDA'), HighInteger, nil, false);
     // set provided keyword to the new entry
     SetEditValue(keywordRef, GetEditValue(keyword));
   end;
@@ -2579,12 +2586,12 @@ end;
 // Gets a template item of the comparable type (e.g. sword) and tier (e.g. ebony)
 function GetTemplate(aRecord: IInterface): IInterface;
 var
+	tempRecord, record_sig, record_edid, record_full, books, flags, tempSpellRecord: IInterface;
 	i, x, y, recordValue, slItemMaxValue, slItemMaxLength, slItemMinLength: Integer;	
-	tempRecord, record_sig, record_edid, record_full: IInterface;
-	debugMsg, tempBoolean, ExitFunction: Boolean;
+	debugMsg, tempBoolean: Boolean;
 	slTemp, slItem, slBOD2, slFiles: TStringList;
+	tempString, itemType, halfCostPerk: String;
 	startTime, stopTime: TDateTime;
-	tempString, itemType: String;
 begin
 	// Initialize 
 	debugMsg := False;
@@ -2610,7 +2617,7 @@ begin
 	// {Debug} if debugMsg then msgList('[GetTemplate] slFiles := ', slFiles, '');
 	// {Debug} if debugMsg then for i := 0 to slFiles.Count-1 do msg('[GetTemplate] slFiles.Objects['+IntToStr(i)+'] := '+GetFileName(ote(slFiles.Objects[i])));
 	
-	// This section filters clothing items
+	// This section filters clothing items with keywords
 	slTemp.Clear;
 	Randomize;
 	slTemp.CommaText := 'ArmorClothing, VendorItemClothing, ClothingBody';
@@ -2621,7 +2628,6 @@ begin
 			end else
 				slItem.CommaText := '0001BE1A, 000209A6, 000261C0, 0003452E';
 			Result := GetRecordByFormID(slItem[Random(slItem.Count)]);
-			ExitFunction := True;
 		end;
 	end;
 	slTemp.CommaText := 'ClothingHead';
@@ -2632,14 +2638,12 @@ begin
 			end else
 				slItem.CommaText := '00017696, 000330B3, 000209AA, 000330BC';			
 			Result := GetRecordByFormID(slItem[Random(slItem.Count)]);
-			ExitFunction := True;
 		end;
 	end;
 	slTemp.CommaText := 'ClothingHands';
 	for i := 0 to slTemp.Count-1 do begin
 		if HasKeyword(aRecord, slTemp[i]) then begin
 			Result := GetRecordByFormID('000261C1');
-			ExitFunction := True;
 		end;
 	end;
 	slTemp.CommaText := 'ClothingFeet';
@@ -2650,14 +2654,86 @@ begin
 			end else
 				slItem.CommaText := '0001BE1B, 000209A5, 000261BD, 0003452F';
 			Result := GetRecordByFormID(slItem[Random(slItem.Count)]);
-			ExitFunction := True;
 		end;
 	end;
-	if ExitFunction then begin
+	if Assigned(Result) then begin
 		slTemp.Free;
 		slItem.Free;
 		slBOD2.Free;
 		Exit;
+	end;
+
+	// This section filters spellbooks
+	if (sig(aRecord) = 'BOOK') then begin
+		flags := ElementByPath(bookRecord, 'DATA/FLAGS');
+		if not (genv(flags, 'Teaches Spell') = nil) then begin//checks if book is tome
+			tempSpellRecord := LinksTo(ElementByPath(bookRecord, 'DATA/Spell'));//spell from tome
+			if not (LinksTo(ElementByPath(tempSpellRecord, 'SPIT/Half-cost Perk')) = -1) then begin
+				halfCostPerk := geev(ElementByPath(tempSpellRecord, 'SPIT/Half-cost Perk'));
+				case exractInts(halfCostPerk, 1) of
+				00	:	begin
+							case ElementByPath(halfCostPerk, 'Novice', True) of
+								'Alteration'	:	Result :=GetRecordByFormID('0009E2A7');
+								'Conjuration'	:	Result :=GetRecordByFormID('0009E2AA');
+								'Destruction'	:	Result :=GetRecordByFormID('0009CD52');
+								'Illusion'		:	Result :=GetRecordByFormID('0009E2AD');
+								'Restoration'	:	Result :=GetRecordByFormID('0009E2AE');
+							end;
+						end;
+				25	:	begin
+							case ElementByPath(halfCostPerk, 'Apprentice', True) of
+								'Alteration'	:	Result :=GetRecordByFormID('000A26E3');
+								'Conjuration'	:	Result :=GetRecordByFormID('0009CD54');
+								'Destruction'	:	Result :=GetRecordByFormID('000A2702');
+								'Illusion'		:	Result :=GetRecordByFormID('000A270F');
+								'Restoration'	:	Result :=GetRecordByFormID('000A2720');
+							end;
+						end;
+				50	:	begin
+							case ElementByPath(halfCostPerk, 'Adept', True) of
+								'Alteration'	:	Result :=GetRecordByFormID('000A26E7');
+								'Conjuration'	:	Result :=GetRecordByFormID('000A26EE');
+								'Destruction'	:	Result :=GetRecordByFormID('000A2708');
+								'Illusion'		:	Result :=GetRecordByFormID('000A2714');
+								'Restoration'	:	Result :=GetRecordByFormID('0010F64D');
+							end;
+						end;
+				75	:	begin
+							case ElementByPath(halfCostPerk, 'Expert', True) of
+								'Alteration'	:	Result :=GetRecordByFormID('000A26E8');
+								'Conjuration'	:	Result :=GetRecordByFormID('000A26F7');
+								'Destruction'	:	Result :=GetRecordByFormID('0010F7F4');
+								'Illusion'		:	Result :=GetRecordByFormID('000A2718');
+								'Restoration'	:	Result :=GetRecordByFormID('000A2729');
+							end;
+						end;
+				100	:	begin
+							case ElementByPath(halfCostPerk, 'Master', True) of
+								'Alteration'	:	Result :=GetRecordByFormID('000DD646');
+								'Conjuration'	:	Result :=GetRecordByFormID('000A26FA');
+								'Destruction'	:	Result :=GetRecordByFormID('000A270D');
+								'Illusion'		:	Result :=GetRecordByFormID('000A2719');
+								'Restoration'	:	Result :=GetRecordByFormID('000FDE7B');
+							end;
+						end;
+				end;
+			else do //uses restoration books as level list base
+				case StrToInt(geev(ElementByPath(tempSpellRecord, 'SPIT/BASE COST'))) of
+					0..96		: Result :=GetRecordByFormID('0009E2AE');//novice
+					97..156		: Result :=GetRecordByFormID('000A2720');//aprentice
+					157..250	: Result :=GetRecordByFormID('0010F64D');//adept
+					251..644	: Result :=GetRecordByFormID('000A2729');//expert
+				else
+					Result :=GetRecordByFormID('000FDE7B');//master
+				end;
+			end;
+		end;
+		if Assigned(Result) then begin
+			slTemp.Free;
+			slItem.Free;
+			slBOD2.Free;
+			Exit;
+		end;
 	end;
 	
 ////////////////////////////////////////////////////////////////////// TIER ASSIGNMENT ////////////////////////////////////////////////////////////////////////////////////////////
@@ -2883,10 +2959,10 @@ begin
 	debugMsg := False;
   if not (Name(aList) = 'Conditions') then begin
     if sig(aList) = 'COBJ' then begin // record itself was provided
-      tempRecord := ebp(aList, 'Conditions');
+      tempRecord := ElementByPath(aList, 'Conditions');
       if not Assigned(tempRecord) then begin
         Add(aList, 'Conditions', True);
-        aList := ebp(aList, 'Conditions');
+        aList := ElementByPath(aList, 'Conditions');
         newCondition := ebi(aList, 0); // xEdit will create dummy condition if new list was added
       end else
         aList := tempRecord;
@@ -2897,12 +2973,12 @@ begin
   // set type to Equal to
   SetElementEditValues(newCondition, 'CTDA - \Type', '10000000');
   // set some needed properties
-	SetElementEditValues(ebp(newCondition, 'CTDA'), 'Type', '10000000');
-	SetElementEditValues(ebp(newCondition, 'CTDA'), 'Comparison Value', '1');
-  SetElementEditValues(ebp(newCondition, 'CTDA'), 'Function', 'HasPerk'); 
-  SetElementEditValues(ebp(newCondition, 'CTDA'), 'Perk', GetEditValue(aPerk));
-  SetElementEditValues(ebp(newCondition, 'CTDA'), 'Run On', 'Subject');
-  SetElementEditValues(ebp(newCondition, 'CTDA'), 'Parameter #3', '-1');	
+	SetElementEditValues(ElementByPath(newCondition, 'CTDA'), 'Type', '10000000');
+	SetElementEditValues(ElementByPath(newCondition, 'CTDA'), 'Comparison Value', '1');
+  SetElementEditValues(ElementByPath(newCondition, 'CTDA'), 'Function', 'HasPerk'); 
+  SetElementEditValues(ElementByPath(newCondition, 'CTDA'), 'Perk', GetEditValue(aPerk));
+  SetElementEditValues(ElementByPath(newCondition, 'CTDA'), 'Run On', 'Subject');
+  SetElementEditValues(ElementByPath(newCondition, 'CTDA'), 'Parameter #3', '-1');	
   removeInvalidEntries(aList);
   Result := newCondition;
 	debugMsg := False;
@@ -3025,7 +3101,7 @@ begin
 	for i := 0 to Pred(LLec(aLevelList)) do begin
 		if StrWithinStr(LLebi(aLevelList, i), EditorID(aRecord)) then begin
 			Result := LLebi(aLevelList, i);
-			Remove(ebi(ebp(aLevelList, 'Leveled List Entries'), i));
+			Remove(ebi(ElementByPath(aLevelList, 'Leveled List Entries'), i));
 		end;	
 	end;
 end;
@@ -3040,8 +3116,8 @@ begin
   debugMsg := False;
   Result := False;
   for i := 0 to Pred(LLec(aLevelList)) do begin
-	  if debugMsg then msg('[IndexOfLL] if '+geev(ebi(ebp(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference')+', '+ShortName(aRecord)+' then begin');
-	  if StrWithinStr(geev(ebi(ebp(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference'), EditorID(aRecord)) then begin
+	  if debugMsg then msg('[IndexOfLL] if '+geev(ebi(ElementByPath(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference')+', '+ShortName(aRecord)+' then begin');
+	  if StrWithinStr(geev(ebi(ElementByPath(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference'), EditorID(aRecord)) then begin
 		  Result := i;
 			Exit;
 	  end;
@@ -3061,10 +3137,10 @@ begin
 	
   Result := False;
   for i := 0 to Pred(LLec(aLevelList)) do begin
-		if debugMsg then msg('[LLreplace] '+geev(ebi(ebp(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference'));
-	  if StrWithinStr(geev(ebi(ebp(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference'), EditorID(aRecord)) then begin
-			if debugMsg then msg('[LLreplace] SetEditValue( '+geev(ebi(ebp(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference')+', '+ShortName(bRecord)+');');
-			SetEditValue(ebp(ebi(ebp(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference'), ShortName(bRecord));
+		if debugMsg then msg('[LLreplace] '+geev(ebi(ElementByPath(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference'));
+	  if StrWithinStr(geev(ebi(ElementByPath(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference'), EditorID(aRecord)) then begin
+			if debugMsg then msg('[LLreplace] SetEditValue( '+geev(ebi(ElementByPath(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference')+', '+ShortName(bRecord)+');');
+			SetEditValue(ElementByPath(ebi(ElementByPath(aLevelList, 'Leveled List Entries'), i), 'LVLO\Reference'), ShortName(bRecord));
 			Result := True;
 			if debugMsg then msg('[LLreplace] '+EditorID(LLebi(aLevelList, i))+' = '+EditorID(aRecord));
 			if debugMsg then msg('[LLreplace] Result := True');
@@ -3086,8 +3162,8 @@ var
 begin
   Result := False;
 	if ee(aRecord, 'LVLF') then // If this record has a 'Flags' section
-	  if ee(ebp(aRecord, 'LVLF'), aFlag) then // If this record has the flag, 'aFlag'
-		  Result := GetElementNativeValues(ebp(aRecord, 'LVLF'), aFlag); // Return an integer value for this flag.  IIRC it's a binary for Flag on/off
+	  if ee(ElementByPath(aRecord, 'LVLF'), aFlag) then // If this record has the flag, 'aFlag'
+		  Result := GetElementNativeValues(ElementByPath(aRecord, 'LVLF'), aFlag); // Return an integer value for this flag.  IIRC it's a binary for Flag on/off
 end;
 
 // Creates new record inside provided file [Skyrim Utils]
@@ -3149,9 +3225,9 @@ begin
 // Begin debugMsg section
 	debugMsg := False;
 	
-	if not Assigned(ebp(aRecord, 'Items')) then
+	if not Assigned(ElementByPath(aRecord, 'Items')) then
 		Add(aRecord, 'Items', True);
-	tempRecord := ElementAssign(ebp(aRecord, 'Items'), HighInteger, nil, False);
+	tempRecord := ElementAssign(ElementByPath(aRecord, 'Items'), HighInteger, nil, False);
 	seev(tempRecord, 'CNTO - Item\Item', Name(aItem));
 	seev(tempRecord, 'CNTO - Item\Count', aCount);
 	Result := tempRecord;
@@ -3170,7 +3246,7 @@ begin
 	debugMsg := False;
 	
 	{Debug} if debugMsg then msg('[addToLeveledList] addToLeveledList( '+EditorID(aLeveledList)+', '+EditorID(aRecord)+', '+IntToStr(aLevel)+' );');
-  tempRecord := ElementAssign(ebp(aLeveledList, 'Leveled List Entries'), HighInteger, nil, False);
+  tempRecord := ElementAssign(ElementByPath(aLeveledList, 'Leveled List Entries'), HighInteger, nil, False);
 	seev(tempRecord, 'LVLO\Reference', Name(aRecord));
   seev(tempRecord, 'LVLO\Count', 1);
   seev(tempRecord, 'LVLO\Level', aLevel);
@@ -3235,9 +3311,9 @@ begin
 			end;
 		end;
 		// Broad Default values based on skill/animation style
-		if StrWithinStr(GetEditValue(ebp(ElementBySignature(aRecord, 'DNAM'), 'Animation Type')), 'TwoHand') or StrWithinStr(GetEditValue(ebp(ElementBySignature(aRecord, 'DNAM'), 'Skill')), 'TwoHand') then begin
+		if StrWithinStr(GetEditValue(ElementByPath(ElementBySignature(aRecord, 'DNAM'), 'Animation Type')), 'TwoHand') or StrWithinStr(GetEditValue(ElementByPath(ElementBySignature(aRecord, 'DNAM'), 'Skill')), 'TwoHand') then begin
 			Result := slTemp[slTemp.Count-1];
-		end else if StrWithinStr(GetEditValue(ebp(ElementBySignature(aRecord, 'DNAM'), 'Animation Type')), 'Bow') or StrWithinStr(GetEditValue(ebp(ElementBySignature(aRecord, 'DNAM'), 'Skill')), 'Archery') then begin
+		end else if StrWithinStr(GetEditValue(ElementByPath(ElementBySignature(aRecord, 'DNAM'), 'Animation Type')), 'Bow') or StrWithinStr(GetEditValue(ElementByPath(ElementBySignature(aRecord, 'DNAM'), 'Skill')), 'Archery') then begin
 			Result := slTemp[1];
 		end else begin
 			Result := slTemp[0];
@@ -3277,7 +3353,7 @@ begin
 			if slContains(slBOD2, slTemp[i]) then begin
 				// This 'if' covers certain mods that change helmet BOD2
 				if (slTemp[i] = '42') then
-					if Assigned(ebp(aRecord, 'DNAM')) then
+					if Assigned(ElementByPath(aRecord, 'DNAM')) then
 						if (geev(aRecord, 'DNAM') > 0) then
 							Result := '30';
 				if not Assigned(Result) then
@@ -3289,9 +3365,9 @@ begin
 		if debugMsg then msg('[GetItemType] Non-vanilla slots prioritize keywords');
 		if (Result = '') then begin
 			{Debug} if debugMsg then msg('[GetTemplate] Check Keywords');
-			for i := 0 to Pred(ec(ebp(aRecord, 'KWDA'))) do begin
-				{Debug} if debugMsg then msg('[GetTemplate] Keyword := '+GetEditValue(ebi(ebp(aRecord, 'KWDA'), i)));
-				Result := KeywordToBOD2(GetEditValue(ebi(ebp(aRecord, 'KWDA'), i)));
+			for i := 0 to Pred(ec(ElementByPath(aRecord, 'KWDA'))) do begin
+				{Debug} if debugMsg then msg('[GetTemplate] Keyword := '+GetEditValue(ebi(ElementByPath(aRecord, 'KWDA'), i)));
+				Result := KeywordToBOD2(GetEditValue(ebi(ElementByPath(aRecord, 'KWDA'), i)));
 				if (Result <> '') then Break;
 			end;
 		end;
@@ -3324,7 +3400,7 @@ begin
 			for i := 0 to slTemp.Count-1 do begin
 				if slContains(slBOD2, slTemp[i]) then begin
 					Result := '42';
-					if Assigned(ebp(aRecord, 'DNAM')) then
+					if Assigned(ElementByPath(aRecord, 'DNAM')) then
 						if (geev(aRecord, 'DNAM') > 0) then
 							Result := '30';	
 				end;
@@ -3574,7 +3650,7 @@ end;
 // Gets ElementCount of the Leveled List Entries
 function LLec(e: IInterface): Integer;
 begin
-	Result := ec(ebp(e, 'Leveled List Entries'));
+	Result := ec(ElementByPath(e, 'Leveled List Entries'));
 end;
 
 // Gets record from leveled list index
@@ -3585,9 +3661,9 @@ begin
 // Begin debugMsg section
 	debugMsg := False;
 	{Debug} if debugMsg then msg('[LLebi] e := 'EditorID(e));
-	//{Debug} if debugMsg then msg('[LLebi] ebi := '+geev(ebi(ebp(e, 'Leveled List Entries'), i), 'LVLO\Reference'));
-	{Debug} if debugMsg then msg('[LLebi] Result := '+EditorID(LinksTo(ebp(ebi(ebp(e, 'Leveled List Entries'), i), 'LVLO\Reference'))));
-	Result := LinksTo(ebp(ebi(ebp(e, 'Leveled List Entries'), i), 'LVLO\Reference'));
+	//{Debug} if debugMsg then msg('[LLebi] ebi := '+geev(ebi(ElementByPath(e, 'Leveled List Entries'), i), 'LVLO\Reference'));
+	{Debug} if debugMsg then msg('[LLebi] Result := '+EditorID(LinksTo(ElementByPath(ebi(ElementByPath(e, 'Leveled List Entries'), i), 'LVLO\Reference'))));
+	Result := LinksTo(ElementByPath(ebi(ElementByPath(e, 'Leveled List Entries'), i), 'LVLO\Reference'));
 	debugMsg := False;
 // End debugMsg section
 end;
@@ -5220,13 +5296,13 @@ end;
 // Generates enchanted versions of a list of records from a list of input files
 Procedure GenerateEnchantedVersionsAuto;
 var
-	slTemp, slItemTiers, slIndex, slFiles, slTempList, slRecords, slEnchanted, slExistingRecords: TStringList;
+	slTemp, slItem, slItemTiers, slIndex, slFiles, slTempList, slRecords, slEnchanted, slExistingRecords: TStringList;
   tempRecord, tempElement, objEffect, enchLevelList, chanceLevelList, GEVfile: IInterface;
 	debugMsg, tempBoolean, AllowDisenchanting, ReplaceInLeveledList: Boolean;
-  tempString, suffix, record_sig, record_edid, PatchFile: String;	
+  tempString, suffix, record_sig, record_edid, PatchFile, enchString: String;	
 	startTime, stopTime, tempStartTime, tempStopTime, processStartTime, processStopTime: TDateTime;
 	enchAmount, enchMultiplier: Float;	
-	i, x, y, z, tempInteger: Integer;	
+	i, x, y, z, tempInteger, enchCount: Integer;	
 begin
 	// Initialize
 	debugMsg := False;
@@ -5239,6 +5315,7 @@ begin
 	if not Assigned(slGlobal) then slGlobal := TStringList.Create;
 	if not Assigned(slIndex) then slIndex := TStringList.Create;
 	if not Assigned(slFiles) then slFiles := TStringList.Create;
+	if not Assigned(slItem) then slItem := TStringList.Create;
 	if not Assigned(slTemp) then slTemp := TStringList.Create;
 
 	// Detect loaded plugins
@@ -5276,53 +5353,67 @@ begin
 		if Assigned(slIndex) then slIndex.Free;
 		if Assigned(slFiles) then slFiles.Free;
 		if Assigned(slTemp) then slTemp.Free;
+		if Assigned(slItem) then slItem.Free;
 		Exit;
 	end;
 	{Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] AllowDisenchanting := '+BoolToStr(Boolean(GetObject('AllowDisenchanting', slGlobal))));
 	
 	for i := 0 to slGlobal.Count-1 do
 		if StrWithinStr(slGlobal[i], 'Original') then
-			if not Assigned(ebp(ote(slGlobal.Objects[i]), 'EITM')) then // Most items with enchantments on the original records are legendary or unique items and should be excluded
+			if not Assigned(ElementByPath(ote(slGlobal.Objects[i]), 'EITM')) then // Most items with enchantments on the original records are legendary or unique items and should be excluded
 				SetObject(StrPosCopy(slGlobal[i], 'Original', True), slGlobal.Objects[i], slRecords);
 	{Debug} if debugMsg then msgList('slGlobal := ', slGlobal, '');
 	{Debug} if debugMsg then msgList('slRecords := ', slRecords, '');
 
 	// Add masters
+	tempStartTime := Time;
 	for x := 0 to slFiles.Count-1 do begin
 		msg('Adding '+slFiles[x]+' masters to '+GetFileName(GEVfile));
 		AddMastersAuto(ote(slFiles.Objects[x]), GEVfile);
 	end;
 	AddMastersList(slRecords, GEVfile);
+	tempStopTime := Time;
+	if ProcessTime then addProcessTime('Add Masters', TimeBtwn(tempStartTime, tempStopTime));
 
 	// Build indexes of loaded plugins
+	tempStartTime := Time;
 	{Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] Build indexes of loaded plugins');
 	slTemp.Clear;
 	// Get keywords
 	for x := 0 to slRecords.Count-1 do begin
 		tempRecord := ote(slRecords.Objects[x]);
 		if (sig(tempRecord) = 'ARMO') then begin
-			slGetFlagValues(tempRecord, slTemp, False);
+			slItem.Clear;
+			slGetFlagValues(tempRecord, slItem, False);
+			// Add clothing type to keywords
+			for y := 0 to slItem.Count-1 do begin
+				if not ((slItem[y] = '35') or (slItem[y] = '36') or (slItem[y] = '42')) then
+					slItem[y] := slItem[y]+'-'+geev(tempRecord, GetElementType(tempRecord)+'\Armor Type');
+			end;
 			// Non-vanilla armor types prioritize keywords over BOD2
 			slTempList.CommaText :=  '30, 32, 33, 37, 39'; // 30 - Head, 32 - Body, 33 - Gauntlers, 37 - Feet, 39 - Shield
-			for y := 0 to slTemp.Count-1 do
-				if not StrWithinSL(slTemp[y], slTempList) then
-					if not slContains(slTemp, AssociatedBOD2(slTemp[y])) then
-						slTemp.Add(AssociatedBOD2(slTemp[y]));
-			// Add clothing type to keywords
-			for y := 0 to slTemp.Count-1 do begin
-				if not ((slTemp[y] = '30') or (slTemp[y] = '35') or (slTemp[y] = '36')) then
-					slTemp[y] := slTemp[y]+'-'+geev(ElementBySignature(tempRecord, GetElementType(tempRecord)), 'Armor Type');
-			end;
+			for y := 0 to slItem.Count-1 do
+				if not StrWithinSL(slItem[y], slTempList) then
+					if not slContains(slItem, AssociatedBOD2(slItem[y])) then
+						slItem.Add(AssociatedBOD2(slItem[y]));
+			for y := 0 to slItem.Count-1 do
+				if not slContains(slTemp, slItem[y]) then
+					slTemp.Add(slItem[y]);
 		end else
-			slTemp.Add(sig(tempRecord));
+			if not slContains(slTemp, sig(tempRecord)) then
+				slTemp.Add(sig(tempRecord));
 		slClearEmptyStrings(slTemp);
 	end;
 	{Debug} if debugMsg then msgList('[GenerateEnchantedVersionsAuto] Keywords (slTemp) := ', slTemp, '');
 	for x := 0 to slFiles.Count-1 do begin
-		msg('Indexing '+IntToStr(ec(gbs(ote(slFiles.Objects[x]), 'ENCH')))+' Enchantments in '+slFiles[x]);
+		tempInteger := ec(gbs(ote(slFiles.Objects[x]), 'ENCH'));
+		enchCount := enchCount + tempInteger;
+		msg('Indexing '+IntToStr(tempInteger)+' Enchantments in '+slFiles[x]);
 		IndexObjEffect(ote(slFiles.Objects[x]), slTemp, slIndex);				
 	end;
 	if debugMsg then msgList('[GenerateEnchantedVersionsAuto] slIndex := ', slIndex, '');
+	tempStopTime := Time;
+	addProcessTime('Create Library of '+IntToStr(enchCount)+' Enchantments', TimeBtwn(tempStartTime, tempStopTime));
 	
 	// Set Item Tiers
 	for x := 1 to 6 do
@@ -5390,12 +5481,12 @@ begin
 		
 		// Process records using the indexed list
 		tempStartTime := Time;
-		msg('Processing '+record_edid+' enchanted versions');
+		msg('['+IntToStr(i+1)+'/'+IntToStr(slRecords.Count)+'] Processing '+record_edid+' enchanted versions');
 		{Debug} if debugMsg then msg('record_sig := '+record_sig);	
 		if (record_sig = 'ARMO') then begin 
 			slTemp.Clear;
 			slGetFlagValues(selectedRecord, slTemp, False);
-			// Non-vanilla armor types prioritize keywords over BOD2
+			// Non-vanilla slot items need to have a vanilla slot associated with them for enchantment generation
 			slTempList.CommaText :=  '30, 32, 33, 37, 39'; // 30 - Head, 32 - Body, 33 - Gauntlets, 37 - Feet, 39 - Shield
 			if not StrWithinStrSL(slTemp, slTempList) then begin
 				{Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] [Process Records using Indexed List] No Vanilla Slot Detected');
@@ -5409,27 +5500,24 @@ begin
 				{Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] [Process Records using Indexed List] Vanilla Slot Detected');
 			// Adds clothing type to the BOD2 string
 			for x := 0 to slTemp.Count-1 do begin
-				if not ((slTemp[x] = '30') or (slTemp[x] = '35') or (slTemp[x] = '36')) then
-					slTemp[x] := slTemp[x]+'-'+geev(ElementBySignature(selectedRecord, GetElementType(tempRecord)), 'Armor Type');
+				if not ((slTemp[x] = '35') or (slTemp[x] = '36') or (slTemp[x] = '42')) then
+					slTemp[x] := slTemp[x]+'-'+geev(ElementBySignature(selectedRecord, GetElementType(selectedRecord)), 'Armor Type');
 			end;
 			tempString := nil;
 		end;
 		for x := 0 to slIndex.Count-1 do begin
 			objEffect := nil;
+			suffix := StrPosCopy(slIndex[x], '-//-', True);
+			enchString := StrPosCopy(slIndex[x], '-//-', False);
 			if (record_sig = 'ARMO') then begin 	
 				{Debug} if debugMsg then msgList('[GenerateEnchantedVersionsAuto] slTemp := ', slTemp, '');
-				for y := 0 to slTemp.Count-1 do begin
-					{Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] slTemp[y] := '+slTemp[y]);
-					if StrWithinStr(slIndex[x], slTemp[y]) then begin
-						objEffect := ote(slIndex.Objects[x]);
-						{Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] objEffect := '+EditorID(objEffect));
-						Break;
-					end;
+				if SLWithinStr(enchString, slTemp) then begin
+					objEffect := ote(slIndex.Objects[x]);
+					{Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] objEffect := '+EditorID(objEffect));
 				end;
 			end else begin
-				if StrWithinStr(slIndex[x], record_sig) then begin
+				if StrWithinStr(enchString, record_sig) then begin
 					objEffect := ote(slIndex.Objects[x]);
-					if StrWithinStr(EditorID(objEffect), 'Trap') then Continue;
 					{Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] objEffect := '+EditorID(objEffect));
 				end;	
 			end;
@@ -5441,24 +5529,6 @@ begin
 				tempInteger := GetEnchLevel(objEffect, slItemTiers); {Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] enchLevel := '+IntToStr(tempInteger));
 				if (tempInteger >= 0) then begin					
 					enchAmount := (enchMultiplier div 100)*geev(objEffect, 'ENIT\Enchantment Amount');
-					tempString := nil;
-					// Sorting Mod Stuff
-					if DoesFileExist('AnotherSortingMod_2017-SSE.esp') then								
-						for z := 0 to slItemTiers.Count-1 do
-							if (slItemTiers.Objects[z] = tempInteger) then
-								tempString := slItemTiers[z];
-					suffix := nil;
-					// Check for specific enchantment name
-					slTempList.Clear;
-					for z := 0 to Pred(rbc(objEffect)) do
-						if StrWithinStr(full(rbi(objEffect, z)), 'of ') then
-							slTempList.Add(StrPosCopy(full(rbi(objEffect, z)), 'of ', False));
-					suffix := MostCommonString(slTempList);
-					// If there is no enchantment name then use the objEffect name
-					if (suffix = '') then
-						suffix := StrPosCopy(full(objEffect), 'of', False);
-					if (tempString <> '') then
-						suffix := suffix+' '+DecToRoman(StrToInt(tempString));
 					// Pre-Existing records
 					if not slContains(slExistingRecords, EditorID(selectedRecord)+'_'+EditorID(objEffect)) then begin
 						tempElement := CopyRecordToFile(selectedRecord, GEVfile, True, True); {Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] enchRecord := '+EditorID(tempElement));
@@ -5471,29 +5541,31 @@ begin
 				end;
 			end;
 		end;
-		tempStopTime := Time;
-		if ProcessTime then addProcessTime('[GEV] Process Records using Indexed List', TimeBtwn(tempStartTime, tempStopTime));
 		// Leveled Lists
 		if ReplaceInLeveledList then begin
 			//  Add to enchanted lists
 			tempElement := nil;
 			if (sig(selectedRecord) = 'WEAP') then begin
-				tempElement := ebEDID(gbs(FileByName('Skyrim.esm'), 'LVLI'), 'LItemEnch'+EditorID(ote(GetObject(EditorID(selectedRecord)+'Template', slGlobal)))); {Debug} if debugMsg then msg('tempElement := '+EditorID(tempElement));
+				tempElement := ebEDID(gbs(FileByName('Skyrim.esm'), 'LVLI'), 'LItemEnch'+EditorID(ote(GetObject(EditorID(selectedRecord)+'Template', slGlobal)))); {Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] tempElement := '+EditorID(tempElement));
 			end else
-				tempElement := ebEDID(gbs(FileByName('Skyrim.esm'), 'LVLI'), 'LItemEnchArmor'+StrPosCopy(geev(selectedRecord, 'BOD2\Armor Type'), ' ', True)+GetItemType(selectedRecord)); {Debug} if debugMsg then msg('tempElement := '+EditorID(tempElement));		
+				tempElement := ebEDID(gbs(FileByName('Skyrim.esm'), 'LVLI'), 'LItemEnchArmor'+StrPosCopy(geev(selectedRecord, GetElementType(selectedRecord)+'\Armor Type'), ' ', True)+GetItemType(selectedRecord)); {Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] tempElement := '+EditorID(tempElement));		
 			if Assigned(tempElement) then begin
 				tempRecord := nil;
 				if HasFileOverride(tempElement, GEVfile) then begin
 					tempRecord := GetFileOverride(tempElement, GEVfile);
 				end else
 					tempRecord := CopyRecordToFile(selectedRecord, GEVfile, False, True);
-				if Assigned(tempRecord) then
-					addToLeveledList(tempRecord, enchLevelList, GEVfile);
+				if Assigned(tempRecord) and Assigned(enchLevelList) then begin
+					{Debug} if debugMsg then msg('[GenerateEnchantedVersionsAuto] if Assigned(tempRecord) and Assigned(enchLevelList) then ReplaceInLeveledListAuto( '+EditorID(tempRecord)+', '+EditorID(enchLevelList)+', '+GetFileName(GEVfile)+' );');
+					ReplaceInLeveledListAuto(tempRecord, enchLevelList, GEVfile);
+				end;
 			end;
 		end;
+		tempStopTime := Time;
+		if ProcessTime then addProcessTime('[GEV] Process Enchanted Versions', TimeBtwn(tempStartTime, tempStopTime));
 	end;
 	processStopTime := Time;
-	if ProcessTime then addProcessTime('[GEV] Process', TimeBtwn(processStartTime, processStopTime));
+	addProcessTime('Generate Enchantments for '+IntToStr(slRecords.Count)+' Records', TimeBtwn(processStartTime, processStopTime));
 	
 	// Replace original with enchanted versions
 	if ReplaceInLeveledList then
@@ -5504,7 +5576,7 @@ begin
 	
 	// Finalize
 	stopTime := Time;
-	addProcessTime('GenerateEnchantedVersionsAuto', TimeBtwn(startTime, stopTime));
+	if ProcessTime then addProcessTime('GenerateEnchantedVersionsAuto', TimeBtwn(startTime, stopTime));
 	if Assigned(slExistingRecords) then slExistingRecords.Free;
 	if Assigned(slEnchanted) then slEnchanted.Free;
 	if Assigned(slItemTiers) then slItemTiers.Free;
@@ -5513,29 +5585,35 @@ begin
 	if Assigned(slIndex) then slIndex.Free;
 	if Assigned(slFiles) then slFiles.Free;
 	if Assigned(slTemp) then slTemp.Free;
+	if Assigned(slItem) then slItem.Free;
 end;
 
 // Indexes an Object effect
 Procedure IndexObjEffect(aRecord: IInterface; BOD2List, aList: TStringList);
 var
-	slTemp, slBOD2, slFlagOutput: TStringList;
+	slTemp, slBOD2, slFlagOutput, slEnchantmentSuffix: TStringList;
+	tempString, suffix, sortingSuffix: String;
 	objEffect, tempRecord: IInterface;
 	debugMsg, tempBoolean: Boolean;
 	startTime, stopTime: TDateTime;
-	tempString: String;
 	i, x, y: Integer;
 begin
 	// Initialize
 	debugMsg := False;
 	startTime := Time;
+	slEnchantmentSuffix := TStringList.Create;
+	slFlagOutput := TStringList.Create;
 	slBOD2 := TStringList.Create;
 	slTemp := TStringList.Create;
-	slFlagOutput := TStringList.Create;
 	{Debug} if debugMsg then msgList('[IndexObjEffect] input BOD2 := ', BOD2List, '');
 	
 	// Function
-	for i := 0 to Pred(ec(gbs(aRecord, 'ENCH'))) do begin 
+	for i := 0 to Pred(ec(gbs(aRecord, 'ENCH'))) do begin
+		// Clear info from previous loops
+		suffix := nil;
+		slEnchantmentSuffix.Clear;
 		slBOD2.Assign(BOD2List);
+		// Skip invalid records
 		tempRecord := WinningOverride(ebi(gbs(aRecord, 'ENCH'), i));
 		if (EditorID(objEffect) = EditorID(tempRecord)) then Continue;
 		objEffect := tempRecord;
@@ -5543,7 +5621,7 @@ begin
 		// Check for recognizable EditorID
 		tempBoolean := False;
 		tempString := EditorID(objEffect);
-		slTemp.CommaText := 'Nightingale, Chillrend, Frostmere, trap, Miraak';
+		slTemp.CommaText := 'Nightingale, Chillrend, Frostmere, trap, Miraak, Base';
 		if SLWithinStr(tempString, slTemp) then
 			Continue;
 		slTemp.Clear;
@@ -5559,21 +5637,26 @@ begin
 		if not tempBoolean then
 			if StrWithinStr(tempString, 'EldEnch') then
 				tempBoolean := True;
+		// If the enchantment is recognized then begin
 		if tempBoolean then begin
 			tempString := nil;
 			// Search objEffect references for matching BOD2 slot
 			for x := 0 to Pred(rbc(objEffect)) do begin
 				tempRecord := rbi(objEffect, x);
+				// Store reference name for suffix determination
+				if StrWithinStr(full(tempRecord), 'of ') then
+					slEnchantmentSuffix.Add(StrPosCopy(full(tempRecord), 'of ', False));
 				// {Debug} if debugMsg then msg('[IndexObjEffect] tempRecord := '+EditorID(tempRecord));
 				if (sig(tempRecord) = 'ARMO') then begin
 					// Get this record's BOD2
 					slFlagOutput.Clear;
 					slGetFlagValues(tempRecord, slFlagOutput, False);
+					if not (slFlagOutput.Count > 0) then Continue;
 					// {Debug} if debugMsg then msgList('[IndexObjEffect] slGetFlagValues := ', slTemp, '');
 					// Add clothing type to BOD2
 					for y := 0 to slFlagOutput.Count-1 do begin
-						if not ((slFlagOutput[y] = '30') or (slFlagOutput[y] = '35') or (slFlagOutput[y] = '36')) then
-							slFlagOutput[y] := Trim(slFlagOutput[y])+'-'+Trim(geev(ElementBySignature(tempRecord, GetElementType(tempRecord)), 'Armor Type'));
+						if not ((slFlagOutput[y] = '35') or (slFlagOutput[y] = '36') or (slFlagOutput[y] = '42')) then
+							slFlagOutput[y] := Trim(slFlagOutput[y])+'-'+Trim(geev(tempRecord, GetElementType(tempRecord)+'\Armor Type'));
 					end;
 					// Add to this ObjEffect's BOD2 if not already present
 					for y := 0 to slFlagOutput.Count-1 do
@@ -5593,9 +5676,25 @@ begin
 				if (slBOD2.Count <= 0) then Break;
 			end;
 			{Debug} if debugMsg then msg('[IndexObjEffect] '+EditorID(objEffect)+' slBOD2 := '+tempString);
+			// Create slIndex entry if objEffect has valid slots
 			if (tempString <> '') then begin
+				// Sorting Mod Stuff
+				{ sortingSuffix := nil;
+				if DoesFileExist('AnotherSortingMod_2017-SSE.esp') then								
+					for z := 0 to slItemTiers.Count-1 do
+						if (slItemTiers.Objects[z] = tempInteger) then
+							sortingSuffix := slItemTiers[z]; }
+				// Determine item suffix
+				suffix := MostCommonString(slEnchantmentSuffix);
+				// If there is no enchantment name then use the objEffect name
+				if (suffix = '') then
+					suffix := StrPosCopy(full(objEffect), 'of', False);
+				if (sortingSuffix <> '') then
+					suffix := suffix+' '+DecToRoman(StrToInt(sortingSuffix));
+			
+				// Make slIndex Entry
 				{Debug} if debugMsg then msg('[IndexObjEffect] aList.AddObject( '+Trim(tempString)+', '+EditorID(objEffect)+' );');
-				aList.AddObject(tempString, TObject(objEffect));
+				aList.AddObject(suffix+'-//-'+tempString, TObject(objEffect));
 			end;
 		end;
 	end;
@@ -5603,13 +5702,11 @@ begin
 	//Finalize
 	{Debug} if debugMsg then msgList('[IndexObjEffect] aList := ', aList, '');
 	stopTime := Time;
-	addProcessTime('IndexObjEffect', TimeBtwn(startTime, stopTime));
+	if ProcessTime then addProcessTime('IndexObjEffect', TimeBtwn(startTime, stopTime));
+	slEnchantmentSuffix.Free;
+	slFlagOutput.Free;
 	slBOD2.Free;
 	slTemp.Free;
-	slFlagOutput.Free;
-	
-	debugMsg := False;
-// End debugMsg section
 end;
 
 
@@ -5698,7 +5795,7 @@ begin
 	
   // Filter invalid records
 	tempBoolean := False;
-	if Assigned(ebp(aRecord, 'CNAM')) then 
+	if Assigned(ElementByPath(aRecord, 'CNAM')) then 
 		tempBoolean := True;
 	if not tempBoolean then
 		if not ((record_sig = 'WEAP') or (record_sig = 'ARMO') or (record_sig = 'AMMO')) then
@@ -5714,6 +5811,8 @@ begin
 	if not tempBoolean then
 		if IsClothing(aRecord) then
 			tempBoolean := True;
+	if IsClothing(aRecord) then
+		tempBoolean := True;
 	if tempBoolean then begin
 		slTemp.Free;
 		Exit;
@@ -5724,13 +5823,13 @@ begin
   recipeTemper := createRecipe(aRecord, aPlugin);
   Add(recipeTemper, 'Conditions', True);
 	RemoveInvalidEntries(recipeTemper);
-  recipeCondition := ebp(recipeTemper, 'Conditions');
-	seev(ebp(recipeCondition, 'Condition\CTDA'), 'Type', '00010000');
-	seev(ebp(recipeCondition, 'Condition\CTDA'), 'Comparison Value', '1');
-  seev(ebp(recipeCondition, 'Condition\CTDA'), 'Function', 'EPTemperingItemIsEnchanted'); 
-  seev(ebp(recipeCondition, 'Condition\CTDA'), 'Run On', 'Subject');
-  seev(ebp(recipeCondition, 'Condition\CTDA'), 'Parameter #3', '-1');
-	AddPerkCondition(ebp(recipeTemper, 'Conditions'), GetRecordByFormID('0005218E')); // ArcaneBlacksmith
+  recipeCondition := ElementByPath(recipeTemper, 'Conditions');
+	seev(ElementByPath(recipeCondition, 'Condition\CTDA'), 'Type', '00010000');
+	seev(ElementByPath(recipeCondition, 'Condition\CTDA'), 'Comparison Value', '1');
+  seev(ElementByPath(recipeCondition, 'Condition\CTDA'), 'Function', 'EPTemperingItemIsEnchanted'); 
+  seev(ElementByPath(recipeCondition, 'Condition\CTDA'), 'Run On', 'Subject');
+  seev(ElementByPath(recipeCondition, 'Condition\CTDA'), 'Parameter #3', '-1');
+	AddPerkCondition(ElementByPath(recipeTemper, 'Conditions'), GetRecordByFormID('0005218E')); // ArcaneBlacksmith
   
 	{Debug} if debugMsg then msg('[MakeTemperable] if record_sig := '+record_sig+' = WEAP then begin');
   if (record_sig = 'WEAP') then begin
@@ -5858,7 +5957,7 @@ begin
 	
 	// Initialize
 	{Debug} if debugMsg then msg('[MakeCraftable] MakeCraftable( '+EditorID(aRecord)+', '+GetFileName(aPlugin)+' );');
-	if Assigned(ebp(aRecord, 'EITM')) then Exit;
+	if Assigned(ElementByPath(aRecord, 'EITM')) then Exit;
 	slTemp := TStringList.Create;
 	RecipeScaling := Boolean(GetObject('RecipeScaling', slGlobal));
 	
@@ -5927,7 +6026,7 @@ begin
 		end;	
 		if (tempInteger > 0) and RecipeScaling then begin
 			for i := 0 to Pred(ec(gbs(recipeRecord, 'Items'))) do begin			
-				SetNativeValue(ebp(gbs(recipeRecord, 'Items'), 'Item\Count'), 2*tempInteger*StrToInt(geev((ebp(gbs(recipeRecord, 'Items'), 'Item\Count'))))); {Debug} if debugMsg then msg('[MakeCraftable] SetNativeValue(ebp(gbs( '+EditorID(recipeRecord)+', Items ), Item\Count ), '+IntToStr(tempInteger*GetNativeValue(ebp(gbs(recipeRecord, 'Items'), 'Item\Count'))));
+				SetNativeValue(ElementByPath(gbs(recipeRecord, 'Items'), 'Item\Count'), 2*tempInteger*StrToInt(geev((ElementByPath(gbs(recipeRecord, 'Items'), 'Item\Count'))))); {Debug} if debugMsg then msg('[MakeCraftable] SetNativeValue(ElementByPath(gbs( '+EditorID(recipeRecord)+', Items ), Item\Count ), '+IntToStr(tempInteger*GetNativeValue(ElementByPath(gbs(recipeRecord, 'Items'), 'Item\Count'))));
 			end;
 		end;
 	end else begin {Debug} if debugMsg then msg('[MakeCraftable] end else begin');
@@ -5958,11 +6057,11 @@ Procedure AddGetItemCountCondition(rec: IInterface; s: string; aBoolean: Boolean
 var
   conditions, condition: IInterface;
 begin
-  conditions := ebp(rec, 'Conditions');
+  conditions := ElementByPath(rec, 'Conditions');
   if not Assigned(conditions) then begin
     Add(rec, 'Conditions', True);
-    conditions := ebp(rec, 'Conditions');
-    condition := ebp(ebi(conditions, 0), 'CTDA');
+    conditions := ElementByPath(rec, 'Conditions');
+    condition := ElementByPath(ebi(conditions, 0), 'CTDA');
   end else
     condition := ElementAssign(conditions, HighInteger, nil, False);
   seev(condition, 'Type', '11000000'); // Greater than or equal to
@@ -6022,7 +6121,7 @@ begin
 	if not Assigned(cobj) then
 		tempBoolean := True;
 	if not Boolean(GetObject('BreakdownEnchanted', slGlobal)) then
-		if Assigned(ebp(cobj, 'EITM')) then
+		if Assigned(ElementByPath(cobj, 'EITM')) then
 			tempBoolean := True;
 	if not Boolean(GetObject('BreakdownDaedric', slGlobal)) then
 		if HasItem(cobj, 'DaedraHeart') then
@@ -6041,13 +6140,13 @@ begin
 	
 	// Common Function Output
 	{Debug} if debugMsg then msg('[MakeBreakdown] Common Function Output');
-	items := ebp(cobj, 'Items');
+	items := ElementByPath(cobj, 'Items');
 	LeatherCount := 0;
 
 	// Process ingredients
 	{Debug} if debugMsg then msg('[MakeBreakdown] Process ingredients');
 	for i := 0 to Pred(ec(items)) do begin
-		item := LinksTo(ebp(ebi(items, i), 'CNTO - Item\Item'));
+		item := LinksTo(ElementByPath(ebi(items, i), 'CNTO - Item\Item'));
 		count := geev(ebi(items, i), 'CNTO - Item\Count');		
 		edid := EditorID(item);
 		{Debug} if debugMsg then msg('[MakeBreakdown] edid := '+edid);
@@ -6081,7 +6180,7 @@ begin
 			AddGetItemCountCondition(recipeRecord, ShortName(aRecord), Boolean(GetObject('BreakdownEquipped', slGlobal)));
 			// Add items
 			{Debug} if debugMsg then msg('[MakeBreakdown] Add items');
-			items := ebp(recipeRecord, 'Items');
+			items := ElementByPath(recipeRecord, 'Items');
 			item := ebi(items, 0);
 			seev(item, 'CNTO - Item\Item', ShortName(aRecord));
 			seev(item, 'CNTO - Item\Count', 1);
@@ -6119,7 +6218,7 @@ begin
 		senv(recipeRecord, 'BNAM', $0007866A); // CraftingTanningRack
 		AddGetItemCountCondition(recipeRecord, ShortName(aRecord), Boolean(GetObject('BreakdownEquipped', slGlobal)));
 		// Add items to recipeRecord
-		items := ebp(recipeRecord, 'Items');
+		items := ElementByPath(recipeRecord, 'Items');
 		item := ebi(items, 0);
 		seev(item, 'CNTO - Item\Item', ShortName(aRecord));
 		seev(item, 'CNTO - Item\Count', 1);
@@ -6163,13 +6262,13 @@ var
   i: integer;
 begin
   Result := False;
-  items := ebp(aRecord, 'Items');
+  items := ElementByPath(aRecord, 'Items');
   if not Assigned(items) then 
     exit;
   
   for i := 0 to Pred(ec(items)) do begin
     li := ebi(items, i);
-    name := EditorID(LinksTo(ebp(li, 'CNTO - Item\Item')));
+    name := EditorID(LinksTo(ElementByPath(li, 'CNTO - Item\Item')));
     if (name = s) then begin
       Result := True;
       Break;
@@ -6522,7 +6621,7 @@ var
 	i: Integer;
 begin
   Result := False;
-  Keywords := ebp(aRecord, 'KWDA');
+  Keywords := ElementByPath(aRecord, 'KWDA');
   for i := 0 to ec(Keywords) - 1 do begin
 		tempString := EditorID(LinksTo(ebi(Keywords, i)));
     if StrWithinStr(tempString, 'Male') or StrWithinStr(tempString, 'Female') then begin
@@ -6540,7 +6639,7 @@ var
 	i: Integer;
 begin
   Result := '';
-  Keywords := ebp(aRecord, 'KWDA');
+  Keywords := ElementByPath(aRecord, 'KWDA');
   for i := 0 to ec(Keywords) - 1 do begin
 		tempString := EditorID(LinksTo(ebi(Keywords, i)));
     if StrWithinStr(tempString, 'Male') then begin
@@ -6713,111 +6812,6 @@ Procedure addProcessTime(aFunctionName: String; aTime: Integer);
 begin
 	SetObject(aFunctionName, Integer(GetObject(aFunctionName, slProcessTime))+aTime, slProcessTime);
 end;
-function SpellTomes(bookRecord:IInterface):IInterface;
-var
-	books, flags, tempSpellRecord: IInterface;
-	halfCostPerk: string;
-begin
-	flags := ebp(bookRecord, 'DATA/FLAGS');
-	if not (genv(flags, 'Teaches Spell') = -1) then begin//checks if book is tome
-		tempSpellRecord := LinksTo(ebp(bookRecord, 'DATA/Spell'));//spell from tome
-		if not (LinksTo(ebp(tempSpellRecord, 'SPIT/Half-cost Perk')) = -1) then begin
-			halfCostPerk := geev(ebp(tempSpellRecord, 'SPIT/Half-cost Perk'));
-			case exractInts(halfCostPerk, 1) of
-			00	:	begin
-						case ebp(halfCostPerk, 'Novice', True) of
-							'Alteration'	:	Result :=GetRecordByFormID('0009E2A7');
-							'Conjuration'	:	Result :=GetRecordByFormID('0009E2AA');
-							'Destruction'	:	Result :=GetRecordByFormID('0009CD52');
-							'Illusion'		:	Result :=GetRecordByFormID('0009E2AD');
-							'Restoration'	:	Result :=GetRecordByFormID('0009E2AE');
-						end;
-					end;
-			25	:	begin
-						case ebp(halfCostPerk, 'Apprentice', True) of
-							'Alteration'	:	Result :=GetRecordByFormID('000A26E3');
-							'Conjuration'	:	Result :=GetRecordByFormID('0009CD54');
-							'Destruction'	:	Result :=GetRecordByFormID('000A2702');
-							'Illusion'		:	Result :=GetRecordByFormID('000A270F');
-							'Restoration'	:	Result :=GetRecordByFormID('000A2720');
-						end;
-					end;
-			50	:	begin
-						case ebp(halfCostPerk, 'Adept', True) of
-							'Alteration'	:	Result :=GetRecordByFormID('000A26E7');
-							'Conjuration'	:	Result :=GetRecordByFormID('000A26EE');
-							'Destruction'	:	Result :=GetRecordByFormID('000A2708');
-							'Illusion'		:	Result :=GetRecordByFormID('000A2714');
-							'Restoration'	:	Result :=GetRecordByFormID('0010F64D');
-						end;
-					end;
-			75	:	begin
-						case ebp(halfCostPerk, 'Expert', True) of
-							'Alteration'	:	Result :=GetRecordByFormID('000A26E8');
-							'Conjuration'	:	Result :=GetRecordByFormID('000A26F7');
-							'Destruction'	:	Result :=GetRecordByFormID('0010F7F4');
-							'Illusion'		:	Result :=GetRecordByFormID('000A2718');
-							'Restoration'	:	Result :=GetRecordByFormID('000A2729');
-						end;
-					end;
-			100	:	begin
-						case ebp(halfCostPerk, 'Master', True) of
-							'Alteration'	:	Result :=GetRecordByFormID('000DD646');
-							'Conjuration'	:	Result :=GetRecordByFormID('000A26FA');
-							'Destruction'	:	Result :=GetRecordByFormID('000A270D');
-							'Illusion'		:	Result :=GetRecordByFormID('000A2719');
-							'Restoration'	:	Result :=GetRecordByFormID('000FDE7B');
-						end;
-					end;
-			end;
-		else do //uses restoration books as level list base
-			case StrToInt(geev(ebp(tempSpellRecord, 'SPIT/BASE COST'))) of
-				0..96		: Result :=GetRecordByFormID('0009E2AE');//novice
-				97..156		: Result :=GetRecordByFormID('000A2720');//aprentice
-				157..250	: Result :=GetRecordByFormID('0010F64D');//adept
-				251..644	: Result :=GetRecordByFormID('000A2729');//expert
-			else
-				Result :=GetRecordByFormID('000FDE7B');//master
-			end;
-		end;
-	end;
-end;
 
-
-//extracts the specified integer (Natural Numbers only) from an input; returns -1 if no suitable number is not found
-//	O(10n) time complexity
-function extractInts(inputString: string; intToPull: integer): integer;//tested and works
-const
-    ints = '1234567890';
-var
-    i, j, currentInt: integer;
-    flag1, flag2 : boolean;
-	resultString : string;
-begin
-    resultString := '';
-    CurrentInt := 0;
-    flag1 := true;
-    flag2 := true;
-    for i := 0 to (length(inputString) - 1) do
-    begin
-        j := 0;
-        while j < 10 do
-        begin
-            if copy(inputString, i+1, 1) = copy(ints, j+1, 1) then
-            begin
-                 if flag1 then currentInt := currentInt + 1;
-                 if (currentInt = intToPull) then resultString := resultString + copy(inputString, i+1, 1);
-                 flag1 := false;
-                 flag2 := false;
-                 break;
-            end;
-            j := j + 1;
-        end;
-        if flag2 then flag1 := true;
-        flag2 := true;
-    end;
-	if not (resultString = '') then result := StrToInt(resultString)
-	else result := -1
-end;
 end.
 
