@@ -39,7 +39,7 @@ const
 	defaultItemTier06 = 40;
 	defaultTemperLight = 1;
 	defaultTemperHeavy = 2;
-	ProcessTime = True;
+	ProcessTime = False;
 	Constant = True;
 
 ////////////////////////////////////////////////////////////////////// SCRIPT-SPECIFIC FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////
@@ -2207,7 +2207,7 @@ begin
 	// Finalize
 	slTemp.Free;
 	stopTime := Time;
-	addProcessTime('Process', TimeBtwn(stopTime, startTime));
+	if ProcessTime then addProcessTime('Process', TimeBtwn(stopTime, startTime));
 	
 	debugMsg := False;
 // End debugMsg Section
@@ -2218,9 +2218,9 @@ function Finalize: integer;
 var
 	slTemp, slIndex, slOutfit, slRecords, slTemplate, slFiles: TStringList;
 	tempRecord, ALLAfile, RecipeFile, outfitLevelList: IInterface;
+	startTime, stopTime, tempStart, tempStop: TDateTime;
 	i, x, y, z, tempInteger: Integer;
   debugMsg, tempBoolean: Boolean;
-	startTime, stopTime: TDateTime;
 	tempString: String; 
 begin
 ////////////////////////////////////////////////////////////////////// PREP SECTION /////////////////////////////////////////////////////////////////////////////////////////
@@ -2308,14 +2308,19 @@ begin
 	{Debug} if debugMsg then msgList('slRecords := ', slRecords, '');
 	
 	// Add masters
-	msg('Adding Record Masters (This may take a while)');
+	tempStart := Time;
 	{Debug} if debugMsg then msg('Add file masters');
 	AddMastersList(slFiles, ALLAfile);
 	AddMastersList(slRecords, ALLAfile);
+	tempStop := Time;
+	addProcessTime('Add Masters', TimeBtwn(tempStart, tempStop));
 	
 	// Add to leveled lists
+	tempStart := Time;
 	if Boolean(GetObject('AutoDetect', slGlobal)) then
 		AddToLeveledListByList(slRecords, slTemplate, ALLAfile);
+	tempStop := Time;
+	addProcessTime('Add to Leveled Lists', TimeBtwn(tempStart, tempStop));
 	
 	// Process Male/Female-only Records
 	for i := 0 to slRecords.Count-1 do begin
@@ -2330,6 +2335,7 @@ begin
 	end;
 	
 	// Generate recipes
+	tempStart := Time;
 	{Debug} if debugMsg then msg('[GenerateRecipes] Generate Recipes; Recipes('+BoolToStr(Boolean(GetObject('GenerateRecipes', slGlobal)))+') Crafting('+BoolToStr(Boolean(GetObject('Crafting', slGlobal)))+') Temper('+BoolToStr(Boolean(GetObject('Temper', slGlobal)))+') Breakdown('+BoolToStr(Boolean(GetObject('Breakdown', slGlobal)))+')');
 	if Boolean(GetObject('GenerateRecipes', slGlobal)) then begin
 		{Debug} if debugMsg then msgList('[GenerateRecipes] slRecords := ', slRecords, '');
@@ -2343,11 +2349,16 @@ begin
 				MakeBreakdown(tempRecord, RecipeFile);
 		end;
 	end;
+	tempStop := Time;
+	addProcessTime('Generate Recipes', TimeBtwn(tempStart, tempStop));
 
 	// Generate Enchanted Versions
+	tempStart := Time;
 	{Debug} if debugMsg then msg('[GenerateEnchantedVersions] GenerateEnchantedVersions := '+BoolToStr(Boolean(GetObject('GenerateEnchantedVersions', slGlobal))));
 	if Boolean(GetObject('GenerateEnchantedVersions', slGlobal)) then
 		GenerateEnchantedVersionsAuto;
+	tempStop := Time;
+	if ProcessTime then addProcessTime('Generate Enchanted Versions', TimeBtwn(tempStart, tempStop));
 	
 	// Selected Records are a Set
 	{Debug} if debugMsg then msg('[Finalization] Selected Records are a Set Start');
@@ -2377,10 +2388,10 @@ begin
 
 	// Finalize
 	stopTime := Time;
-	addProcessTime('Finalize', TimeBtwn(startTime, stopTime));
-	if ProcessTime then
-		for i := 0 to slProcessTime.Count-1 do
-			msg(slProcessTime[i]+': '+IntegerToTime(Integer(slProcessTime.Objects[i])));
+	msg('---Process Time Summary---');
+	addProcessTime('Total Process Time', TimeBtwn(startTime, stopTime));
+	for i := 0 to slProcessTime.Count-1 do
+		msg(slProcessTime[i]+': '+IntegerToTime(Integer(slProcessTime.Objects[i])));
 	slProcessTime.Free;
 	slTemplate.Free;
 	slRecords.Free;	
