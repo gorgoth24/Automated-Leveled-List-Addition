@@ -6860,15 +6860,16 @@ var
     i, j, inputLength, compareLength : integer;
 begin
     j := 1;
-    DoesContain := false;
+    result := false;
     inputLength :=  length(inputstring);
     compareLength := length(compareString);
     for i := 1 to inputLength do begin
-        if (i > (inputLength - compareLength)+1) AND (j = 1) then break; //dont bother looking if there isnt engou characters left
+    	//dont bother looking if there isnt enough characters left also prevents copy from looping over the string
+        if (i > (inputLength - compareLength)+1) AND (j = 1) then break; 
         if copy(inputString, i, 1) = copy(compareString, j, 1) then begin
             j := j + 1;
             if j = compareLength then begin
-                DoesContain := true;
+                result := true;
                 break;
             end;
         end 
