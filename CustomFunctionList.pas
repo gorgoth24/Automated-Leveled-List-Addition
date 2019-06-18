@@ -6857,23 +6857,17 @@ end;
 // O(n) n = length of inputstring
 function DoesContain(inputString, compareString : String): boolean;
 var
-    i, j, inputLength, compareLength : integer;
+    i, inputLength, compareLength : integer;
 begin
-    j := 1;
     result := false;
     inputLength :=  length(inputstring);
     compareLength := length(compareString);
     for i := 1 to inputLength do begin
-    	//dont bother looking if there isnt enough characters left also prevents copy from looping over the string
-        if (i > (inputLength - compareLength)+1) AND (j = 1) then break; 
-        if copy(inputString, i, 1) = copy(compareString, j, 1) then begin
-            j := j + 1;
-            if j = compareLength then begin
+        if (i > (inputLength - compareLength)+1) then break; //dont bother looking if there isnt engou characters left
+        if copy(inputString, i, compareLength) = compareString then begin
                 result := true;
                 break;
-            end;
-        end 
-        else j := 1;
+        end;
     end;
 end;
 end.
