@@ -2583,15 +2583,14 @@ begin
   end;
 end;
 
-// Gets a template item of the comparable type (e.g. sword) and tier (e.g. ebony)
 function GetTemplate(aRecord: IInterface): IInterface;
 var
-	tempRecord, record_sig, record_edid, record_full, books, flags, tempSpellRecord: IInterface;
 	i, x, y, recordValue, slItemMaxValue, slItemMaxLength, slItemMinLength: Integer;	
-	debugMsg, tempBoolean: Boolean;
+	tempRecord, record_sig, record_edid, record_full: IInterface;
+	debugMsg, tempBoolean, ExitFunction: Boolean;
 	slTemp, slItem, slBOD2, slFiles: TStringList;
-	tempString, itemType, halfCostPerk: String;
 	startTime, stopTime: TDateTime;
+	tempString, itemType: String;
 begin
 	// Initialize 
 	debugMsg := False;
@@ -2617,7 +2616,7 @@ begin
 	// {Debug} if debugMsg then msgList('[GetTemplate] slFiles := ', slFiles, '');
 	// {Debug} if debugMsg then for i := 0 to slFiles.Count-1 do msg('[GetTemplate] slFiles.Objects['+IntToStr(i)+'] := '+GetFileName(ote(slFiles.Objects[i])));
 	
-	// This section filters clothing items with keywords
+	// This section filters clothing items
 	slTemp.Clear;
 	Randomize;
 	slTemp.CommaText := 'ArmorClothing, VendorItemClothing, ClothingBody';
@@ -2628,6 +2627,7 @@ begin
 			end else
 				slItem.CommaText := '0001BE1A, 000209A6, 000261C0, 0003452E';
 			Result := GetRecordByFormID(slItem[Random(slItem.Count)]);
+			ExitFunction := True;
 		end;
 	end;
 	slTemp.CommaText := 'ClothingHead';
@@ -2638,12 +2638,14 @@ begin
 			end else
 				slItem.CommaText := '00017696, 000330B3, 000209AA, 000330BC';			
 			Result := GetRecordByFormID(slItem[Random(slItem.Count)]);
+			ExitFunction := True;
 		end;
 	end;
 	slTemp.CommaText := 'ClothingHands';
 	for i := 0 to slTemp.Count-1 do begin
 		if HasKeyword(aRecord, slTemp[i]) then begin
 			Result := GetRecordByFormID('000261C1');
+			ExitFunction := True;
 		end;
 	end;
 	slTemp.CommaText := 'ClothingFeet';
@@ -2654,88 +2656,89 @@ begin
 			end else
 				slItem.CommaText := '0001BE1B, 000209A5, 000261BD, 0003452F';
 			Result := GetRecordByFormID(slItem[Random(slItem.Count)]);
+			ExitFunction := True;
 		end;
 	end;
+	//runs for books (spelltomes only atm)
+	Result := BookTemplate(aRecord);
+	
 	if Assigned(Result) then begin
 		slTemp.Free;
 		slItem.Free;
 		slBOD2.Free;
 		Exit;
-	end;
-
-	// This section filters spellbooks
-	if (sig(aRecord) = 'BOOK') then begin
-		flags := ElementByPath(bookRecord, 'DATA/FLAGS');
-		if not (genv(flags, 'Teaches Spell') = nil) then begin//checks if book is tome
-			tempSpellRecord := LinksTo(ElementByPath(bookRecord, 'DATA/Spell'));//spell from tome
-			if not (LinksTo(ElementByPath(tempSpellRecord, 'SPIT/Half-cost Perk')) = -1) then begin
-				halfCostPerk := geev(ElementByPath(tempSpellRecord, 'SPIT/Half-cost Perk'));
-				case exractInts(halfCostPerk, 1) of
-				00	:	begin
-							case ElementByPath(halfCostPerk, 'Novice', True) of
-								'Alteration'	:	Result :=GetRecordByFormID('0009E2A7');
-								'Conjuration'	:	Result :=GetRecordByFormID('0009E2AA');
-								'Destruction'	:	Result :=GetRecordByFormID('0009CD52');
-								'Illusion'		:	Result :=GetRecordByFormID('0009E2AD');
-								'Restoration'	:	Result :=GetRecordByFormID('0009E2AE');
-							end;
+end;
+	
+//gets templetes for books
+function BookTemplate(bookRecord:IInterface):IInterface;
+var
+	books, flags, tempSpellRecord: IInterface;
+	halfCostPerk: string;
+begin
+	flags := ebp(bookRecord, 'DATA/FLAGS');
+	if not (genv(flags, 'Teaches Spell') = -1) then begin//checks if book is tome
+		tempSpellRecord := LinksTo(ebp(bookRecord, 'DATA/Spell'));//spell from tome
+		if not (LinksTo(ebp(tempSpellRecord, 'SPIT/Half-cost Perk')) = -1) then begin
+			halfCostPerk := geev(ebp(tempSpellRecord, 'SPIT/Half-cost Perk'));
+			case exractInts(halfCostPerk, 1) of
+			00	:	begin
+						case ebp(halfCostPerk, 'Novice', True) of
+							'Alteration'	:	Result :=GetRecordByFormID('0009E2A7');
+							'Conjuration'	:	Result :=GetRecordByFormID('0009E2AA');
+							'Destruction'	:	Result :=GetRecordByFormID('0009CD52');
+							'Illusion'		:	Result :=GetRecordByFormID('0009E2AD');
+							'Restoration'	:	Result :=GetRecordByFormID('0009E2AE');
 						end;
-				25	:	begin
-							case ElementByPath(halfCostPerk, 'Apprentice', True) of
-								'Alteration'	:	Result :=GetRecordByFormID('000A26E3');
-								'Conjuration'	:	Result :=GetRecordByFormID('0009CD54');
-								'Destruction'	:	Result :=GetRecordByFormID('000A2702');
-								'Illusion'		:	Result :=GetRecordByFormID('000A270F');
-								'Restoration'	:	Result :=GetRecordByFormID('000A2720');
-							end;
+					end;
+			25	:	begin
+						case ebp(halfCostPerk, 'Apprentice', True) of
+							'Alteration'	:	Result :=GetRecordByFormID('000A26E3');
+							'Conjuration'	:	Result :=GetRecordByFormID('0009CD54');
+							'Destruction'	:	Result :=GetRecordByFormID('000A2702');
+							'Illusion'		:	Result :=GetRecordByFormID('000A270F');
+							'Restoration'	:	Result :=GetRecordByFormID('000A2720');
 						end;
-				50	:	begin
-							case ElementByPath(halfCostPerk, 'Adept', True) of
-								'Alteration'	:	Result :=GetRecordByFormID('000A26E7');
-								'Conjuration'	:	Result :=GetRecordByFormID('000A26EE');
-								'Destruction'	:	Result :=GetRecordByFormID('000A2708');
-								'Illusion'		:	Result :=GetRecordByFormID('000A2714');
-								'Restoration'	:	Result :=GetRecordByFormID('0010F64D');
-							end;
+					end;
+			50	:	begin
+						case ebp(halfCostPerk, 'Adept', True) of
+							'Alteration'	:	Result :=GetRecordByFormID('000A26E7');
+							'Conjuration'	:	Result :=GetRecordByFormID('000A26EE');
+							'Destruction'	:	Result :=GetRecordByFormID('000A2708');
+							'Illusion'		:	Result :=GetRecordByFormID('000A2714');
+							'Restoration'	:	Result :=GetRecordByFormID('0010F64D');
 						end;
-				75	:	begin
-							case ElementByPath(halfCostPerk, 'Expert', True) of
-								'Alteration'	:	Result :=GetRecordByFormID('000A26E8');
-								'Conjuration'	:	Result :=GetRecordByFormID('000A26F7');
-								'Destruction'	:	Result :=GetRecordByFormID('0010F7F4');
-								'Illusion'		:	Result :=GetRecordByFormID('000A2718');
-								'Restoration'	:	Result :=GetRecordByFormID('000A2729');
-							end;
+					end;
+			75	:	begin
+						case ebp(halfCostPerk, 'Expert', True) of
+							'Alteration'	:	Result :=GetRecordByFormID('000A26E8');
+							'Conjuration'	:	Result :=GetRecordByFormID('000A26F7');
+							'Destruction'	:	Result :=GetRecordByFormID('0010F7F4');
+							'Illusion'		:	Result :=GetRecordByFormID('000A2718');
+							'Restoration'	:	Result :=GetRecordByFormID('000A2729');
 						end;
-				100	:	begin
-							case ElementByPath(halfCostPerk, 'Master', True) of
-								'Alteration'	:	Result :=GetRecordByFormID('000DD646');
-								'Conjuration'	:	Result :=GetRecordByFormID('000A26FA');
-								'Destruction'	:	Result :=GetRecordByFormID('000A270D');
-								'Illusion'		:	Result :=GetRecordByFormID('000A2719');
-								'Restoration'	:	Result :=GetRecordByFormID('000FDE7B');
-							end;
+					end;
+			100	:	begin
+						case ebp(halfCostPerk, 'Master', True) of
+							'Alteration'	:	Result :=GetRecordByFormID('000DD646');
+							'Conjuration'	:	Result :=GetRecordByFormID('000A26FA');
+							'Destruction'	:	Result :=GetRecordByFormID('000A270D');
+							'Illusion'		:	Result :=GetRecordByFormID('000A2719');
+							'Restoration'	:	Result :=GetRecordByFormID('000FDE7B');
 						end;
-				end;
-			else do //uses restoration books as level list base
-				case StrToInt(geev(ElementByPath(tempSpellRecord, 'SPIT/BASE COST'))) of
-					0..96		: Result :=GetRecordByFormID('0009E2AE');//novice
-					97..156		: Result :=GetRecordByFormID('000A2720');//aprentice
-					157..250	: Result :=GetRecordByFormID('0010F64D');//adept
-					251..644	: Result :=GetRecordByFormID('000A2729');//expert
-				else
-					Result :=GetRecordByFormID('000FDE7B');//master
-				end;
+					end;
+			end;
+		else do //uses restoration books as level list base
+			case StrToInt(geev(ebp(tempSpellRecord, 'SPIT/BASE COST'))) of
+				0..96		: Result :=GetRecordByFormID('0009E2AE');//novice
+				97..156		: Result :=GetRecordByFormID('000A2720');//aprentice
+				157..250	: Result :=GetRecordByFormID('0010F64D');//adept
+				251..644	: Result :=GetRecordByFormID('000A2729');//expert
+			else
+				Result :=GetRecordByFormID('000FDE7B');//master
 			end;
 		end;
-		if Assigned(Result) then begin
-			slTemp.Free;
-			slItem.Free;
-			slBOD2.Free;
-			Exit;
-		end;
 	end;
-	
+end;
 ////////////////////////////////////////////////////////////////////// TIER ASSIGNMENT ////////////////////////////////////////////////////////////////////////////////////////////
 	slItem.Clear;
 	// Weapon tier detection
