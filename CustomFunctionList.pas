@@ -2660,7 +2660,7 @@ begin
 		end;
 	end;
 	//runs for books (spelltomes only atm)
-	Result := BookTemplate(aRecord);
+	if (sig(aRecord) = 'BOOK') then Result := BookTemplate(aRecord);
 	
 	if Assigned(Result) then begin
 		slTemp.Free;
@@ -2669,76 +2669,6 @@ begin
 		Exit;
 end;
 	
-//gets templetes for books
-function BookTemplate(bookRecord:IInterface):IInterface;
-var
-	books, flags, tempSpellRecord: IInterface;
-	halfCostPerk: string;
-begin
-	flags := ebp(bookRecord, 'DATA/FLAGS');
-	if not (genv(flags, 'Teaches Spell') = -1) then begin//checks if book is tome
-		tempSpellRecord := LinksTo(ebp(bookRecord, 'DATA/Spell'));//spell from tome
-		if not (LinksTo(ebp(tempSpellRecord, 'SPIT/Half-cost Perk')) = -1) then begin
-			halfCostPerk := geev(ebp(tempSpellRecord, 'SPIT/Half-cost Perk'));
-			case exractInts(halfCostPerk, 1) of
-			00	:	begin
-						case ebp(halfCostPerk, 'Novice', True) of
-							'Alteration'	:	Result :=GetRecordByFormID('0009E2A7');
-							'Conjuration'	:	Result :=GetRecordByFormID('0009E2AA');
-							'Destruction'	:	Result :=GetRecordByFormID('0009CD52');
-							'Illusion'		:	Result :=GetRecordByFormID('0009E2AD');
-							'Restoration'	:	Result :=GetRecordByFormID('0009E2AE');
-						end;
-					end;
-			25	:	begin
-						case ebp(halfCostPerk, 'Apprentice', True) of
-							'Alteration'	:	Result :=GetRecordByFormID('000A26E3');
-							'Conjuration'	:	Result :=GetRecordByFormID('0009CD54');
-							'Destruction'	:	Result :=GetRecordByFormID('000A2702');
-							'Illusion'		:	Result :=GetRecordByFormID('000A270F');
-							'Restoration'	:	Result :=GetRecordByFormID('000A2720');
-						end;
-					end;
-			50	:	begin
-						case ebp(halfCostPerk, 'Adept', True) of
-							'Alteration'	:	Result :=GetRecordByFormID('000A26E7');
-							'Conjuration'	:	Result :=GetRecordByFormID('000A26EE');
-							'Destruction'	:	Result :=GetRecordByFormID('000A2708');
-							'Illusion'		:	Result :=GetRecordByFormID('000A2714');
-							'Restoration'	:	Result :=GetRecordByFormID('0010F64D');
-						end;
-					end;
-			75	:	begin
-						case ebp(halfCostPerk, 'Expert', True) of
-							'Alteration'	:	Result :=GetRecordByFormID('000A26E8');
-							'Conjuration'	:	Result :=GetRecordByFormID('000A26F7');
-							'Destruction'	:	Result :=GetRecordByFormID('0010F7F4');
-							'Illusion'		:	Result :=GetRecordByFormID('000A2718');
-							'Restoration'	:	Result :=GetRecordByFormID('000A2729');
-						end;
-					end;
-			100	:	begin
-						case ebp(halfCostPerk, 'Master', True) of
-							'Alteration'	:	Result :=GetRecordByFormID('000DD646');
-							'Conjuration'	:	Result :=GetRecordByFormID('000A26FA');
-							'Destruction'	:	Result :=GetRecordByFormID('000A270D');
-							'Illusion'		:	Result :=GetRecordByFormID('000A2719');
-							'Restoration'	:	Result :=GetRecordByFormID('000FDE7B');
-						end;
-					end;
-			end;
-		else do //uses restoration books as level list base
-			case StrToInt(geev(ebp(tempSpellRecord, 'SPIT/BASE COST'))) of
-				0..96		: Result :=GetRecordByFormID('0009E2AE');//novice
-				97..156		: Result :=GetRecordByFormID('000A2720');//aprentice
-				157..250	: Result :=GetRecordByFormID('0010F64D');//adept
-				251..644	: Result :=GetRecordByFormID('000A2729');//expert
-			else
-				Result :=GetRecordByFormID('000FDE7B');//master
-			end;
-		end;
-	end;
-end;
 ////////////////////////////////////////////////////////////////////// TIER ASSIGNMENT ////////////////////////////////////////////////////////////////////////////////////////////
 	slItem.Clear;
 	// Weapon tier detection
@@ -2940,10 +2870,81 @@ end;
 	stopTime := Time;
 	if ProcessTime then
 		addProcessTime('GetTemplate', TimeBtwn(startTime, stopTime));
-	slFiles.Free;
-	slTemp.Free;
-	slItem.Free;
-	slBOD2.Free;
+		slFiles.Free;
+		slTemp.Free;
+		slItem.Free;
+		slBOD2.Free;
+	end;
+
+//gets templetes for books
+function BookTemplate(bookRecord:IInterface):IInterface;
+var
+	books, flags, tempSpellRecord: IInterface;
+	halfCostPerk: string;
+begin
+	flags := ebp(bookRecord, 'DATA/FLAGS');
+	if not (genv(flags, 'Teaches Spell') = -1) then begin//checks if book is tome
+		tempSpellRecord := LinksTo(ebp(bookRecord, 'DATA/Spell'));//spell from tome
+		if not (LinksTo(ebp(tempSpellRecord, 'SPIT/Half-cost Perk')) = -1) then begin
+			halfCostPerk := geev(ebp(tempSpellRecord, 'SPIT/Half-cost Perk'));
+			case exractInts(halfCostPerk, 1) of
+			00	:	begin
+						case ebp(halfCostPerk, 'Novice', True) of
+							'Alteration'	:	Result :=GetRecordByFormID('0009E2A7');
+							'Conjuration'	:	Result :=GetRecordByFormID('0009E2AA');
+							'Destruction'	:	Result :=GetRecordByFormID('0009CD52');
+							'Illusion'		:	Result :=GetRecordByFormID('0009E2AD');
+							'Restoration'	:	Result :=GetRecordByFormID('0009E2AE');
+						end;
+					end;
+			25	:	begin
+						case ebp(halfCostPerk, 'Apprentice', True) of
+							'Alteration'	:	Result :=GetRecordByFormID('000A26E3');
+							'Conjuration'	:	Result :=GetRecordByFormID('0009CD54');
+							'Destruction'	:	Result :=GetRecordByFormID('000A2702');
+							'Illusion'		:	Result :=GetRecordByFormID('000A270F');
+							'Restoration'	:	Result :=GetRecordByFormID('000A2720');
+						end;
+					end;
+			50	:	begin
+						case ebp(halfCostPerk, 'Adept', True) of
+							'Alteration'	:	Result :=GetRecordByFormID('000A26E7');
+							'Conjuration'	:	Result :=GetRecordByFormID('000A26EE');
+							'Destruction'	:	Result :=GetRecordByFormID('000A2708');
+							'Illusion'		:	Result :=GetRecordByFormID('000A2714');
+							'Restoration'	:	Result :=GetRecordByFormID('0010F64D');
+						end;
+					end;
+			75	:	begin
+						case ebp(halfCostPerk, 'Expert', True) of
+							'Alteration'	:	Result :=GetRecordByFormID('000A26E8');
+							'Conjuration'	:	Result :=GetRecordByFormID('000A26F7');
+							'Destruction'	:	Result :=GetRecordByFormID('0010F7F4');
+							'Illusion'		:	Result :=GetRecordByFormID('000A2718');
+							'Restoration'	:	Result :=GetRecordByFormID('000A2729');
+						end;
+					end;
+			100	:	begin
+						case ebp(halfCostPerk, 'Master', True) of
+							'Alteration'	:	Result :=GetRecordByFormID('000DD646');
+							'Conjuration'	:	Result :=GetRecordByFormID('000A26FA');
+							'Destruction'	:	Result :=GetRecordByFormID('000A270D');
+							'Illusion'		:	Result :=GetRecordByFormID('000A2719');
+							'Restoration'	:	Result :=GetRecordByFormID('000FDE7B');
+						end;
+					end;
+			end;
+		else do //uses restoration books as level list base
+			case StrToInt(geev(ebp(tempSpellRecord, 'SPIT/BASE COST'))) of
+				0..96		: Result :=GetRecordByFormID('0009E2AE');//novice
+				97..156		: Result :=GetRecordByFormID('000A2720');//aprentice
+				157..250	: Result :=GetRecordByFormID('0010F64D');//adept
+				251..644	: Result :=GetRecordByFormID('000A2729');//expert
+			else
+				Result :=GetRecordByFormID('000FDE7B');//master
+			end;
+		end;
+	end;
 end;
 
 // Gets a HexFormID
