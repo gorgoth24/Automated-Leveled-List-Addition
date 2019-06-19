@@ -2886,10 +2886,10 @@ var
     debugMsg: boolean;
 begin
 // Begin debugMsg Section
-	debugMsg := False;
+	debugMsg := false;
 	if (GetEditValue(elementbypath(selectedRecord, 'DATA\Flags\Teaches spell'))) = '1' then begin//checks if book is tome
         {Debug} if debugMsg then AddMessage('Spell tome found');
-		tempSpellRecord := LinksTo(elementbypath(bookRecord, 'DATA\Flags\Teaches'));//spell from tome
+		tempSpellRecord := LinksTo(elementbypath(selectedRecord, 'DATA\Teaches'));//spell from tome
 		halfCostPerk := GetElementEditValues(tempSpellRecord, 'SPIT - Data\Half-cost Perk');
         {Debug} if debugMsg then AddMessage('Half Cost perk:' + halfCostPerk);
 		if not (halfCostPerk = 'NULL - Null Reference [00000000]') then begin
@@ -2898,9 +2898,9 @@ begin
 			D := 'D';
 			I := 'I';
 			R := 'R';
+			School := copy(halfCostPerk,0,1);
 			case extractInts(halfCostPerk, 1) of
                 00	:	begin
-                            School := copy(halfCostPerk,7,1);
                             {Debug} if debugMsg then AddMessage('Spell level Assigined: novice');
                             {Debug} if debugMsg then AddMessage('First letter of the spells School:' + School);
                             case ord(School) of //novice
@@ -2912,7 +2912,6 @@ begin
                             end;
                         end;
                 25	:	begin
-                            School := copy(halfCostPerk,11,1);
                             {Debug} if debugMsg then AddMessage('Spell level Assigined: apprentice');
                             {Debug} if debugMsg then AddMessage('First letter of the spells School:' + School);
                             case ord(School) of //apprentice
@@ -2924,7 +2923,6 @@ begin
                             end;
                         end;
                 50	:	begin
-                            School := copy(halfCostPerk,6,1);
                             {Debug} if debugMsg then AddMessage('Spell level Assigined: adept');
                             {Debug} if debugMsg then AddMessage('First letter of the spells School:' + School);
                             case ord(School) of //adept
@@ -2936,7 +2934,6 @@ begin
                             end;
                         end;
                 75	:	begin
-                            School := copy(halfCostPerk,7,1);
                             {Debug} if debugMsg then AddMessage('Spell level Assigined: expert');
                             {Debug} if debugMsg then AddMessage('First letter of the spells School:' + School);
                             case ord(School) of //expert
@@ -2948,7 +2945,6 @@ begin
                             end;
                         end;
                 100	:	begin
-                        School := copy(halfCostPerk,7,1);
                         {Debug} if debugMsg then AddMessage('Spell level Assigined: master');
                         {Debug} if debugMsg then AddMessage('First letter of the spells School:' + School);
 						case ord(School) of //master
@@ -2973,8 +2969,6 @@ begin
         end
             else AddMessage('your spell is set up wrong and you should feel bad');
 	end;
-    {Debug}if debugMsg then
-                            if not result = nil then AddMessage('A template was assigned');
 end;
 
 // Gets a HexFormID

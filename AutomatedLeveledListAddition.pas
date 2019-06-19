@@ -1550,7 +1550,7 @@ begin
 		if (frm.ModalResult = mrOk) then begin
 			// Change template record
 			if (ddEditorID.Text <> '') then begin
-				if MessageDlg('Do you wish to change the template of '+full(tempRecord)+' from '+full(ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(tempRecord)+'Template')]))+' to '+full(ote(ddEditorID.Items.Objects[ddEditorID.ItemIndex]))+'?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then begin
+				if (MessageDlg('Do you wish to change the template of '+full(tempRecord)+' from '+full(ote(slGlobal.Objects[slGlobal.IndexOf(EditorID(tempRecord)+'Template')]))+' to '+full(ote(ddEditorID.Items.Objects[ddEditorID.ItemIndex]))+'?', mtConfirmation, [mbYes, mbNo], 0) = mrYes) then begin
 					slTemp.Clear;
 					for i := 0 to slGlobal.Count-1 do 
 						if StrWithinStr(slGlobal[i], '-//-') then
@@ -2173,11 +2173,11 @@ begin
 	slTemp := TStringList.Create;
 	
 	// Record selected
-	slTemp.CommaText := 'ARMO, AMMO, WEAP'{+', BOOK'};
+	slTemp.CommaText := 'ARMO, AMMO, WEAP'+', BOOK';
 	if (ElementType(aRecord) = etMainRecord) then begin
 		// Filter invalid records
 		{Debug} if debugMsg then msg('[AutoDetect] Filtering Invalid Records');
-		if ((sig(aRecord) = 'WEAP') or (sig(aRecord) = 'ARMO') or (sig(aRecord) = 'AMMO') or {(sig(aRecord) = 'BOOK'))} then begin
+		if ((sig(aRecord) = 'WEAP') or (sig(aRecord) = 'ARMO') or (sig(aRecord) = 'AMMO') or (sig(aRecord) = 'BOOK')) then begin
 			{Debug} if debugMsg then msg('[Process] aRecord := '+EditorID(aRecord));
 			SetObject(EditorID(aRecord)+'Original', TObject(aRecord), slGlobal);
 			SetObject(EditorID(aRecord)+'Template', TObject(GetTemplate(aRecord)), slGlobal);			
