@@ -2883,56 +2883,75 @@ var
 	books, flags, tempSpellRecord: IInterface;
 	halfCostPerk: string;
 	A, C, D, I, R, School: char;
+    debugMsg: boolean;
 begin
+// Begin debugMsg Section
+	debugMsg := False;
 	if (GetEditValue(elementbypath(selectedRecord, 'DATA\Flags\Teaches spell'))) = '1' then begin//checks if book is tome
+        {Debug} if debugMsg then AddMessage('Spell tome found');
 		tempSpellRecord := LinksTo(elementbypath(bookRecord, 'DATA\Flags\Teaches'));//spell from tome
 		halfCostPerk := GetElementEditValues(tempSpellRecord, 'SPIT - Data\Half-cost Perk');
+        {Debug} if debugMsg then AddMessage('Half Cost perk:' + halfCostPerk);
 		if not (halfCostPerk = 'NULL - Null Reference [00000000]') then begin
 			A := 'A';
 			C := 'C';
 			D := 'D';
 			I := 'I';
 			R := 'R';
-			School := elementbypath(halfCostPerk, 'Novice', True);//get first char for all
 			case extractInts(halfCostPerk, 1) of
-			00	:	begin
-						case ord(School) of
-							ord(A){lteration}	:	Result :=GetRecordByFormID('0009E2A7');
-							ord(C){onjuration}	:	Result :=GetRecordByFormID('0009E2AA');
-							ord(D){estruction}	:	Result :=GetRecordByFormID('0009CD52');
-							ord(I){llusion}		:	Result :=GetRecordByFormID('0009E2AD');
-							ord(R){estoration}	:	Result :=GetRecordByFormID('0009E2AE');
-						end;
-					end;
-			25	:	begin
-						case elementbypath(halfCostPerk, 'Apprentice', True) of
-							ord(A){lteration}	:	Result :=GetRecordByFormID('000A26E3');
-							ord(C){onjuration}	:	Result :=GetRecordByFormID('0009CD54');
-							ord(D){estruction}	:	Result :=GetRecordByFormID('000A2702');
-							ord(I){llusion}		:	Result :=GetRecordByFormID('000A270F');
-							ord(R){estoration}	:	Result :=GetRecordByFormID('000A2720');
-						end;
-					end;
-			50	:	begin
-						case elementbypath(halfCostPerk, 'Adept', True) of
-							ord(A){lteration}	:	Result :=GetRecordByFormID('000A26E7');
-							ord(C){onjuration}	:	Result :=GetRecordByFormID('000A26EE');
-							ord(D){estruction}	:	Result :=GetRecordByFormID('000A2708');
-							ord(I){llusion}		:	Result :=GetRecordByFormID('000A2714');
-							ord(R){estoration}	:	Result :=GetRecordByFormID('0010F64D');
-						end;
-					end;
-			75	:	begin
-						case elementbypath(halfCostPerk, 'Expert', True) of
-							ord(A){lteration}	:	Result :=GetRecordByFormID('000A26E8');
-							ord(C){onjuration}	:	Result :=GetRecordByFormID('000A26F7');
-							ord(D){estruction}	:	Result :=GetRecordByFormID('0010F7F4');
-							ord(I){llusion}		:	Result :=GetRecordByFormID('000A2718');
-							ord(R){estoration}	:	Result :=GetRecordByFormID('000A2729');
-						end;
-					end;
-			100	:	begin
-						case elementbypath(halfCostPerk, 'Master', True) of
+                00	:	begin
+                            School := copy(halfCostPerk,7,1);
+                            {Debug} if debugMsg then AddMessage('Spell level Assigined: novice');
+                            {Debug} if debugMsg then AddMessage('First letter of the spells School:' + School);
+                            case ord(School) of //novice
+                                ord(A){lteration}	:	Result :=GetRecordByFormID('0009E2A7');
+                                ord(C){onjuration}	:	Result :=GetRecordByFormID('0009E2AA');
+                                ord(D){estruction}	:	Result :=GetRecordByFormID('0009CD52');
+                                ord(I){llusion}		:	Result :=GetRecordByFormID('0009E2AD');
+                                ord(R){estoration}	:	Result :=GetRecordByFormID('0009E2AE');
+                            end;
+                        end;
+                25	:	begin
+                            School := copy(halfCostPerk,11,1);
+                            {Debug} if debugMsg then AddMessage('Spell level Assigined: apprentice');
+                            {Debug} if debugMsg then AddMessage('First letter of the spells School:' + School);
+                            case ord(School) of //apprentice
+                                ord(A){lteration}	:	Result :=GetRecordByFormID('000A26E3');
+                                ord(C){onjuration}	:	Result :=GetRecordByFormID('0009CD54');
+                                ord(D){estruction}	:	Result :=GetRecordByFormID('000A2702');
+                                ord(I){llusion}		:	Result :=GetRecordByFormID('000A270F');
+                                ord(R){estoration}	:	Result :=GetRecordByFormID('000A2720');
+                            end;
+                        end;
+                50	:	begin
+                            School := copy(halfCostPerk,6,1);
+                            {Debug} if debugMsg then AddMessage('Spell level Assigined: adept');
+                            {Debug} if debugMsg then AddMessage('First letter of the spells School:' + School);
+                            case ord(School) of //adept
+                                ord(A){lteration}	:	Result :=GetRecordByFormID('000A26E7');
+                                ord(C){onjuration}	:	Result :=GetRecordByFormID('000A26EE');
+                                ord(D){estruction}	:	Result :=GetRecordByFormID('000A2708');
+                                ord(I){llusion}		:	Result :=GetRecordByFormID('000A2714');
+                                ord(R){estoration}	:	Result :=GetRecordByFormID('0010F64D');
+                            end;
+                        end;
+                75	:	begin
+                            School := copy(halfCostPerk,7,1);
+                            {Debug} if debugMsg then AddMessage('Spell level Assigined: expert');
+                            {Debug} if debugMsg then AddMessage('First letter of the spells School:' + School);
+                            case ord(School) of //expert
+                                ord(A){lteration}	:	Result :=GetRecordByFormID('000A26E8');
+                                ord(C){onjuration}	:	Result :=GetRecordByFormID('000A26F7');
+                                ord(D){estruction}	:	Result :=GetRecordByFormID('0010F7F4');
+                                ord(I){llusion}		:	Result :=GetRecordByFormID('000A2718');
+                                ord(R){estoration}	:	Result :=GetRecordByFormID('000A2729');
+                            end;
+                        end;
+                100	:	begin
+                        School := copy(halfCostPerk,7,1);
+                        {Debug} if debugMsg then AddMessage('Spell level Assigined: master');
+                        {Debug} if debugMsg then AddMessage('First letter of the spells School:' + School);
+						case ord(School) of //master
 							ord(A){lteration}	:	Result :=GetRecordByFormID('000DD646');
 							ord(C){onjuration}	:	Result :=GetRecordByFormID('000A26FA');
 							ord(D){estruction}	:	Result :=GetRecordByFormID('000A270D');
@@ -2942,17 +2961,20 @@ begin
 					end;
 			end;
 		end
-		else begin //uses restoration books as level list base
-			case StrToInt(GetElementEditValues(tempSpellRecord, 'SPIT - Data\flags')) of //ght flag value
-				0..96		: Result :=GetRecordByFormID('0009E2AE');//novice
-				97..156		: Result :=GetRecordByFormID('000A2720');//aprentice
-				157..250	: Result :=GetRecordByFormID('0010F64D');//adept
-				251..644	: Result :=GetRecordByFormID('000A2729');//expert
-			else
-				Result :=GetRecordByFormID('000FDE7B');//master
-			end;
-		end;
+		else if ElementExists('SPIT - Data\BaseCost') then begin //uses restoration books as level list base
+            case GetElementNativeValues(tempSpellRecord, 'SPIT - Data\BaseCost') of //need to get flag value
+                0..96		: Result :=GetRecordByFormID('0009E2AE');//novice
+                97..156		: Result :=GetRecordByFormID('000A2720');//apprentice
+                157..250	: Result :=GetRecordByFormID('0010F64D');//adept
+                251..644	: Result :=GetRecordByFormID('000A2729');//expert
+            else
+                Result :=GetRecordByFormID('000FDE7B');//master
+            end;
+        end
+            else AddMessage('your spell is set up wrong and you should feel bad');
 	end;
+    {Debug}if debugMsg then
+                            if not result = nil then AddMessage('A template was assigned');
 end;
 
 // Gets a HexFormID
