@@ -7,6 +7,6 @@ public
     function getnext()node;
         result := node;
     end;
-    procedure addnode(inode : node);
+    procedure setnext(inode : node);
         next := inode
     end;

@@ -1,7 +1,7 @@
 implementation
 
 type
-    EnchNode = class
+    EnchNode = class(node)
 private
     levels, childEnchs : leveledlist;
     FormId : cardinal;
