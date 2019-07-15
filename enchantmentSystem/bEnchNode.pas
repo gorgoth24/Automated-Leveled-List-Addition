@@ -1,31 +1,62 @@
 implementation
 
 type
-    EnchNode = class(node)
-private
-    levels, childEnchs : leveledlist;
-    FormId : cardinal;
-public
+    bEnchNode = class(node)
 
-    function getnext(level : integer)Enchnode;
-    var
-        i : integer;
-        levelnode : node;
+private
+    levels : leveledlist;
+    childEnchs : cEnchLinkedList; 
+    FormId : cardinal;
+    function coinflip()boolean;//used in determining height
     begin
-        levelnode := levels.gethead();
-        for i := 1 to level do 
-            levelnode := levelnode.getnext();
+        if 
+            (randomrange(1, 2) = 1) then := true //tails
+        end else 
+            result := false //heads
         end;
-        result := levelnode.getnode();
+    end;
+
+        
+public
+    constructor create(iFormId : cardinal)
+    var
+        ilnode : lnode;
+        i : int;
+    begin
+        FormId := iFormId;
+        levels := levels.create();
+        while coinflip() do
+            i := i + 1;
+            levels.addlevel(ilnode.create(i, iFormId))
+        end;
+    end;
+    
+    function levels.getnext(level : integer)Enchnode;
+    begin
+        levels.getnext(level);
     end;
     
     procedure addlevel(level: integer, inode : Enchnode)
-    var
-        i : integer;
     begin
-        for i := 1 to level do
-            
+        if levels = nil then
+      
+        end else
+        levels.addlevel(level, inode)
+        end;
     end;
     
+//child enchantments
+    procedure addchild(iNode : cEnchNode);
+    begin
+        if childEnchs = nil then
+            
+        end else childEnchs.insertnode(inode)
+        end;
+    end;
     
-    
+
+//data getter
+     function getFormId()cardinal;
+     begin
+        result := FormId;
+     end;

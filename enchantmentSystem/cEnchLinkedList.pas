@@ -5,12 +5,12 @@ uses
 implementation
     EnchLinkedList = class(linkedlist)
     
-constructor EnchLinkedList(firstnode : cEnchNode);
-    head := firstnode;
-    tail := firstnode;
-end;
-
 public
+    constructor EnchLinkedList(firstnode : cEnchNode);
+        head := firstnode;
+        tail := firstnode;
+    end;
+    
     procedure insertnode(inode : cEnchNode)//sorted
     var
         cNode : cEnchNode; //current node

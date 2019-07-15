@@ -2,16 +2,18 @@ implementation
 type
     lnode = class(node)
     
-constructor lnode(ilevel : integer, ienchNode : bEnchNode);
-    level := ilevel;
-    enchNode := ienchNode;
-end;
 
 private
-    level := integer;
     enchNode := bEnchNode;
-
+    next := bEnchNode;
+    down := lnode;
 public
+    constructor create(ilevel : integer, ienchNode : bEnchNode, inext : bEnchNode);
+        level := ilevel;
+        enchNode := ienchNode;
+        next := inext;
+    end;
+//getters
     function getnode()bEnchNode;
     begin
         result := enchNode;
@@ -19,4 +21,8 @@ public
     function getlevel()integer;
     begin
         result := level;
+    end;
+    function getprevous()lnode;
+    begin
+        result := prevous;
     end;
