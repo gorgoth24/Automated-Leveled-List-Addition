@@ -4,59 +4,33 @@ type
     bEnchNode = class(node)
 
 private
-    levels : leveledlist;
+    levels : levellist;
     childEnchs : cEnchLinkedList; 
     FormId : cardinal;
-    function coinflip()boolean;//used in determining height
-    begin
-        if 
-            (randomrange(1, 2) = 1) then := true //tails
-        end else 
-            result := false //heads
-        end;
-    end;
-
         
 public
-    constructor create(iFormId : cardinal)
-    var
-        ilnode : lnode;
-        i : int;
+    constructor create(iFormId : cardinal, inode : lnode);
     begin
         FormId := iFormId;
-        levels := levels.create();
-        while coinflip() do
-            i := i + 1;
-            levels.addlevel(ilnode.create(i, iFormId))
-        end;
+        levels := levellist.create(self, inode);
     end;
     
-    function levels.getnext(level : integer)Enchnode;
-    begin
-        levels.getnext(level);
-    end;
-    
-    procedure addlevel(level: integer, inode : Enchnode)
-    begin
-        if levels = nil then
-      
-        end else
-        levels.addlevel(level, inode)
-        end;
-    end;
     
 //child enchantments
     procedure addchild(iNode : cEnchNode);
     begin
         if childEnchs = nil then
-            
+            childEnchs := cEnchLinkedList.create(inode);
         end else childEnchs.insertnode(inode)
         end;
     end;
     
-
-//data getter
+//getters
      function getFormId()cardinal;
      begin
         result := FormId;
+     end;
+     function getlevels()levellist;
+     begin
+        result := levels;
      end;

@@ -5,24 +5,31 @@ type
 
 private
     enchNode := bEnchNode;
-    next := bEnchNode;
+    next := lnode;
     down := lnode;
 public
-    constructor create(ilevel : integer, ienchNode : bEnchNode, inext : bEnchNode);
-        level := ilevel;
+    constructor create(ienchNode : bEnchNode);
         enchNode := ienchNode;
-        next := inext;
+    end;
+//setters
+    procedure setdown(inode : lnode);
+    begin
+        down := inode;
+    end;
+    procedure setnext(inode : lnode);
+    begin
+        next := lnode;
     end;
 //getters
     function getnode()bEnchNode;
     begin
         result := enchNode;
     end;
-    function getlevel()integer;
+    function getdown()lnode;
     begin
-        result := level;
+        result := down;
     end;
-    function getprevous()lnode;
+    function getnext()lnode;
     begin
-        result := prevous;
+        result := next;
     end;

@@ -1,14 +1,11 @@
 implementation
 type
     cEnchNode = class(node)
-
-
-    
 private
     FormId : Cardinal;
     EnchCost : integer;
 public
-    constructor create(iFormId : Cardinal, iEnchCost : Integer);
+    constructor create(iFormId : cardinal, iEnchCost : integer);
         EnchCost := iEnchCost;
         FormId := iFormId;
     end;

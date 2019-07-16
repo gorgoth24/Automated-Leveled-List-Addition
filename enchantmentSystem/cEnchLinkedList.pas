@@ -6,7 +6,7 @@ implementation
     EnchLinkedList = class(linkedlist)
     
 public
-    constructor EnchLinkedList(firstnode : cEnchNode);
+    constructor create(firstnode : cEnchNode);
         head := firstnode;
         tail := firstnode;
     end;
