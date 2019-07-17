@@ -14,13 +14,13 @@ public
         head.setnext(inext);
     end;
     
-    procedure addlevel(inext : lnode);
+    procedure addlevel();
     var
         new : lnode;
     begin
         new := lnode.create(head.getnode());
         new.setdown(head);
-        new.setnext(inext);
+        new.setnext();
         head := new;
     end;
     
