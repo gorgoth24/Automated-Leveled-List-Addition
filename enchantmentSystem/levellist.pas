@@ -7,11 +7,10 @@ private
     head : lnode;
 public
     
-    constructor create(inode : bEnchNode, inext : lnode);
-    begin
+    constructor create(inode : bEnchNode);
+    begin 
         L0 := lnode.create(inode);
         head := L0;
-        head.setnext(inext);
     end;
     
     procedure addlevel();

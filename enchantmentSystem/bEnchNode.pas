@@ -7,12 +7,14 @@ private
     levels : levellist;
     childEnchs : cEnchLinkedList; 
     FormId : cardinal;
+    Ench : IInterface;
         
 public
-    constructor create(iFormId : cardinal, inode : lnode);
+    constructor create(iFormId : cardinal, iEnch : IInterface);
     begin
         FormId := iFormId;
-        levels := levellist.create(self, inode);
+        Ench := iEnch;
+        levels := levellist.create(self);
     end;
     
     
@@ -33,4 +35,8 @@ public
      function getlevels()levellist;
      begin
         result := levels;
+     end;
+     function getEnch()IInterface;
+     begin
+        result := Ench;
      end;
