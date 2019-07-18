@@ -130,19 +130,22 @@ public
     end;
     
     
-    //TODO
-    procedure processEnchantments()
-        i : lnode;
+    //removes non true bases and stores information on the types of items the bases are applied to
+    procedure prepareEnchantments()
+        i, inext : lnode;
         ench : IInterface;
     begin
         i := masterladder.getL0();
+        masterladder.sethead(nil);//not needed anymore as data will be processed sequentualy and not looked up
         while not i.getnext() = nil begin
-            i := i.getnext();
-            ench := i.getEnchNode().getEnch()
+            inext := i.getnext();
+            ench := inext.getEnchNode().getEnch();
+            ench.getlevels().sethead(nil);//not needed anymore as data will be processed sequentualy and not looked up
             {check refrenced by}
-            {if refrenced by non armor or weap}
-                {set FormID to Null}
-            {else}
-                {if refrenced by armor, iterate and find slots}
+            if {refrenced by armor or weap} then begin
+                
+            end else begin
+                
+            end;
         end;
     end;
