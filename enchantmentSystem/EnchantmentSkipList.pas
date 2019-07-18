@@ -5,6 +5,8 @@ type
     
 private
     masterladder : levellist;
+    amortail, weapontail : lnode;
+    
     
     
     function coinflip()boolean;//used in determining height
@@ -129,23 +131,62 @@ public
         end;
     end;
     
-    
+    //TODDO: ARMOR SLOT STRORAGE
+    //       see if I need to store weapon types
     //removes non true bases and stores information on the types of items the bases are applied to
     procedure prepareEnchantments()
-        i, inext : lnode;
-        ench : IInterface;
+        i, count : integer;
+        current, next : lnode;
+        ench, ref : IInterface;
+        AlvlInit, WlvlInit : boolean;
     begin
-        i := masterladder.getL0();
+        AlvlInit := False;
+        WlvlInit := False;
         masterladder.sethead(nil);//not needed anymore as data will be processed sequentualy and not looked up
-        while not i.getnext() = nil begin
-            inext := i.getnext();
-            ench := inext.getEnchNode().getEnch();
+        masterladder.addlevel();//L1, Weapon level
+        weapontail := masterladder.gethead();
+        masterladder.addlevel();//L2, Armor level
+        armortail := masterladder.gethead();
+        current := masterladder.getL0();
+        while not current.getnext() = nil begin
+            next := current.getnext();
+            ench := next.getEnchNode().getEnch();
             ench.getlevels().sethead(nil);//not needed anymore as data will be processed sequentualy and not looked up
-            {check refrenced by}
-            if {refrenced by armor or weap} then begin
-                
-            end else begin
-                
+            count := ReferencedByCount(ench);
+            While i <= count do
+                ref := ReferencedByIndex(ench, i)
+                if Signature(ref) = 'ARMO' then begin
+                    if not WlvlInit and not AlvlInit then begin//Weaponlvl and AlvlInit DNE
+                        next.getEnchNode().getlevels().addlevel();//build to L2(1/2)
+                        next.getEnchNode().getlevels().addlevel();//build to L2(2/2)
+                        AlvlInit := True;
+                    end else if not AlvlInit then begin//Weaponlvl Exists and AlvlInit DNE
+                        next.getEnchNode().getlevels().addlevel();//build to L2
+                        AlvlInit := True;
+                    end;
+                    armortail.setnext(next.getEnchNode().getlevels().gethead());//link node
+                    armortail := amortail.getnext();//set tail
+                end if Signature(ref) = 'WEAP' else begin
+                    if not AlvlInit and not WlvlInit then begin//Weaponlvl and AlvlInit DNE
+                        next.getEnchNode().getlevels().addlevel();//Build to L1
+                        weapontail.setnext(next.getEnchNode().getlevels().gethead());
+                        weapontail := weapontail.getnext();//set tail
+                        WlvlInit := False;
+                    end else if not AlvlInit then begin//Weaponlvl DNE and Armorlvl Exists 
+                        weapontail.setnext(next.getEnchNode().getlevels().gethead().getdown());
+                        weapontail := weapontail.getnext();//set tail
+                        WlvlInit := False;
+                    end else if not WlvlInit then begin//Weaponlvl Exists and Armorlvl DNE
+                        weapontail.setnext(next.getEnchNode().getlevels().gethead());
+                        weapontail := weapontail.getnext();//set tail
+                    end;
+                end;
             end;
+            if not AlvlInit or WlvlInit then//neither an armor or weap ench.
+                current.setnext(next.getnext());//delete node
+            end;
+            current := next;
+            i := i + 1;
         end;
     end;
+    
